@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TomeNET monster search</title>
+  <link rel="stylesheet" href="monsters.css">
+</head>
+<body>
+  <main>
+    <h1>TomeNET monster search</h1>
+    <form id="search-form">
+      <div class="form-row">
+        <label><b>Name:</b> <input type="text" name="name" id="monster-name" autofocus></label>
+        <label><b>Character:</b> <input type="text" name="char" size="2" maxlength="1"></label>
+        <label><b>Color:</b> <input type="text" name="color" size="2" maxlength="1"></label>
+      </div>
+
+      <fieldset>
+        <legend>Monster type</legend>
+        <label class="type-base"><input type="checkbox" name="type" value="base" checked> Base</label>
+        <label class="type-zang"><input type="checkbox" name="type" value="zang" checked> Zangband</label>
+        <label class="type-cthulhu"><input type="checkbox" name="type" value="cthulhu" checked> Cthulhu</label>
+        <label class="type-pern"><input type="checkbox" name="type" value="pern" checked> Pernband</label>
+        <label class="type-blue"><input type="checkbox" name="type" value="blue" checked> Blueband</label>
+        <label class="type-joke"><input type="checkbox" name="type" value="joke"> Joke</label>
+        <label class="type-none"><input type="checkbox" name="type" value="none" checked> None</label>
+      </fieldset>
+
+      <div class="range-grid">
+        <label><input type="number" name="level_min" min="0"> &le; <b>Level</b> &le; <input type="number" name="level_max" min="0"></label>
+        <label><input type="number" name="hp_min" min="0"> &le; <b>HP</b> &le; <input type="number" name="hp_max" min="0"></label>
+        <label><input type="number" name="spell_chance_min" min="0"> &le; <b>1_IN_x</b> &le; <input type="number" name="spell_chance_max" min="0"></label>
+      </div>
+
+      <div class="search-fields">
+        <label><b>Spells:</b> <input type="text" name="spells"></label>
+        <small>For example: BR_NETH or !S_HI_DRAGON. <a href="spells.html">List of spells</a></small>
+        <label><b>Flags:</b> <input type="text" name="flags"></label>
+        <small>For example: ATTR_MULTI or !UNIQUE. <a href="flags.html">List of flags</a></small>
+        <div class="resistance-row"><b>Resistances:</b> <input type="text" name="resistances">
+          <span><label><input type="radio" name="resistance_logic" value="and" checked> AND</label>
+          <label><input type="radio" name="resistance_logic" value="or"> OR</label></span>
+        </div>
+        <small>For example: fire !cold with AND, or nether chaos with OR.</small>
+        <label><b>Description:</b> <input type="text" name="description"></label>
+      </div>
+
+      <div class="actions">
+        <button type="submit">Search</button>
+        <button type="reset">Reset</button>
+      </div>
+    </form>
+
+    <p id="status" class="status">Loading monster data...</p>
+    <section id="results" aria-live="polite"></section>
+    <footer>TomeNET monster search static edition. Data version <span id="data-version">...</span>.</footer>
+  </main>
+  <script src="data/monsters.js"></script>
+  <script src="static/js/common.js"></script>
+  <script src="static/js/search.js"></script>
+</body>
+</html>
