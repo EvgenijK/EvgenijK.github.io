@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TomeNET Quest Editor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <h1>TomeNET Quest Editor</h1>
+      <p>Quest form backed by imported game config data.</p>
+    </div>
+  </header>
+
+  <main class="app-layout preview-folded" id="appLayout">
+    <aside class="quest-list-panel" id="questListPanel">
+      <div class="quest-list-head">
+        <button type="button" class="icon-button" id="toggleQuestList" aria-expanded="true" title="Fold quest list">&lt;</button>
+        <h2>Quests</h2>
+        <span id="questListCount">0</span>
+        <button type="button" class="secondary small-button" id="loadQuestFile">Load q_info.txt</button>
+        <input type="file" id="questFileInput" accept=".txt,text/plain" hidden>
+      </div>
+      <div class="quest-import-status" id="questImportStatus" hidden></div>
+      <div class="quest-list-body" id="questListBody">
+        <p class="empty-note">Loading quest data...</p>
+      </div>
+    </aside>
+
+    <form class="editor" id="questForm" autocomplete="off">
+      <div class="editor-tabs">
+        <div class="editor-tab-group" role="tablist" aria-label="Quest editor sections">
+          <button type="button" class="editor-tab is-active" id="questTab" data-editor-tab="quest" role="tab" aria-selected="true" aria-controls="questTabPanel">Quest</button>
+          <button type="button" class="editor-tab" id="questorsTab" data-editor-tab="questors" role="tab" aria-selected="false" aria-controls="questorsTabPanel" tabindex="-1">Questors</button>
+          <button type="button" class="editor-tab" id="stagesTab" data-editor-tab="stages" role="tab" aria-selected="false" aria-controls="stagesTabPanel" tabindex="-1">Stages</button>
+        </div>
+
+        <div class="editor-tab-group" role="tablist" aria-label="Quest q_info section">
+            <button type="button" class="editor-tab preview-toggle" id="togglePreview" aria-expanded="false" title="Show generated q_info">See q_info</button>
+            <button type="button" class="editor-tab preview-toggle primary" id="copyOutput">Copy q_info</button>
+
+        </div>
+      </div>
+
+      <section class="section" id="questTabPanel" data-editor-tab-panel="quest" role="tabpanel" aria-labelledby="questTab">
+        <div class="section-title">
+          <h2>Quest</h2>
+          <span>N, C, I, E, T, U</span>
+        </div>
+
+        <div class="line-group-title">N: quest info</div>
+        <div class="field-grid">
+          <label>Index <input name="quest_index" type="number" min="0" value="0"></label>
+          <label>Codename <input name="codename" maxlength="10" value="newquest00"></label>
+          <label>Creator <input name="creator" value="Quest Creator"></label>
+          <label>Quest name <input name="quest_name" value="New Quest"></label>
+          <label>
+            <span class="label-row">
+              Repeatable
+              <button type="button" class="tooltip-button" aria-label="Repeatable value help" data-tooltip="-1 means infinitely repeatable. 0 means the quest can be completed once. Positive values mean the player can repeat it that many times.">?</button>
+            </span>
+            <input name="repeatable" type="number" min="-1" value="0">
+          </label>
+          <label>
+            Auto accept
+            <select name="auto_accept">
+              <option value="0">0 - no</option>
+              <option value="1">1 - yes</option>
+              <option value="2">2 - quietly</option>
+              <option value="3">3 - quietly, no ending notice</option>
+            </select>
+          </label>
+          <label>
+            Local
+            <select name="local">
+              <option value="0">0 - normal quest</option>
+              <option value="1">1 - local quest</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="line-group-title">C: acquisition stages</div>
+        <div class="field-grid">
+          <label class="wide">
+            Acquisition stages
+            <input name="accept_stages" type="hidden">
+            <select name="accept_stages_select" id="acceptStagesSelect" multiple size="1"></select>
+          </label>
+        </div>
+
+        <div class="line-group-title">I: player requirements</div>
+        <div class="field-grid">
+          <label>
+            Privileged
+            <select name="privileged">
+              <option value="0">0 - normal players</option>
+              <option value="1">1 - privileged users</option>
+              <option value="2">2 - very privileged users</option>
+              <option value="3">3 - admins</option>
+            </select>
+          </label>
+          <label>
+            Individual mode
+            <select name="individual">
+              <option value="1">1 - party-shared individual</option>
+              <option value="2">2 - solo individual</option>
+            </select>
+          </label>
+          <label>Min level <input name="min_level" type="number" min="1" max="99" value="1"></label>
+          <label>Max level <input name="max_level" type="number" min="1" max="100" value="100"></label>
+
+          <div class="half-wide field-label races-field">
+            <span>Races</span>
+            <div class="option-picker" id="racesPicker" data-all-mask="FFFFF">
+              <button type="button" class="option-picker-toggle" id="racesToggle" aria-expanded="false" aria-controls="racesPanel">
+                <span id="racesSummary">All races</span>
+                <span aria-hidden="true">v</span>
+              </button>
+              <div class="option-picker-panel" id="racesPanel">
+                <label class="picker-option">
+                  <input type="checkbox" id="raceAll" value="all" checked>
+                  <span>All races (FFFFF)</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="0" checked>
+                  <span>0 - Human</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="1" checked>
+                  <span>1 - Half-Elf</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="2" checked>
+                  <span>2 - Elf</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="3" checked>
+                  <span>3 - Hobbit</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="4" checked>
+                  <span>4 - Gnome</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="5" checked>
+                  <span>5 - Dwarf</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="6" checked>
+                  <span>6 - Half-Orc</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="7" checked>
+                  <span>7 - Half-Troll</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="8" checked>
+                  <span>8 - Dunadan</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="9" checked>
+                  <span>9 - High-Elf</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="10" checked>
+                  <span>10 - Yeek</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="11" checked>
+                  <span>11 - Goblin</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="12" checked>
+                  <span>12 - Ent</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="13" checked>
+                  <span>13 - Draconian</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="14" checked>
+                  <span>14 - Kobold</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="15" checked>
+                  <span>15 - Dark-Elf</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="16" checked>
+                  <span>16 - Vampire</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="race-checkbox" name="race_ids[]" value="17" checked>
+                  <span>17 - Maia</span>
+                </label>
+              </div>
+            </div>
+            <input name="races" type="hidden" value="FFFFF">
+            <span class="field-note" id="racesMaskPreview">Mask: FFFFF</span>
+          </div>
+
+          <div class="half-wide field-label classes-field">
+            <span>Classes</span>
+            <div class="option-picker" id="classesPicker" data-all-mask="FFFF">
+              <button type="button" class="option-picker-toggle" id="classesToggle" aria-expanded="false" aria-controls="classesPanel">
+                <span id="classesSummary">All classes</span>
+                <span aria-hidden="true">v</span>
+              </button>
+              <div class="option-picker-panel" id="classesPanel">
+                <label class="picker-option">
+                  <input type="checkbox" id="classAll" value="all" checked>
+                  <span>All classes (FFFF)</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="class-checkbox" name="class_ids[]" value="0" checked>
+                  <span>0 - Warrior</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="class-checkbox" name="class_ids[]" value="1" checked>
+                  <span>1 - Istar</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="class-checkbox" name="class_ids[]" value="2" checked>
+                  <span>2 - Priest</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="class-checkbox" name="class_ids[]" value="3" checked>
+                  <span>3 - Rogue</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="class-checkbox" name="class_ids[]" value="4" checked>
+                  <span>4 - Mimic</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="class-checkbox" name="class_ids[]" value="5" checked>
+                  <span>5 - Archer</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="class-checkbox" name="class_ids[]" value="6" checked>
+                  <span>6 - Paladin</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="class-checkbox" name="class_ids[]" value="7" checked>
+                  <span>7 - Ranger</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="class-checkbox" name="class_ids[]" value="8" checked>
+                  <span>8 - Adventurer</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="class-checkbox" name="class_ids[]" value="9" checked>
+                  <span>9 - Druid</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="class-checkbox" name="class_ids[]" value="10" checked>
+                  <span>10 - Shaman</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="class-checkbox" name="class_ids[]" value="11" checked>
+                  <span>11 - Runemaster</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="class-checkbox" name="class_ids[]" value="12" checked>
+                  <span>12 - Mindcrafter</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="class-checkbox" name="class_ids[]" value="13" checked>
+                  <span>13 - Death Knight</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="class-checkbox" name="class_ids[]" value="14" checked>
+                  <span>14 - Hell Knight</span>
+                </label>
+                <label class="picker-option">
+                  <input type="checkbox" class="class-checkbox" name="class_ids[]" value="15" checked>
+                  <span>15 - Corrupted Priest</span>
+                </label>
+              </div>
+            </div>
+            <input name="classes" type="hidden" value="FFFF">
+            <span class="field-note" id="classesMaskPreview">Mask: FFFF</span>
+          </div>
+
+          <label>
+            <span class="label-row">Mode normal <button type="button" class="tooltip-button" aria-label="Mode normal value help" data-tooltip="0 means normal-mode characters cannot acquire the quest. 1 means characters that are not Everlasting and not PvP can acquire it.">?</button></span>
+            <select name="modenorm"><option value="1">1 - allowed</option><option value="0">0 - disallowed</option></select>
+          </label>
+          <label>
+            <span class="label-row">Mode everlasting <button type="button" class="tooltip-button" aria-label="Mode everlasting value help" data-tooltip="0 means Everlasting characters cannot acquire the quest. 1 means characters with MODE_EVERLASTING can acquire it.">?</button></span>
+            <select name="modeel"><option value="1">1 - allowed</option><option value="0">0 - disallowed</option></select>
+          </label>
+          <label>
+            <span class="label-row">Mode PvP <button type="button" class="tooltip-button" aria-label="Mode PvP value help" data-tooltip="0 means PvP characters cannot acquire the quest. 1 means characters with MODE_PVP can acquire it.">?</button></span>
+            <select name="modepvp"><option value="1">1 - allowed</option><option value="0">0 - disallowed</option></select>
+          </label>
+          <label class="row-start">
+            <span class="label-row">Fruit bat <button type="button" class="tooltip-button" aria-label="Fruit bat value help" data-tooltip="0 means no fruit bat requirement. 1 means the player must be a real born fruit bat. 2 means the player may be either a real fruit bat or a temporary/fake fruit bat form.">?</button></span>
+            <select name="fruitbat"><option value="0">0 - not required</option><option value="1">1 - real fruit bat</option><option value="2">2 - real or fake fruit bat</option></select>
+          </label>
+          <label class="monsterform-field">
+            <span class="label-row">Monster form <button type="button" class="tooltip-button" aria-label="Monster form value help" data-tooltip="0 means no monster-form requirement. Any other value is an r_info monster race ID.">?</button></span>
+            <input id="monsterformSearch" type="search" placeholder="Search monsters">
+            <input name="monsterform" type="hidden" value="0">
+            <div class="autocomplete-list" id="monsterformSuggestions"></div>
+            <div class="selected-entity" id="monsterformSelected">Selected: None (0)</div>
+          </label>
+          <label>
+            <span class="label-row">Quest done credit stage <button type="button" class="tooltip-button" aria-label="Quest done credit stage help" data-tooltip="Minimum quest stage that still gives quest_done credit when a player cancels the quest. Valid normal stage values are 0..49.">?</button></span>
+            <input name="questdonecreditstage" type="number" min="0" max="49" value="1">
+          </label>
+        </div>
+
+        <div class="line-group-title">E: prerequisites</div>
+        <div class="field-grid">
+          <label class="wide">
+            Prerequisite quests
+            <input name="prerequisites" type="hidden">
+            <input id="prerequisiteSearch" type="search" placeholder="Search prerequisite quests">
+            <select name="prerequisites_select" id="prerequisitesSelect" multiple size="5"></select>
+            <div class="selected-entity selected-list" id="prerequisitesPreview">Selected: None</div>
+          </label>
+        </div>
+
+        <div class="line-group-title">T: quest spawn times</div>
+        <div class="field-grid">
+          <label class="checkbox-field"><input name="time_night" type="checkbox" value="1" checked> Night</label>
+          <label class="checkbox-field"><input name="time_day" type="checkbox" value="1" checked> Day</label>
+          <label class="checkbox-field"><input name="time_morning" type="checkbox" value="1" checked> Morning</label>
+          <label class="checkbox-field"><input name="time_forenoon" type="checkbox" value="1" checked> Forenoon</label>
+          <label class="checkbox-field"><input name="time_noon" type="checkbox" value="1" checked> Noon</label>
+          <label class="checkbox-field"><input name="time_afternoon" type="checkbox" value="1" checked> Afternoon</label>
+          <label class="checkbox-field"><input name="time_evening" type="checkbox" value="1" checked> Evening</label>
+          <label class="checkbox-field"><input name="time_midnight" type="checkbox" value="1" checked> Midnight</label>
+          <label class="checkbox-field"><input name="time_deepnight" type="checkbox" value="1" checked> Deepnight</label>
+          <label>
+            <span class="label-row">Start minute <button type="button" class="tooltip-button" aria-label="Start minute help" data-tooltip="-1 disables this bound. Otherwise TomeNET compares against minute within the hour, so use 0..59.">?</button></span>
+            <input name="time_start" type="number" min="-1" max="59" value="-1">
+          </label>
+          <label>
+            <span class="label-row">Stop minute <button type="button" class="tooltip-button" aria-label="Stop minute help" data-tooltip="-1 disables this bound. Otherwise TomeNET compares against minute within the hour, so use 0..59. Stop must be greater than start when both are set.">?</button></span>
+            <input name="time_stop" type="number" min="-1" max="59" value="-1">
+          </label>
+        </div>
+
+        <div class="line-group-title">U: quest ending/respawn</div>
+        <div class="field-grid">
+          <label>
+            <span class="label-row">Ending stage <button type="button" class="tooltip-button" aria-label="Ending stage help" data-tooltip="0 means no explicit ending stage. Any non-zero stage terminates the quest when that stage is reached.">?</button></span>
+            <input name="ending_stage" type="number" min="0" max="49" value="0">
+          </label>
+          <label>
+            <span class="label-row">Duration <button type="button" class="tooltip-button" aria-label="Duration help" data-tooltip="Documented as max duration after accepting, but TomeNET comments say this is currently not implemented. Use 0 unless testing parser output.">?</button></span>
+            <input name="duration" type="number" min="0" value="0">
+          </label>
+          <label>
+            <span class="label-row">Cooldown <button type="button" class="tooltip-button" aria-label="Cooldown help" data-tooltip="Cooldown in minutes before the quest can respawn or be reacquired. -1 uses TomeNET default cooldown of 5 minutes.">?</button></span>
+            <input name="cooldown" type="number" min="-1" value="0">
+          </label>
+        </div>
+      </section>
+
+      <section class="section" id="questorsTabPanel" data-editor-tab-panel="questors" role="tabpanel" aria-labelledby="questorsTab" hidden>
+        <div class="section-title"><h2>Questors</h2><span>Q, L, Ld, F, K</span></div>
+        <div class="questor-layout">
+          <div>
+            <div class="questor-toolbar">
+              <button type="button" id="addQuestor">Add questor</button>
+              <button type="button" id="duplicateQuestor">Duplicate</button>
+              <button type="button" id="removeQuestor">Remove</button>
+            </div>
+            <div class="questor-list" id="questorList"></div>
+          </div>
+          <div id="questorEditor" class="questor-editor"></div>
+        </div>
+      </section>
+
+      <section class="section" id="stagesTabPanel" data-editor-tab-panel="stages" role="tabpanel" aria-labelledby="stagesTab" hidden>
+        <div class="section-title"><h2>Stages</h2><span>stage-centered workspace</span></div>
+        <div class="stage-layout">
+          <div>
+            <div class="stage-toolbar">
+              <button type="button" id="addStage">Add stage</button>
+              <button type="button" id="duplicateStage">Duplicate</button>
+              <button type="button" id="moveStageUp" title="Move stage up" aria-label="Move stage up">↑</button>
+              <button type="button" id="moveStageDown" title="Move stage down" aria-label="Move stage down">↓</button>
+              <button type="button" id="removeStage">Remove</button>
+            </div>
+            <div class="stage-list" id="stageList"></div>
+          </div>
+          <div id="stageEditor" class="stage-editor"></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title"><h2>Validation</h2><span>basic checks</span></div>
+        <div id="issues"></div>
+        <button type="reset" id="resetForm">Reset form</button>
+      </section>
+    </form>
+
+    <aside class="preview is-folded" id="previewPanel">
+      <div class="preview-head">
+        <h2>Generated q_info.txt</h2>
+      </div>
+      <pre id="questOutput"></pre>
+    </aside>
+  </main>
+
+  <datalist id="monsterList"></datalist>
+  <datalist id="monsterEgoList"></datalist>
+  <datalist id="itemList"></datalist>
+  <datalist id="artifactList"></datalist>
+  <datalist id="egoItemList"></datalist>
+  <datalist id="featureList"></datalist>
+  <datalist id="dungeonList"></datalist>
+  <datalist id="templateList"></datalist>
+
+  <script src="script.js"></script>
+</body>
+</html>

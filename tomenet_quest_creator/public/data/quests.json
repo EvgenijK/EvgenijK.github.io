@@ -1,0 +1,1409 @@
+[
+    {
+        "index": "0",
+        "codename": "testquesAR",
+        "creator": "C. Blue",
+        "name": "Test Quest",
+        "repeatable": "-1",
+        "autoAccept": "0",
+        "local": "0",
+        "acceptStages": "0",
+        "prerequisites": "",
+        "spawnTimes": "1:1:1:1:1:1:1:1:1:-1:-1",
+        "endingRespawn": "0:0:0",
+        "questors": [
+            {
+                "q": "1:0:37:0:0:37:T:-1:-1:Blind Bat:0",
+                "l": "0:0:0:63:63:0:0:98:39:0:-:0:0",
+                "ld": "",
+                "f": "0:1:1:0:1:0:0",
+                "k": ""
+            }
+        ],
+        "stages": [
+            {
+                "a": "",
+                "af": [],
+                "w": [
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "Hello, $$N!"
+                    },
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "Would you like some [[ale]] or rather a [[solid ration]]?"
+                    }
+                ],
+                "y": [
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "ale",
+                        "changeFlags": "-",
+                        "nextstage": "1",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "ration",
+                        "changeFlags": "-",
+                        "nextstage": "2",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "solid ration",
+                        "changeFlags": "-",
+                        "nextstage": "2",
+                        "yq": "",
+                        "ys": ""
+                    }
+                ],
+                "xLog": [
+                    {
+                        "flags": "-",
+                        "text": "You haven't decided upon the request yet.."
+                    }
+                ]
+            },
+            {
+                "a": "",
+                "af": [],
+                "w": [
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "Well then, visit the shop keeper of the general store!"
+                    }
+                ],
+                "xLog": [
+                    {
+                        "flags": "-",
+                        "text": "You accepted the request to get some ale."
+                    }
+                ],
+                "mg": [
+                    {
+                        "goal": "1",
+                        "returnQuestor": "-1",
+                        "wx": "32",
+                        "wy": "32",
+                        "wz": "0",
+                        "terrainPatch": "0",
+                        "x": "105",
+                        "y": "40",
+                        "radius": "0",
+                        "map": "-",
+                        "mapX": "0",
+                        "mapY": "0"
+                    }
+                ],
+                "g": [
+                    {
+                        "nextStage": "3",
+                        "goals": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "a": "",
+                "af": [],
+                "w": [
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "Well then, visit the shop keeper of the general store.."
+                    }
+                ],
+                "xLog": [
+                    {
+                        "flags": "-",
+                        "text": "You accepted the request to get some food."
+                    }
+                ],
+                "mg": [
+                    {
+                        "goal": "1",
+                        "returnQuestor": "-1",
+                        "wx": "32",
+                        "wy": "32",
+                        "wz": "0",
+                        "terrainPatch": "0",
+                        "x": "105",
+                        "y": "40",
+                        "radius": "0",
+                        "map": "-",
+                        "mapX": "0",
+                        "mapY": "0"
+                    }
+                ],
+                "g": [
+                    {
+                        "nextStage": "4",
+                        "goals": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "a": "",
+                "af": [],
+                "o": [
+                    {
+                        "rewardIndex": "0",
+                        "goals": [
+                            "0"
+                        ]
+                    }
+                ],
+                "xNarration": [
+                    {
+                        "flags": "-",
+                        "text": "The shop keeper hands you a pint of fine ale!"
+                    }
+                ],
+                "reward": [
+                    {
+                        "tval": "80",
+                        "sval": "38",
+                        "pval": "0",
+                        "bpval": "0",
+                        "name1": "0",
+                        "name2": "0",
+                        "name2b": "0",
+                        "good": "0",
+                        "great": "0",
+                        "vgreat": "0",
+                        "reward": "0",
+                        "gold": "4",
+                        "exp": "2",
+                        "statusEffect": "0"
+                    }
+                ]
+            },
+            {
+                "a": "",
+                "af": [],
+                "o": [
+                    {
+                        "rewardIndex": "1",
+                        "goals": [
+                            "0"
+                        ]
+                    }
+                ],
+                "xNarration": [
+                    {
+                        "flags": "-",
+                        "text": "The shop keeper hands you a ration of food!"
+                    }
+                ],
+                "reward": [
+                    {
+                        "tval": "80",
+                        "sval": "35",
+                        "pval": "0",
+                        "bpval": "0",
+                        "name1": "0",
+                        "name2": "0",
+                        "name2b": "0",
+                        "good": "0",
+                        "great": "0",
+                        "vgreat": "0",
+                        "reward": "0",
+                        "gold": "3",
+                        "exp": "1",
+                        "statusEffect": "0"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": "1",
+        "codename": "testquestM",
+        "creator": "C. Blue",
+        "name": "Minimal Test Quest",
+        "repeatable": "-1",
+        "autoAccept": "0",
+        "local": "0",
+        "acceptStages": "",
+        "prerequisites": "",
+        "spawnTimes": "",
+        "endingRespawn": "",
+        "questors": [
+            {
+                "q": "3:0:22:30:0:0:0:0:0:0:0:0:P:0:Sharp..Bat..of Slicing?:0",
+                "l": "0:0:0:63:63:0:0:100:39:0:-:0:0",
+                "ld": "",
+                "f": "",
+                "k": ""
+            }
+        ],
+        "stages": {
+            "0": {
+                "a": "",
+                "af": [],
+                "w": [
+                    {
+                        "questor": "0",
+                        "examine": "1",
+                        "flags": "-",
+                        "text": "Hello, $$T! Wanna visit the General Store for me?"
+                    }
+                ],
+                "y": [
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "y",
+                        "changeFlags": "-",
+                        "nextstage": "1",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "n",
+                        "changeFlags": "-",
+                        "nextstage": "2",
+                        "yq": "",
+                        "ys": ""
+                    }
+                ]
+            },
+            "1": {
+                "a": "",
+                "af": [],
+                "w": [
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "Thanks!"
+                    }
+                ],
+                "mg": [
+                    {
+                        "goal": "1",
+                        "returnQuestor": "-1",
+                        "wx": "32",
+                        "wy": "32",
+                        "wz": "0",
+                        "terrainPatch": "0",
+                        "x": "105",
+                        "y": "40",
+                        "radius": "0",
+                        "map": "-",
+                        "mapX": "0",
+                        "mapY": "0"
+                    }
+                ],
+                "g": [
+                    {
+                        "nextStage": "3",
+                        "goals": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            "3": {
+                "a": "",
+                "af": [],
+                "xNarration": [
+                    {
+                        "flags": "-",
+                        "text": "The shop keeper hands you a pint of fine ale!"
+                    }
+                ],
+                "reward": [
+                    {
+                        "tval": "80",
+                        "sval": "38",
+                        "pval": "0",
+                        "bpval": "0",
+                        "name1": "0",
+                        "name2": "0",
+                        "name2b": "0",
+                        "good": "0",
+                        "great": "0",
+                        "vgreat": "0",
+                        "reward": "0",
+                        "gold": "1",
+                        "exp": "1",
+                        "statusEffect": "0"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "index": "2",
+        "codename": "testquesKR",
+        "creator": "C. Blue",
+        "name": "Kill/Retrieve Test Quest",
+        "repeatable": "-1",
+        "autoAccept": "0",
+        "local": "0",
+        "acceptStages": "",
+        "prerequisites": "",
+        "spawnTimes": "",
+        "endingRespawn": "",
+        "questors": [
+            {
+                "q": "1:0:37:0:0:37:N:-1:-1:Goalkeeper Bat:0",
+                "l": "0:0:0:63:63:0:0:99:35:0:-:0:0",
+                "ld": "",
+                "f": "",
+                "k": ""
+            }
+        ],
+        "stages": {
+            "0": {
+                "a": "",
+                "af": [],
+                "w": [
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "'Sup, yo $$r! [[Kill]] shit or [[retrieve]] stuff for me."
+                    },
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "So what do you prefer, buddy?"
+                    }
+                ],
+                "xLog": [
+                    {
+                        "flags": "-",
+                        "text": "You haven't decided upon the request yet.."
+                    }
+                ],
+                "y": [
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "kill",
+                        "changeFlags": "-",
+                        "nextstage": "1",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "retrieve",
+                        "changeFlags": "-",
+                        "nextstage": "2",
+                        "yq": "",
+                        "ys": ""
+                    }
+                ]
+            },
+            "-1": {
+                "a": "",
+                "af": [],
+                "y": [
+                    {
+                        "questor": "0",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "sup",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "yo",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    }
+                ],
+                "yr": [
+                    {
+                        "questor": "0",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "sup",
+                        "yy": "",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "Yo!"
+                            }
+                        ]
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "yo",
+                        "yy": "",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "Sup!"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "1": {
+                "a": "",
+                "af": [],
+                "w": [
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "Slay two dogs or wolves, they deserve it. Let me know when you're done."
+                    },
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "..oh and also, maybe this bat comes in handy. DON'T LOSE IT!"
+                    }
+                ],
+                "xLog": [
+                    {
+                        "flags": "-",
+                        "text": "You accepted the request to kill two dogs or wolves."
+                    }
+                ],
+                "b": [
+                    {
+                        "b": "0:\\:u:40:0:& Bat~",
+                        "bl": "0:0:0:0:0:0:0:0:0:0:0:-:0:0"
+                    }
+                ],
+                "r": [
+                    {
+                        "goal": "3",
+                        "minValue": "0",
+                        "number": "1",
+                        "allowOwned": "0",
+                        "names": "",
+                        "items": "127:2",
+                        "values": ""
+                    }
+                ],
+                "k": [
+                    {
+                        "goal": "1",
+                        "minlev": "0",
+                        "maxlev": "0",
+                        "number": "2",
+                        "names": "",
+                        "ridx": "",
+                        "reidx": "",
+                        "visuals": "C:-"
+                    }
+                ],
+                "mg": [
+                    {
+                        "goal": "2",
+                        "returnQuestor": "0",
+                        "wx": "63",
+                        "wy": "63",
+                        "wz": "0",
+                        "terrainPatch": "0",
+                        "x": "99",
+                        "y": "35",
+                        "radius": "1",
+                        "map": "-",
+                        "mapX": "0",
+                        "mapY": "0"
+                    }
+                ],
+                "g": [
+                    {
+                        "nextStage": "3",
+                        "goals": [
+                            "1",
+                            "2",
+                            "3"
+                        ]
+                    }
+                ]
+            },
+            "3": {
+                "a": "",
+                "af": [],
+                "xNarration": [
+                    {
+                        "flags": "-",
+                        "text": "The Goalkeeper Bat seems very satisfied."
+                    }
+                ],
+                "reward": [
+                    {
+                        "tval": "80",
+                        "sval": "38",
+                        "pval": "0",
+                        "bpval": "0",
+                        "name1": "0",
+                        "name2": "0",
+                        "name2b": "0",
+                        "good": "0",
+                        "great": "0",
+                        "vgreat": "0",
+                        "reward": "0",
+                        "gold": "2",
+                        "exp": "2",
+                        "statusEffect": "0"
+                    }
+                ]
+            },
+            "2": {
+                "a": "",
+                "af": [],
+                "w": [
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "Dude where's muh potions.. I had two red potions I'm sure."
+                    }
+                ],
+                "xLog": [
+                    {
+                        "flags": "-",
+                        "text": "You accepted the request to retrieve two red potions."
+                    }
+                ],
+                "r": [
+                    {
+                        "goal": "1",
+                        "minValue": "0",
+                        "number": "2",
+                        "allowOwned": "0",
+                        "names": "",
+                        "items": "",
+                        "values": "-9999:-9999:r:-1:-1:-1:-9999:-9999:R:-1:-1:-1:"
+                    }
+                ],
+                "mg": [
+                    {
+                        "goal": "2",
+                        "returnQuestor": "0",
+                        "wx": "63",
+                        "wy": "63",
+                        "wz": "0",
+                        "terrainPatch": "0",
+                        "x": "99",
+                        "y": "35",
+                        "radius": "1",
+                        "map": "-",
+                        "mapX": "0",
+                        "mapY": "0"
+                    }
+                ],
+                "g": [
+                    {
+                        "nextStage": "4",
+                        "goals": [
+                            "1",
+                            "2"
+                        ]
+                    }
+                ]
+            },
+            "4": {
+                "a": "",
+                "af": [],
+                "xNarration": [
+                    {
+                        "flags": "-",
+                        "text": "The Goalkeeper Bat seems very satisfied."
+                    }
+                ],
+                "reward": [
+                    {
+                        "tval": "80",
+                        "sval": "38",
+                        "pval": "0",
+                        "bpval": "0",
+                        "name1": "0",
+                        "name2": "0",
+                        "name2b": "0",
+                        "good": "1",
+                        "great": "1",
+                        "vgreat": "0",
+                        "reward": "0",
+                        "gold": "2",
+                        "exp": "2",
+                        "statusEffect": "0"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "index": "3",
+        "codename": "testCastle",
+        "creator": "C. Blue",
+        "name": "Treasure Depository Breach",
+        "repeatable": "-1",
+        "autoAccept": "0",
+        "local": "0",
+        "acceptStages": "",
+        "prerequisites": "",
+        "spawnTimes": "",
+        "endingRespawn": "",
+        "questors": [
+            {
+                "q": "1:1:1059:0:0:1059:u:-1:-1:Guard:0",
+                "l": "0:0:0:63:63:0:0:150:30:0:tq_testcastle.txt:143:22",
+                "ld": "",
+                "f": "",
+                "k": ""
+            },
+            {
+                "q": "1:1:1059:0:0:1059:u:-1:-1:Guard:0",
+                "l": "0:0:0:63:63:0:0:152:30:0:-:0:0",
+                "ld": "",
+                "f": "",
+                "k": ""
+            }
+        ],
+        "stages": {
+            "0": {
+                "a": "",
+                "af": [],
+                "w": [
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "Hold it right there! What is the password?"
+                    },
+                    {
+                        "questor": "1",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "Hold it right there! What is the password?"
+                    }
+                ],
+                "wr": [
+                    {
+                        "questor": "0",
+                        "text": "$$Q That's not the right password, $$r!"
+                    }
+                ]
+            },
+            "-1": {
+                "a": "",
+                "af": [],
+                "y": [
+                    {
+                        "questor": "0",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "suxen",
+                        "changeFlags": "-",
+                        "nextstage": "1",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "$$p1",
+                        "changeFlags": "-",
+                        "nextstage": "1",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "1",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "suxen",
+                        "changeFlags": "-",
+                        "nextstage": "1",
+                        "yq": "",
+                        "ys": ""
+                    }
+                ],
+                "yr": [
+                    {
+                        "questor": "0",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "suxen",
+                        "yy": "",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "You may enter!"
+                            }
+                        ]
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "$$p1",
+                        "yy": "",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "You may enter!"
+                            }
+                        ]
+                    },
+                    {
+                        "questor": "1",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "suxen",
+                        "yy": "",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "You may enter!"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "1": {
+                "a": "",
+                "af": [],
+                "b": [],
+                "j": [
+                    "0:-1:-1:-1:-1:-1:-1:-1:-1:151:28:0:0:0:0:0",
+                    "1:-1:-1:-1:-1:-1:-1:-1:-1:151:28:0:0:0:0:0"
+                ]
+            }
+        }
+    },
+    {
+        "index": "4",
+        "codename": "towneltalk",
+        "creator": "C. Blue",
+        "name": "Town Elder Talk",
+        "repeatable": "-1",
+        "autoAccept": "3",
+        "local": "1",
+        "acceptStages": "0",
+        "prerequisites": "",
+        "spawnTimes": "1:1:1:1:1:1:1:1:1:-1:-1",
+        "endingRespawn": "0:0:0",
+        "questors": [
+            {
+                "q": "1:1:15:15:0:15:v:-1:-1:the Town Elder:4",
+                "l": "0:0:0:32:32:0:0:120:40:0:-:0:0",
+                "ld": "",
+                "f": "0:1:1:0:1:0:0",
+                "k": ""
+            }
+        ],
+        "stages": {
+            "0": {
+                "a": "",
+                "af": [],
+                "w": [
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "Stay awhile and listen, $$T!"
+                    },
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "In the game you can press '?' key for a list of command keys."
+                    },
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "Would you like to visit the training [[tower]] first or venture into this"
+                    },
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "town's [[dungeon]], named Barrow-Downs, right away?"
+                    },
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "Or do you seek [[advice]], perhaps to [[prepare]] or [[equip]] properly?"
+                    },
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "The training tower is a safe place where you won't die for real,"
+                    },
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "Experience gain is pretty limited however, and it only has two floors."
+                    },
+                    {
+                        "questor": "0",
+                        "examine": "0",
+                        "flags": "-",
+                        "text": "If you go to the dungeon, don't forget to bring a light source!"
+                    }
+                ],
+                "y": [
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*tower*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*training*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*dungeon*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*barrow*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*light*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*lamp*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*torch*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*thank*",
+                        "changeFlags": "-",
+                        "nextstage": "1",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*dank*",
+                        "changeFlags": "-",
+                        "nextstage": "1",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*cafe*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*help*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*advice*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*advise*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*prep*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*inv*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*pack*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*eq*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*skil*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*stat*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*part*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*exp*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "*ev*",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    },
+                    {
+                        "questor": "0",
+                        "stage": "0",
+                        "flags": "-",
+                        "keyword": "~adminall",
+                        "changeFlags": "-",
+                        "nextstage": "255",
+                        "yq": "",
+                        "ys": ""
+                    }
+                ]
+            },
+            "-1": {
+                "a": "",
+                "af": [],
+                "yr": [
+                    {
+                        "questor": "-1",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "*tower*",
+                        "yy": "*training*",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "Take the south-eastern path out of the town centre,"
+                            },
+                            {
+                                "flags": "-",
+                                "text": "it leads to the training tower. The entrance is a green '<' symbol."
+                            },
+                            {
+                                "flags": "-",
+                                "text": "You can press SHIFT+L to locate it on the map."
+                            }
+                        ]
+                    },
+                    {
+                        "questor": "-1",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "*dungeon*",
+                        "yy": "*barrow*",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "Take the western path out of the town centre,"
+                            },
+                            {
+                                "flags": "-",
+                                "text": "it leads to the somewhat hidden entrance to barrow-downs."
+                            },
+                            {
+                                "flags": "-",
+                                "text": "The entrance is a white '>' symbol."
+                            },
+                            {
+                                "flags": "-",
+                                "text": "You can press SHIFT+L to locate it on the map."
+                            },
+                            {
+                                "flags": "-",
+                                "text": "You should bring some torches or a lantern, except if you're a vampire I guess."
+                            }
+                        ]
+                    },
+                    {
+                        "questor": "-1",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "*light*",
+                        "yy": "*lamp*:*torch*",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "Except for vampires everyone usually brings a light source along."
+                            },
+                            {
+                                "flags": "-",
+                                "text": "You can also buy lights and lamp oil in the general store in this town."
+                            }
+                        ]
+                    },
+                    {
+                        "questor": "-1",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "*thank*",
+                        "yy": "*dank*",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "You are welcome!"
+                            }
+                        ]
+                    },
+                    {
+                        "questor": "-1",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "*cafe*",
+                        "yy": "",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "Thanks, but I prefer tea."
+                            }
+                        ]
+                    },
+                    {
+                        "questor": "-1",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "*help*",
+                        "yy": "",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "Have you come to seek [[advice]]? I might be able to tell you something."
+                            }
+                        ]
+                    },
+                    {
+                        "questor": "-1",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "*advice*",
+                        "yy": "*advise*",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "//quest_towneltalk(\"$$c\", -1)"
+                            },
+                            {
+                                "flags": "-",
+                                "text": "How to properly [[prepare]] yourself for venturing into the unknown?"
+                            },
+                            {
+                                "flags": "-",
+                                "text": "Choosing a fitting dungeon to [[explore]]? Or are you wondering about"
+                            },
+                            {
+                                "flags": "-",
+                                "text": "the public [[events]] that are taking place from time to time? Participate!"
+                            },
+                            {
+                                "flags": "-",
+                                "text": "I could also check on your [[equipment]] or [[status]] of your well-being."
+                            }
+                        ]
+                    },
+                    {
+                        "questor": "-1",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "*prep*",
+                        "yy": "*inv*:*pack*",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "//quest_towneltalk(\"$$c\", 0)"
+                            }
+                        ]
+                    },
+                    {
+                        "questor": "-1",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "*eq*",
+                        "yy": "",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "//quest_towneltalk(\"$$c\", 1)"
+                            }
+                        ]
+                    },
+                    {
+                        "questor": "-1",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "*skil*",
+                        "yy": "",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "//quest_towneltalk(\"$$c\", 2)"
+                            }
+                        ]
+                    },
+                    {
+                        "questor": "-1",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "*stat*",
+                        "yy": "",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "//quest_towneltalk(\"$$c\", 3)"
+                            }
+                        ]
+                    },
+                    {
+                        "questor": "-1",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "*part*",
+                        "yy": "",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "//quest_towneltalk(\"$$c\", 4)"
+                            }
+                        ]
+                    },
+                    {
+                        "questor": "-1",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "*exp*",
+                        "yy": "",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "//quest_towneltalk(\"$$c\", 5)"
+                            }
+                        ]
+                    },
+                    {
+                        "questor": "-1",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "*ev*",
+                        "yy": "",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "//quest_towneltalk(\"$$c\", 6)"
+                            }
+                        ]
+                    },
+                    {
+                        "questor": "-1",
+                        "stage": "-1",
+                        "flags": "-",
+                        "keyword": "adminall",
+                        "yy": "",
+                        "yq": "",
+                        "ys": "",
+                        "replies": [
+                            {
+                                "flags": "-",
+                                "text": "//quest_towneltalk(\"$$c\", -2)"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+]
