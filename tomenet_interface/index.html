@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TomeNET Modern Client — UI Prototype</title>
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="css/foundation.css" />
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/hud.css" />
+  <link rel="stylesheet" href="css/right-panel.css" />
+  <link rel="stylesheet" href="css/messages.css" />
+  <link rel="stylesheet" href="css/shortcuts.css" />
+  <link rel="stylesheet" href="css/windows.css" />
+  <link rel="stylesheet" href="css/equipment-window.css" />
+  <link rel="stylesheet" href="css/combined-items-window.css" />
+  <link rel="stylesheet" href="css/browse-window.css" />
+  <link rel="stylesheet" href="css/item-selector.css" />
+  <link rel="stylesheet" href="css/item-use.css" />
+  <link rel="stylesheet" href="css/item-equip.css" />
+  <link rel="stylesheet" href="css/character-window.css" />
+  <link rel="stylesheet" href="css/guide-window.css" />
+  <link rel="stylesheet" href="css/skills-window.css" />
+  <link rel="stylesheet" href="css/cursors.css" />
+</head>
+<body>
+  <main class="app-shell" id="app">
+    <!-- LEFT COLUMN -->
+    <aside class="left-panel panel">
+      <div class="panel-scroll">
+        <section class="level-card block">
+          <div class="level-row">
+            <div class="level-badge" aria-label="Уровень">57</div>
+            <div class="level-main">
+              <div class="progress xp">
+                <div class="fill" id="xpFill" style="width:68%"></div>
+                <div class="xp-drained-segment" id="xpDrainedSegment" hidden></div>
+                <strong class="xp-level" aria-label="Уровень 57"><span>57</span></strong>
+                <strong class="xp-value" id="xpValue">1,710,159 / 2,500,000</strong>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="currency block compact-row">
+          <span class="icon gold-icon" aria-hidden="true">●</span>
+          <div>
+            <div class="eyebrow">GOLD</div>
+            <div class="big-number">952,358</div>
+          </div>
+        </section>
+
+        <section class="encumbrance-strip block" aria-label="Encumbrance">
+          <div class="encumbrance-slots" id="encumbranceSlots"></div>
+        </section>
+
+        <section class="ping-card block">
+          <div class="row-between">
+            <span class="eyebrow">PING</span>
+          </div>
+          <div class="ping-meter" role="progressbar" aria-label="Ping" aria-valuemin="0" aria-valuemax="1000" aria-valuenow="193" aria-valuetext="100–200 ms" title="Каждая ступень шкалы = диапазон 100 ms">
+            <div class="ping-fill" id="pingFill"></div>
+            <strong id="pingValue" class="ping-value">100–200 ms</strong>
+            <div class="ping-grid" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+          </div>
+          <div class="ping-labels"><span>0</span><span>500</span><span>1000+ ms</span></div>
+        </section>
+
+        <section class="stats block">
+          <h2>ATTRIBUTES</h2>
+          <dl class="stat-list">
+            <div><dt><span class="stat-icon strength-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 11V6.5a1.5 1.5 0 0 1 3 0V10 5.5a1.5 1.5 0 0 1 3 0V10 6.5a1.5 1.5 0 0 1 3 0V11 8.5a1.5 1.5 0 0 1 3 0V14c0 4-2.7 7-7 7-3.2 0-5.2-1.7-6.3-4.1L4.4 14a1.7 1.7 0 0 1 2.6-2.1L9 14"/></svg></span>Strength</dt><dd>18 / 180</dd></div>
+            <div><dt><span class="stat-icon intelligence-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3.5 5.5c3.7-.8 6.1.1 8.5 2.1v12c-2.4-2-4.8-2.9-8.5-2.1zM20.5 5.5c-3.7-.8-6.1.1-8.5 2.1v12c2.4-2 4.8-2.9 8.5-2.1z"/><path d="M6.5 9c1.6-.1 2.6.3 3.6 1M6.5 12c1.6-.1 2.6.3 3.6 1"/></svg></span>Intelligence</dt><dd>18 / 180</dd></div>
+            <div><dt><span class="stat-icon wisdom-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2.5 12s3.5-5.2 9.5-5.2 9.5 5.2 9.5 5.2-3.5 5.2-9.5 5.2S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.7"/><path d="M12 3.2v1.5M5.3 5.4l1.1 1M18.7 5.4l-1.1 1"/></svg></span>Wisdom</dt><dd>18 / 160</dd></div>
+            <div><dt><span class="stat-icon dexterity-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 20c7.8-1.5 12.5-6.8 14.5-16-7.6 2.1-12 6.8-13 13.8"/><path d="M5 20l8.5-9.4M7.4 16.9l-1.9-2.7M10.3 13.6l-2-2.6M13 10.6l-1.8-2.2M10.5 13.8l3.5.3M13.2 10.7l3.2.1"/></svg></span>Dexterity</dt><dd>18 / 140</dd></div>
+            <div><dt><span class="stat-icon constitution-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.8c2.4 1.8 5.2 2.7 8 3v5.4c0 5.2-3 8.6-8 10-5-1.4-8-4.8-8-10V5.8c2.8-.3 5.6-1.2 8-3z"/><path d="M8.2 11.1h2.4V8.7h2.8v2.4h2.4v2.8h-2.4v2.4h-2.8v-2.4H8.2z"/></svg></span>Constitution</dt><dd>18 / 180</dd></div>
+            <div><dt><span class="stat-icon charisma-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.5l1.7 5.8 5.8-1.8-3.8 4.7 4.8 3.7-6.1.1.1 6-3.9-4.6-3.7 4.8 1.8-5.8-6-.7 5-3.5-3.6-4.9 5.7 2z"/><circle cx="12" cy="12" r="2.2"/></svg></span>Charisma</dt><dd>18 / 90</dd></div>
+          </dl>
+        </section>
+
+        <section class="sanity-armor block two-lines">
+          <div class="line" id="sanityLine">
+            <span class="line-icon sanity-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9.2 4.2A3.2 3.2 0 0 0 4.8 8c-2.4 1-2.5 4.6-.4 5.8-.8 2.6 1.4 5 4 4.4.8 2.4 4.2 2.3 4.8.2.9 1.4 3.1 1.7 4.5.5 1.5-1.2 1.6-3.4.5-4.7 2-1.7 1.3-5.1-1-5.8.5-2.6-2.5-4.8-4.8-3.5A3.1 3.1 0 0 0 9.2 4.2z"/><path d="M9.2 4.2c1.2.4 2 1.4 2 2.7v11.5M4.8 8c1.5-.4 2.8.3 3.4 1.5M4.4 13.8c1.5-.7 3.1-.2 3.9 1M13.7 6.5c.2 1.6 1.3 2.7 2.8 2.8M13.4 13.2c1.8-.6 3.5.1 4.4 1.5"/></svg></span>
+            <span>Sanity</span>
+            <span class="sanity-display">
+              <strong id="sanityText">Sound</strong>
+              <span class="sanity-inline-meter" id="sanityInlineMeter" role="progressbar" aria-label="Sanity" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" hidden><span id="sanityInlineFill"></span></span>
+            </span>
+          </div>
+          <div class="line">
+            <span class="line-icon shield-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.8c2.5 1.7 5.2 2.5 8 2.9v5.5c0 5.1-3 8.3-8 9.9-5-1.6-8-4.8-8-9.9V5.7c2.8-.4 5.5-1.2 8-2.9z"/><path d="M12 6v11.4M7.5 8.2c2.8.8 6.2.8 9 0"/></svg></span>
+            <span>Armor</span>
+            <strong>193</strong>
+          </div>
+        </section>
+
+        <section class="vitals block">
+          <div class="resource" id="healthResource">
+            <div class="resource-head"><span>Health</span><strong id="hpText">1912 / 1912</strong></div>
+            <div class="progress health"><div id="hpFill" class="fill" style="width:100%"></div></div>
+          </div>
+          <div class="resource" id="manaResource">
+            <div class="resource-head"><span>Mana</span><strong id="mpText">275 / 275</strong></div>
+            <div class="progress mana"><div id="mpFill" class="fill" style="width:100%"></div></div>
+          </div>
+          <div class="resource stamina-resource">
+            <div class="resource-head"><span>Stamina</span><strong id="stText">10 / 10</strong></div>
+            <div class="progress stamina"><div id="stFill" class="fill" style="width:100%"></div></div>
+          </div>
+        </section>
+
+        <section class="enemy-health-card block" id="enemyHealthCard" aria-label="Enemy health">
+          <div class="enemy-health-meter" id="enemyHealthMeter" role="progressbar" aria-label="Enemy health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="72">
+            <div class="enemy-health-fill" id="enemyHealthFill" style="width:72%"></div>
+          </div>
+        </section>
+
+        <section class="combat-metric block" id="speedCard" aria-label="Speed">
+          <span class="combat-metric-icon" id="speedIcon" aria-hidden="true"></span>
+          <span class="combat-metric-label">Speed</span>
+          <strong id="speedValue">Fast +41</strong>
+        </section>
+
+        <section class="combat-metric block" id="bprCard" aria-label="Blows per round">
+          <span class="combat-metric-icon" id="bprIcon" aria-hidden="true"></span>
+          <span class="combat-metric-label">Blows / Round</span>
+          <strong id="bprValue">4 BpR</strong>
+        </section>
+
+        <section class="effects block" aria-label="Status effects">
+          <h2>STATUS EFFECTS</h2>
+          <div class="status-icon-grid" id="statusIconGrid"></div>
+        </section>
+
+        <section class="wide-vitals block" id="wideVitals" aria-label="Wide resource bars" hidden>
+          <div class="wide-vital mp-wide" id="wideMpBar">
+            <div class="wide-vital-meter" id="wideMpMeter" role="progressbar" aria-label="Mana" aria-valuemin="0" aria-valuemax="275" aria-valuenow="275">
+              <div class="wide-vital-fill" id="wideMpFill" style="height:100%"></div>
+            </div>
+          </div>
+          <div class="wide-vital sn-wide" id="wideSnBar">
+            <div class="wide-vital-meter" id="wideSnMeter" role="progressbar" aria-label="Sanity" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+              <div class="wide-vital-fill" id="wideSnFill" style="height:100%"></div>
+            </div>
+          </div>
+          <div class="wide-vital hp-wide" id="wideHpBar">
+            <div class="wide-vital-meter" id="wideHpMeter" role="progressbar" aria-label="Health" aria-valuemin="0" aria-valuemax="1912" aria-valuenow="1912">
+              <div class="wide-vital-fill" id="wideHpFill" style="height:100%"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <nav class="game-shortcuts" aria-label="Primary game windows">
+        <button class="game-shortcut game-shortcut-menu" type="button" aria-disabled="true" aria-label="Game Menu — Not implemented" data-tooltip="Game Menu · Not implemented">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V7l7-4 7 4v14M8 21V9l4-2 4 2v12M10 21v-7h4v7"/><path d="M3 21h18M9 10h6"/></svg>
+          <kbd>Esc</kbd>
+        </button>
+        <button class="game-shortcut" id="inventoryShortcut" type="button" aria-label="Open Inventory" aria-haspopup="dialog" aria-controls="inventoryOverlay" aria-expanded="false" data-tooltip="Inventory · i">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V6h10v2M6 9h12l2 4v8H4v-8zM8 13h8M9 16h6"/></svg>
+          <kbd>i</kbd>
+        </button>
+        <button class="game-shortcut" type="button" aria-disabled="true" aria-label="Mini-map — Not implemented" data-tooltip="Mini-map · Not implemented">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15M15 6v15"/><path d="M11 9l2 2-2 3 3 2"/></svg>
+          <kbd>M</kbd>
+        </button>
+        <button class="game-shortcut" id="equipmentShortcut" type="button" aria-label="Open Equipment" aria-haspopup="dialog" aria-controls="equipmentOverlay" aria-expanded="false" data-tooltip="Equipment · e">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c2.3 1.6 4.7 2.4 7 2.8v5.1c0 4.7-2.6 7.8-7 9.3-4.4-1.5-7-4.6-7-9.3V5.8C7.3 5.4 9.7 4.6 12 3z"/><path d="M8 15L16 7M14 6l3 3M7 16l3-.7-2.3-2.3z"/></svg>
+          <kbd>e</kbd>
+        </button>
+        <button class="game-shortcut" id="characterShortcut" type="button" aria-label="Open Character Sheet" aria-haspopup="dialog" aria-controls="characterWindowOverlay" aria-expanded="false" data-tooltip="Character · C">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3.2"/><path d="M5 21c.5-5.2 2.8-8 7-8s6.5 2.8 7 8M8.5 14.2L12 18l3.5-3.8"/></svg>
+          <kbd>C</kbd>
+        </button>
+        <button class="game-shortcut" id="skillsShortcut" type="button" aria-label="Open Character Skills" aria-haspopup="dialog" aria-controls="skillsWindowOverlay" aria-expanded="false" data-tooltip="Skills · G">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="18" cy="12" r="2"/><circle cx="9" cy="20" r="2"/><circle cx="15" cy="20" r="2"/><path d="M12 6v3M10.5 8.5L7.5 10.5M13.5 8.5l3 2M7 14l1.5 4M17 14l-1.5 4M8 12h8"/></svg>
+          <kbd>G</kbd>
+        </button>
+      </nav>
+    </aside>
+
+    <div class="splitter splitter-left" data-split="left" title="Перетащите для изменения ширины"></div>
+
+    <!-- GAME VIEW -->
+    <section class="game-column">
+      <div class="game-view" id="gameView">
+        <div class="map-stage" id="mapStage">
+          <canvas class="map-canvas" id="mapCanvas" width="1056" height="1056" tabindex="0" aria-label="Bree map, 66 by 44 cell viewport"></canvas>
+          <div class="map-cell-info" id="mapCellInfo" role="status" hidden></div>
+        </div>
+        <div class="game-vignette"></div>
+        <div class="map-chat-bar" id="mapChatBar">
+          <div class="map-chat-message" id="mapChatMessage" role="status" aria-live="polite"></div>
+          <form class="map-chat-editor" id="mapChatEditor" hidden>
+            <label for="mapChatInput">Message:</label>
+            <input id="mapChatInput" type="text" maxlength="255" autocomplete="off" spellcheck="false" aria-label="General chat message" />
+          </form>
+        </div>
+        <div class="throw-targeting" id="throwTargeting" role="dialog" aria-modal="true" aria-label="Choose a target cell" aria-hidden="true" tabindex="-1" hidden>
+          <div class="throw-target-cell" id="throwTargetCell" aria-hidden="true"></div>
+          <div class="throw-target-hint" id="throwTargetHint">
+            <strong id="throwTargetAction">TARGET</strong>
+            <span id="throwTargetText">Choose a target cell</span>
+            <small id="throwTargetHelp">Mouse or arrows · Enter to confirm · Esc to cancel</small>
+          </div>
+        </div>
+        <div class="target-card" id="targetCard">
+          <span class="target-level">12</span>
+          <span><strong>Bree Guard</strong><small>Neutral</small></span>
+          <span class="target-health"><i></i></span>
+        </div>
+        <div class="interaction-hint" id="interactionHint"><kbd>E</kbd><span>Talk to Bree Guard</span></div>
+      </div>
+    </section>
+
+    <div class="splitter splitter-right" data-split="right" title="Перетащите для изменения ширины"></div>
+
+    <!-- RIGHT COLUMN -->
+    <aside class="right-panel configurable-right-panel">
+      <section class="right-widget msg-chat-widget" id="msgChatWidget" aria-label="Messages">
+        <header class="right-widget-head">
+          <strong>MESSAGES</strong>
+          <span class="message-widget-actions">
+            <span class="right-message-view-switch" role="group" aria-label="Message view">
+              <button type="button" data-right-message-mode="chat" aria-pressed="false">CHAT</button>
+              <button type="button" data-right-message-mode="all" aria-pressed="true">ALL</button>
+            </span>
+            <button id="messageExpand" type="button" aria-label="Open message history" aria-haspopup="dialog" aria-controls="messageHistoryOverlay" title="Open message history">↗</button>
+          </span>
+        </header>
+        <div class="message-feed" id="msgChatFeed" role="log" aria-label="Messages"></div>
+      </section>
+
+      <section class="right-widget inventory-widget" id="inventoryWidget" aria-label="Inventory">
+        <header class="right-widget-head">
+          <strong>INVENTORY</strong>
+          <span id="inventoryCount">9 / 23</span>
+        </header>
+        <div class="inventory-list" id="inventoryList" role="list" aria-label="Inventory slots a through w"></div>
+      </section>
+
+      <section class="right-widget equipment-widget" id="equipmentWidget" aria-label="Equipment" hidden>
+        <header class="right-widget-head">
+          <strong>EQUIPMENT</strong>
+        </header>
+        <div class="equipment-list" id="equipmentList" role="list" aria-label="Equipment slots a through n"></div>
+      </section>
+
+      <section class="right-widget bags-widget" id="bagsWidget" aria-label="Bags">
+        <header class="right-widget-head">
+          <strong>BAGS</strong>
+          <span id="bagsCount">5 CONTAINERS</span>
+        </header>
+        <div class="bags-list" id="bagsList" aria-label="Bag contents"></div>
+      </section>
+
+      <section class="right-widget character-widget character-surface" id="characterWidget" aria-label="Character">
+        <header class="right-widget-head character-widget-head">
+          <strong>CHARACTER</strong>
+          <nav class="character-tabs" role="tablist" aria-label="Character views">
+            <button data-character-tab="summary" role="tab">PROFILE / SKILLS</button>
+            <button data-character-tab="resists" role="tab">RESISTS</button>
+          </nav>
+        </header>
+        <div class="character-content" id="characterContent" data-character-content="panel"></div>
+      </section>
+    </aside>
+
+    <div class="inventory-overlay" id="inventoryOverlay" aria-hidden="true" hidden>
+      <section class="inventory-window" id="inventoryWindow" role="dialog" aria-modal="true" aria-labelledby="inventoryWindowTitle">
+        <header class="inventory-window-head">
+          <strong id="inventoryWindowTitle">INVENTORY</strong>
+          <span id="inventoryWindowCount">18 / 23</span>
+          <button class="inventory-window-close" id="inventoryWindowClose" type="button" aria-label="Close Inventory">×</button>
+        </header>
+        <div class="inventory-list inventory-window-list" id="inventoryWindowList" role="listbox" aria-label="Inventory slots a through w"></div>
+      </section>
+    </div>
+
+    <div class="equipment-overlay" id="equipmentOverlay" aria-hidden="true" hidden>
+      <section class="equipment-window" id="equipmentWindow" role="dialog" aria-modal="true" aria-labelledby="equipmentWindowTitle">
+        <header class="equipment-window-head">
+          <strong id="equipmentWindowTitle">EQUIPMENT</strong>
+          <button class="equipment-window-close" id="equipmentWindowClose" type="button" aria-label="Close Equipment">×</button>
+        </header>
+        <div class="equipment-window-body">
+          <section class="equipment-figure" aria-label="Equipped item layout">
+            <div class="equipment-silhouette" aria-hidden="true">
+              <span class="equipment-silhouette-head"></span>
+              <span class="equipment-silhouette-body"></span>
+              <span class="equipment-silhouette-arms"></span>
+              <span class="equipment-silhouette-legs"></span>
+            </div>
+            <div class="equipment-slot-map" id="equipmentSlotMap"></div>
+          </section>
+          <div class="equipment-list equipment-window-list" id="equipmentWindowList" role="listbox" aria-label="Equipment slots a through n"></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="combined-items-overlay" id="combinedItemsOverlay" aria-hidden="true" hidden>
+      <section class="combined-items-window" id="combinedItemsWindow" role="dialog" aria-modal="true" aria-labelledby="combinedItemsWindowTitle">
+        <header class="combined-items-window-head">
+          <strong id="combinedItemsWindowTitle">ITEMS</strong>
+          <button class="combined-items-window-close" id="combinedItemsWindowClose" type="button" aria-label="Close Items">×</button>
+        </header>
+        <div class="combined-items-window-body">
+          <section class="combined-items-section" data-combined-section="equipment" aria-labelledby="combinedEquipmentTitle">
+            <header class="combined-items-section-head">
+              <strong id="combinedEquipmentTitle">EQUIPMENT</strong>
+            </header>
+            <div class="combined-equipment-body">
+              <section class="equipment-figure" aria-label="Equipped item layout">
+                <div class="equipment-silhouette" aria-hidden="true">
+                  <span class="equipment-silhouette-head"></span>
+                  <span class="equipment-silhouette-body"></span>
+                  <span class="equipment-silhouette-arms"></span>
+                  <span class="equipment-silhouette-legs"></span>
+                </div>
+                <div class="equipment-slot-map" id="combinedEquipmentSlotMap"></div>
+              </section>
+              <div class="equipment-list combined-equipment-list" id="combinedEquipmentList" role="listbox" aria-label="Equipment slots a through n"></div>
+            </div>
+          </section>
+          <section class="combined-items-section" data-combined-section="inventory" aria-labelledby="combinedInventoryTitle">
+            <header class="combined-items-section-head">
+              <strong id="combinedInventoryTitle">INVENTORY</strong>
+              <span id="combinedInventoryCount">18 / 23</span>
+            </header>
+            <div class="inventory-list combined-inventory-list" id="combinedInventoryList" role="listbox" aria-label="Inventory slots a through w"></div>
+          </section>
+        </div>
+      </section>
+    </div>
+
+    <div class="browse-overlay" id="browseOverlay" aria-hidden="true" hidden>
+      <section class="browse-window" id="browseWindow" role="dialog" aria-modal="true" aria-labelledby="browseWindowTitle">
+        <header class="browse-window-head">
+          <button class="browse-window-back" id="browseWindowBack" type="button" aria-label="Back to browsable items" hidden>‹</button>
+          <strong id="browseWindowTitle">BROWSE</strong>
+          <button class="browse-window-close" id="browseWindowClose" type="button" aria-label="Close Browse">×</button>
+        </header>
+        <div class="browse-window-body" id="browseWindowBody"></div>
+        <footer class="browse-window-help" id="browseWindowHelp">Letter opens item · Arrows + Enter · Esc to close</footer>
+      </section>
+    </div>
+
+    <div class="item-selector-overlay" id="itemSelectorOverlay" aria-hidden="true" hidden>
+      <section class="item-selector-window" id="itemSelectorWindow" role="dialog" aria-modal="true" aria-labelledby="itemSelectorTitle">
+        <header class="item-selector-head">
+          <strong id="itemSelectorTitle">SELECT AN ITEM</strong>
+          <button id="itemSelectorClose" type="button" aria-label="Cancel item selection">×</button>
+        </header>
+        <nav class="item-selector-sources" id="itemSelectorSources" role="tablist" aria-label="Item sources"></nav>
+        <div class="item-selector-path" id="itemSelectorPath"></div>
+        <div class="item-selector-list" id="itemSelectorList" role="listbox" aria-label="Selectable items"></div>
+        <footer class="item-selector-help" id="itemSelectorHelp"></footer>
+      </section>
+    </div>
+
+    <div class="skills-window-overlay" id="skillsWindowOverlay" aria-hidden="true" hidden>
+      <section class="skills-window" id="skillsWindow" role="dialog" aria-modal="true" aria-labelledby="skillsWindowTitle">
+        <header class="skills-window-head">
+          <strong id="skillsWindowTitle">CHARACTER SKILLS</strong>
+          <span class="skills-points">SKILL POINTS <b id="skillsPointsValue">5</b></span>
+          <button class="skills-unavailable-toggle" id="skillsUnavailableToggle" type="button" aria-pressed="false">SHOW UNAVAILABLE</button>
+          <button class="skills-window-close" id="skillsWindowClose" type="button" aria-label="Close Character Skills">×</button>
+        </header>
+        <div class="skills-window-body">
+          <section class="skills-tree-pane" aria-label="Skill tree">
+            <div class="skills-tree" id="skillsTree" role="tree" tabindex="0"></div>
+          </section>
+          <aside class="skills-detail" id="skillsDetail" aria-live="polite"></aside>
+        </div>
+        <div class="skills-prompt" id="skillsPrompt" hidden>
+          <label id="skillsPromptLabel" for="skillsPromptInput">Search for skill</label>
+          <input id="skillsPromptInput" type="text" autocomplete="off" />
+          <button id="skillsPromptApply" type="button">APPLY</button>
+          <button id="skillsPromptCancel" type="button">CANCEL</button>
+        </div>
+        <footer class="skills-window-help">2/8 move · 6 train · Enter fold · ? guide · / search · Esc close</footer>
+      </section>
+    </div>
+
+    <div class="character-window-overlay" id="characterWindowOverlay" aria-hidden="true" hidden>
+      <section class="character-window character-surface" id="characterWindow" role="dialog" aria-modal="true" aria-labelledby="characterWindowTitle">
+        <header class="character-window-head">
+          <strong id="characterWindowTitle">CHARACTER</strong>
+          <nav class="character-window-tabs" id="characterWindowTabs" role="tablist" aria-label="Character Sheet pages">
+            <button data-character-tab="profile" type="button" role="tab">PROFILE</button>
+            <button data-character-tab="skills" type="button" role="tab">SKILLS</button>
+            <button data-character-tab="resists" type="button" role="tab">RESISTS</button>
+          </nav>
+          <button class="character-window-dump" id="characterWindowDump" type="button" aria-label="Create prototype character dump">DUMP</button>
+          <button class="character-window-close" id="characterWindowClose" type="button" aria-label="Close Character Sheet">×</button>
+        </header>
+        <div class="character-content character-window-content" id="characterWindowContent" data-character-content="window" tabindex="0"></div>
+      </section>
+    </div>
+
+    <div class="guide-window-overlay" id="guideWindowOverlay" aria-hidden="true" hidden>
+      <section class="guide-window" id="guideWindow" role="dialog" aria-modal="true" aria-labelledby="guideWindowTitle">
+        <header class="guide-window-head">
+          <div><span>THE GUIDE</span><strong id="guideWindowTitle">ARTICLE</strong></div>
+          <button class="guide-window-close" id="guideWindowClose" type="button" aria-label="Close Guide article">×</button>
+        </header>
+        <div class="guide-window-reference" id="guideWindowReference"></div>
+        <article class="guide-window-body" id="guideWindowBody" tabindex="0"></article>
+        <footer class="guide-window-help">Page Up / Page Down · Home / End · Esc close</footer>
+      </section>
+    </div>
+
+    <div class="message-history-overlay" id="messageHistoryOverlay" aria-hidden="true" hidden>
+      <section class="message-history-window" id="messageHistoryWindow" role="dialog" aria-modal="true" aria-labelledby="messageHistoryTitle">
+        <header class="message-history-head">
+          <strong id="messageHistoryTitle">MESSAGE HISTORY</strong>
+          <nav class="message-history-tabs" role="tablist" aria-label="Message history views">
+            <button type="button" data-message-history-tab="chat" role="tab" aria-selected="false">CHAT</button>
+            <button type="button" data-message-history-tab="all" role="tab" aria-selected="true">ALL MESSAGES</button>
+          </nav>
+          <button class="message-history-close" id="messageHistoryClose" type="button" aria-label="Close Message History">×</button>
+        </header>
+        <div class="message-history-body">
+          <div class="message-history-state" id="messageHistoryState" role="status" hidden></div>
+          <div class="message-history-feed" id="messageHistoryFeed" role="log" aria-live="polite" tabindex="0"></div>
+          <button class="message-history-new" id="messageHistoryNew" type="button" hidden>NEW MESSAGES</button>
+        </div>
+        <form class="message-history-editor" id="messageHistoryEditor" hidden>
+          <label for="messageHistoryInput">Message:</label>
+          <input id="messageHistoryInput" type="text" maxlength="255" autocomplete="off" spellcheck="false" aria-label="General chat message" />
+          <small>Enter to send · Esc to cancel</small>
+        </form>
+      </section>
+    </div>
+
+    <div class="inventory-context-menu" id="inventoryContextMenu" role="menu" aria-label="Item actions" hidden></div>
+    <div class="item-action-layer" id="itemActionLayer" aria-hidden="true" hidden>
+      <section class="item-action-dialog" id="itemActionDialog" role="dialog" aria-modal="true" aria-labelledby="itemActionTitle">
+        <header class="item-action-head">
+          <strong id="itemActionTitle">ITEM ACTION</strong>
+          <button id="itemActionClose" type="button" aria-label="Close item action">×</button>
+        </header>
+        <div class="item-action-body" id="itemActionBody"></div>
+        <footer class="item-action-footer" id="itemActionFooter"></footer>
+      </section>
+    </div>
+
+    <div class="system-overlay" id="systemOverlay" aria-hidden="true" hidden>
+      <section class="system-dialog" role="alertdialog" aria-modal="true" aria-labelledby="systemOverlayTitle" aria-describedby="systemOverlayText">
+        <span class="system-dialog-rune" aria-hidden="true"><b>!</b></span>
+        <div>
+          <strong id="systemOverlayTitle">CONNECTION LOST</strong>
+          <p id="systemOverlayText">The link to the server has been interrupted.</p>
+        </div>
+        <button id="systemOverlayAction" type="button">Retry connection</button>
+      </section>
+    </div>
+
+    <button class="prototype-settings-fab" id="openControls" title="Настройка прототипа" aria-label="Открыть настройки прототипа">⚙</button>
+
+    <!-- Prototype controls -->
+    <aside class="controls-drawer" id="controlsDrawer" aria-hidden="true">
+      <div class="controls-head">
+        <strong>Prototype controls</strong>
+        <button id="closeControls">×</button>
+      </div>
+      <nav class="controls-tabs" role="tablist" aria-label="Настройки прототипа">
+        <button class="active" data-controls-tab="general" role="tab" aria-selected="true">General</button>
+        <button data-controls-tab="rightpanel" role="tab" aria-selected="false">Right panel</button>
+        <button data-controls-tab="windows" role="tab" aria-selected="false">Windows</button>
+        <button data-controls-tab="map" role="tab" aria-selected="false">Map</button>
+        <button data-controls-tab="cursor" role="tab" aria-selected="false">Cursor</button>
+        <button data-controls-tab="experience" role="tab" aria-selected="false">Level &amp; XP</button>
+        <button data-controls-tab="encumbrance" role="tab" aria-selected="false">Encumbrance</button>
+        <button data-controls-tab="statuses" role="tab" aria-selected="false">Statuses</button>
+      </nav>
+
+      <div class="controls-page active" data-controls-page="general">
+        <label>Left width <output id="leftWidthValue"></output>
+          <input id="leftWidth" type="range" min="220" max="380" step="2" />
+        </label>
+        <label>Right width <output id="rightWidthValue"></output>
+          <input id="rightWidth" type="range" min="320" max="620" step="2" />
+        </label>
+        <label>Ping <output id="pingControlValue"></output>
+          <input id="pingControl" type="range" min="0" max="1000" step="10" />
+        </label>
+        <label>Health <output id="hpControlValue"></output>
+          <input id="hpControl" type="range" min="0" max="1912" step="1" />
+        </label>
+        <label>Mana <output id="mpControlValue"></output>
+          <input id="mpControl" type="range" min="0" max="275" step="1" />
+        </label>
+        <label>Stamina <output id="stControlValue"></output>
+          <input id="stControl" type="range" min="0" max="10" step="1" />
+        </label>
+        <label>Sanity <output id="sanityControlValue"></output>
+          <input id="sanityControl" type="range" min="0" max="100" step="1" />
+        </label>
+        <label class="sanity-display-control" id="sanityDisplayGroup">Sanity display
+          <select id="sanityDisplayControl">
+            <option value="word">Word</option>
+            <option value="bar">Bar</option>
+            <option value="percent">Percent</option>
+            <option value="exact">Exact</option>
+          </select>
+        </label>
+        <label class="toggle-control"><span>Wide HP bar</span><input id="wideHpControl" type="checkbox" /></label>
+        <label class="toggle-control"><span>Wide MP bar</span><input id="wideMpControl" type="checkbox" /></label>
+        <label class="toggle-control"><span>Wide SN bar</span><input id="wideSanityControl" type="checkbox" /></label>
+        <label class="toggle-control"><span>Enemy present</span><input id="enemyPresentControl" type="checkbox" /></label>
+        <label class="enemy-health-control" id="enemyHealthControlGroup">Enemy health <output id="enemyHealthControlValue"></output>
+          <input id="enemyHealthControl" type="range" min="0" max="100" step="1" />
+        </label>
+        <label>System overlay
+          <select id="systemOverlayControl">
+            <option value="none">None</option>
+            <option value="connection-lost">Connection lost</option>
+            <option value="critical-event">Critical event</option>
+          </select>
+        </label>
+        <p class="controls-tip">Границы колонок также можно перетаскивать мышью.</p>
+      </div>
+
+      <div class="controls-page" data-controls-page="rightpanel">
+        <label class="toggle-control"><span>Hide block headers</span><input id="rightPanelHeadersHiddenControl" type="checkbox" /></label>
+        <label id="rightPanelHeaderHeightGroup">Block header height <output id="rightPanelHeaderHeightValue"></output>
+          <input id="rightPanelHeaderHeightControl" type="range" min="18" max="48" step="1" />
+        </label>
+        <label class="toggle-control"><span>Messages</span><input id="msgChatVisibleControl" type="checkbox" /></label>
+        <label id="rightPanelMessageModeGroup">Message view
+          <select id="rightPanelMessageModeControl">
+            <option value="chat">Chat</option>
+            <option value="all">All messages</option>
+          </select>
+        </label>
+        <label id="msgChatRowsGroup">Message rows <output id="msgChatRowsValue"></output>
+          <input id="msgChatRowsControl" type="range" min="3" max="30" step="1" />
+        </label>
+        <label id="msgChatFontSizeGroup">Message font size <output id="msgChatFontSizeValue"></output>
+          <input id="msgChatFontSizeControl" type="range" min="8" max="20" step="1" />
+        </label>
+        <label class="toggle-control"><span>Inventory</span><input id="inventoryVisibleControl" type="checkbox" /></label>
+        <label id="inventoryFontSizeGroup">Inventory font size <output id="inventoryFontSizeValue"></output>
+          <input id="inventoryFontSizeControl" type="range" min="8" max="20" step="1" />
+        </label>
+        <label class="toggle-control"><span>Equipment</span><input id="equipmentVisibleControl" type="checkbox" /></label>
+        <label id="equipmentFontSizeGroup">Equipment font size <output id="equipmentFontSizeValue"></output>
+          <input id="equipmentFontSizeControl" type="range" min="8" max="20" step="1" />
+        </label>
+        <label class="toggle-control"><span>Bags</span><input id="bagsVisibleControl" type="checkbox" /></label>
+        <label id="bagsFontSizeGroup">Bags font size <output id="bagsFontSizeValue"></output>
+          <input id="bagsFontSizeControl" type="range" min="8" max="20" step="1" />
+        </label>
+        <label id="bagsRowLimitGroup">Bags visible rows <output id="bagsRowLimitValue"></output>
+          <input id="bagsRowLimitControl" type="range" min="1" max="33" step="1" />
+        </label>
+        <label class="toggle-control"><span>Character</span><input id="characterVisibleControl" type="checkbox" /></label>
+        <label id="characterHeightGroup">Character height <output id="characterHeightValue"></output>
+          <input id="characterHeightControl" type="range" min="20" max="100" step="1" />
+        </label>
+        <label id="characterFontSizeGroup">Character font size <output id="characterFontSizeValue"></output>
+          <input id="characterFontSizeControl" type="range" min="8" max="20" step="1" />
+        </label>
+        <label id="characterPageGroup">Character page
+          <select id="characterPageControl">
+            <option value="profile">Profile</option>
+            <option value="skills">Skills</option>
+            <option value="resists">Resists</option>
+          </select>
+        </label>
+        <label id="characterResistsLegendGroup" class="toggle-control"><span>Hide Resists legend</span><input id="characterResistsLegendHiddenControl" type="checkbox" /></label>
+        <section class="right-panel-order-control" aria-labelledby="rightPanelOrderTitle">
+          <h3 id="rightPanelOrderTitle">Block order</h3>
+          <div id="rightPanelOrderControls"></div>
+        </section>
+        <p class="controls-tip">Порядок применяется ко всем блокам, включая временно скрытые.</p>
+      </div>
+
+      <div class="controls-page window-controls-page" data-controls-page="windows">
+        <nav class="window-controls-tabs" role="tablist" aria-label="Настройки отдельных игровых окон">
+          <button type="button" role="tab" aria-selected="false" disabled title="Not implemented">Game Menu</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="items">Items</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="browse">Browse</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="selector">Item Selector</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="devices">Devices</button>
+          <button class="active" type="button" role="tab" aria-selected="true" data-window-controls-tab="inventory">Inventory</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="messages">Messages</button>
+          <button type="button" role="tab" aria-selected="false" disabled title="Not implemented">Mini-map</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="equipment">Equipment</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="character">Character</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="skills">Skills</button>
+        </nav>
+        <section class="window-controls-subpage" data-window-controls-page="items" role="tabpanel">
+          <label class="toggle-control"><span>Combined Equipment + Inventory</span><input id="combinedItemsWindowControl" type="checkbox" /></label>
+          <p class="controls-tip">При включении клавиши и кнопки i/e используют одно окно Items. Повтор активной клавиши закрывает окно, другая клавиша переключает секцию.</p>
+        </section>
+        <section class="window-controls-subpage" data-window-controls-page="browse" role="tabpanel">
+          <label>Font size <output id="browseWindowFontSizeValue"></output>
+            <input id="browseWindowFontSizeControl" type="range" min="8" max="24" step="1" />
+          </label>
+          <label>Data state
+            <select id="browseDataStateControl">
+              <option value="ready">Ready</option>
+              <option value="loading">Loading</option>
+              <option value="empty">No browsable items</option>
+              <option value="unavailable">Unavailable</option>
+              <option value="error">Error</option>
+            </select>
+          </label>
+          <label class="toggle-control"><span>Inventory full</span><input id="browseInventoryFullControl" type="checkbox" /></label>
+          <p class="controls-tip">Browse моделирует общий хоткей b для книг и контейнеров. Inventory full используется для проверки Unstow.</p>
+        </section>
+        <section class="window-controls-subpage" data-window-controls-page="selector" role="tabpanel">
+          <label>Demo command
+            <select id="itemSelectorDemoActionControl">
+              <option value="inspect">Inspect</option>
+              <option value="drop">Drop</option>
+              <option value="destroy">Destroy</option>
+              <option value="throw">Throw</option>
+              <option value="wield">Primary Wield / Wear</option>
+              <option value="wield-secondary">Secondary Wield / Wear</option>
+              <option value="take-off">Take off</option>
+              <option value="swap">Swap</option>
+            </select>
+          </label>
+          <button type="button" id="itemSelectorDemoOpen">Open item selector</button>
+          <p class="controls-tip">Демонстрация command-first сценария. Источники и доступность предметов зависят от выбранного действия.</p>
+        </section>
+        <section class="window-controls-subpage" data-window-controls-page="devices" role="tabpanel">
+          <label>Attempt result
+            <select id="deviceOutcomeControl">
+              <option value="success">Success</option>
+              <option value="failure">Magic Device failure</option>
+              <option value="antimagic">Anti-magic</option>
+            </select>
+          </label>
+          <label>Readiness
+            <select id="deviceReadinessControl">
+              <option value="data">From item data</option>
+              <option value="empty">Empty or charging</option>
+            </select>
+          </label>
+          <label>Antistatic Wrapping access
+            <select id="deviceWrappingSkillControl">
+              <option value="sufficient">Skill sufficient</option>
+              <option value="insufficient">Skill below 15.000</option>
+            </select>
+          </label>
+          <p class="controls-tip">Controls affect Wand / Staff / Rod prototype attempts. Results never mutate the demo item arrays.</p>
+        </section>
+        <section class="window-controls-subpage active" data-window-controls-page="inventory" role="tabpanel">
+          <label>Font size <output id="inventoryWindowFontSizeValue"></output>
+            <input id="inventoryWindowFontSizeControl" type="range" min="8" max="24" step="1" />
+          </label>
+          <p class="controls-tip">Настройка применяется только к открываемому окну Inventory.</p>
+        </section>
+        <section class="window-controls-subpage" data-window-controls-page="messages" role="tabpanel">
+          <label>Font size <output id="messageHistoryFontSizeValue"></output>
+            <input id="messageHistoryFontSizeControl" type="range" min="8" max="20" step="1" />
+          </label>
+          <label>Window opacity <output id="messageHistoryOpacityValue"></output>
+            <input id="messageHistoryOpacityControl" type="range" min="20" max="95" step="5" />
+          </label>
+          <label>Data state
+            <select id="messageHistoryDataStateControl">
+              <option value="ready">Ready</option>
+              <option value="loading">Loading</option>
+              <option value="empty">Empty</option>
+              <option value="unavailable">Unavailable</option>
+              <option value="error">Error</option>
+            </select>
+          </label>
+          <button class="message-history-demo-control" type="button" id="messageHistoryAppendDemoControl">Append incoming chat message</button>
+          <p class="controls-tip">Настройки применяются к общему окну Message History / Chat History.</p>
+        </section>
+        <section class="window-controls-subpage" data-window-controls-page="equipment" role="tabpanel">
+          <label>Font size <output id="equipmentWindowFontSizeValue"></output>
+            <input id="equipmentWindowFontSizeControl" type="range" min="8" max="24" step="1" />
+          </label>
+          <p class="controls-tip">Настройка применяется только к открываемому окну Equipment.</p>
+        </section>
+        <section class="window-controls-subpage" data-window-controls-page="character" role="tabpanel">
+          <label>Font size <output id="characterWindowFontSizeValue"></output>
+            <input id="characterWindowFontSizeControl" type="range" min="8" max="20" step="1" />
+          </label>
+          <p class="controls-tip">Настройка применяется только к открываемому окну Character Sheet.</p>
+        </section>
+        <section class="window-controls-subpage" data-window-controls-page="skills" role="tabpanel">
+          <label>Font size <output id="skillsWindowFontSizeValue"></output>
+            <input id="skillsWindowFontSizeControl" type="range" min="8" max="20" step="1" />
+          </label>
+          <label class="toggle-control"><span>Show unavailable skills</span><input id="skillsShowUnavailableControl" type="checkbox" /></label>
+          <p class="controls-tip">Значения навыков и пять демонстрационных очков меняются только в памяти вкладки.</p>
+        </section>
+      </div>
+
+      <div class="controls-page" data-controls-page="map">
+        <label class="toggle-control"><span>Show grid</span><input id="mapGridControl" type="checkbox" /></label>
+        <label class="toggle-control"><span>Show cell info</span><input id="mapCellInfoControl" type="checkbox" /></label>
+        <label class="toggle-control"><span>Follow player</span><input id="mapFollowControl" type="checkbox" /></label>
+        <div class="map-control-actions">
+          <button type="button" id="mapRecenterControl">Recenter camera</button>
+          <button type="button" id="mapResetPlayerControl">Reset player</button>
+        </div>
+        <output class="map-control-position" id="mapControlPosition">Player 121, 30 · Camera 88, 8</output>
+        <p class="controls-tip">Viewport фиксирован на максимуме клиента 66×44. Shift + drag панорамирует карту, Home возвращает камеру к игроку.</p>
+      </div>
+
+      <div class="controls-page" data-controls-page="experience">
+        <label>Level <output id="levelControlValue"></output>
+          <input id="levelControl" type="range" min="1" max="100" step="1" />
+        </label>
+        <label>Level progress <output id="xpProgressControlValue"></output>
+          <input id="xpProgressControl" type="range" min="0" max="100" step="1" />
+        </label>
+        <div class="xp-thresholds" id="xpThresholds"></div>
+        <label class="toggle-control"><span>Hide XP number</span><input id="hideXpNumber" type="checkbox" /></label>
+        <label class="toggle-control"><span>Drained</span><input id="xpDrained" type="checkbox" /></label>
+        <label id="drainedAmountGroup" hidden>Drained amount <output id="drainedAmountControlValue"></output>
+          <input id="drainedAmountControl" type="range" min="1" max="32" step="1" />
+        </label>
+        <label class="toggle-control"><span>Only XP remaining</span><input id="xpRemainingOnly" type="checkbox" /></label>
+        <p class="controls-tip">Drained использует модель TomeNET: current XP ниже сохранённого max XP.</p>
+      </div>
+
+      <div class="controls-page cursor-controls-page" data-controls-page="cursor">
+        <div class="cursor-theme-list" id="cursorThemeCards" aria-label="Cursor themes"></div>
+        <p class="controls-tip">Каждая тема применяется сразу. Text и resize сохраняют системную форму.</p>
+      </div>
+
+      <div class="controls-page" data-controls-page="encumbrance">
+        <div class="encumbrance-control-list" id="encumbranceControls"></div>
+        <p class="controls-tip">Состояния соответствуют PKT_ENCUMBERMENT. Heavy swimming поддерживается протоколом, но сейчас не используется игрой.</p>
+      </div>
+
+      <div class="controls-page status-controls-page" data-controls-page="statuses">
+        <section class="status-control-section">
+          <h3>Speed &amp; BpR</h3>
+          <label>Speed <output id="speedControlValue"></output>
+            <input id="speedControl" type="range" min="-50" max="100" step="1" />
+          </label>
+          <label class="toggle-control"><span>Temporary speed boost</span><input id="speedBoostedControl" type="checkbox" /></label>
+          <label class="toggle-control"><span>No-Tele grid</span><input id="noTeleControl" type="checkbox" /></label>
+          <label>Blows per round <output id="bprControlValue"></output>
+            <input id="bprControl" type="range" min="0" max="31" step="1" />
+          </label>
+          <label class="toggle-control"><span>Temporary extra blows</span><input id="bprBoostedControl" type="checkbox" /></label>
+          <label>BpR display mode
+            <select id="bprModeControl">
+              <option value="numeric">Numeric</option>
+              <option value="wraith">Wraith</option>
+              <option value="wstep">WStep</option>
+              <option value="pbtrav">PbTrav</option>
+            </select>
+          </label>
+        </section>
+        <section class="status-control-section">
+          <h3>Timed indicators</h3>
+          <div class="status-toggle-list" id="statusIndicatorControls"></div>
+          <label>Reactive shield
+            <select id="shieldControl"></select>
+          </label>
+        </section>
+        <section class="status-control-section">
+          <h3>Player conditions</h3>
+          <div class="condition-control-list" id="conditionControls"></div>
+        </section>
+        <p class="controls-tip">Набор соответствует пакетам состояний TomeNET; таймеры этими пакетами не передаются.</p>
+      </div>
+      <button class="reset-btn" id="resetControls">Reset</button>
+    </aside>
+  </main>
+  <script src="map-data.js"></script>
+  <script src="js/core/namespace.js"></script>
+  <script src="js/core/dom.js"></script>
+  <script src="js/core/window-manager.js"></script>
+  <script src="js/core/input-router.js"></script>
+  <script src="js/data/game-data.js"></script>
+  <script src="js/data/skills-data.js"></script>
+  <script src="js/features/map.js"></script>
+  <script src="js/features/character.js"></script>
+  <script src="js/features/guide-window.js"></script>
+  <script src="js/features/skills-window.js"></script>
+  <script src="js/features/character-window.js"></script>
+  <script src="js/features/equipment-window.js"></script>
+  <script src="js/features/combined-items-window.js"></script>
+  <script src="js/features/browse-window.js"></script>
+  <script src="js/features/right-panel.js"></script>
+  <script src="js/features/hud.js"></script>
+  <script src="js/features/item-lists.js"></script>
+  <script src="js/features/messages.js"></script>
+  <script src="js/features/system-overlay.js"></script>
+  <script src="js/features/cursors.js"></script>
+  <script src="js/features/item-use.js"></script>
+  <script src="js/features/item-device.js"></script>
+  <script src="js/features/item-equip.js"></script>
+  <script src="js/features/items.js"></script>
+  <script src="js/features/item-selector.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

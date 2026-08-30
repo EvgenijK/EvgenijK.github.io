@@ -1,0 +1,558 @@
+/* Gold value shares one line with its label. */
+.currency > div {
+  min-width:0;
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.currency .big-number {
+  margin:0;
+  margin-left:auto;
+  text-align:right;
+  white-space:nowrap;
+}
+
+/* Ping label and value share one full-width horizontal meter row. */
+.ping-card {
+  height:43px;
+  padding:7px 10px;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  align-items:center;
+  gap:11px;
+}
+.ping-card .row-between {
+  width:auto;
+  height:auto;
+  align-items:center;
+}
+.ping-card .eyebrow::before { display:none; }
+.ping-meter {
+  position:relative;
+  left:auto;
+  right:auto;
+  bottom:auto;
+  top:auto;
+  width:100%;
+  height:21px;
+  margin:0;
+  border:1px solid #77633b;
+  border-radius:1px;
+  background:#020403;
+  box-shadow:0 0 0 1px #292c26,inset 0 2px 4px #000;
+}
+.ping-fill {
+  min-width:0;
+  height:100%;
+  background:var(--ping-color,#fff)!important;
+  box-shadow:
+    0 0 8px color-mix(in srgb,var(--ping-color,#fff),transparent 38%);
+}
+.ping-card .ping-value {
+  position:absolute;
+  inset:0 7px;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  color:#eee9dc!important;
+  font:12px var(--terminal);
+  font-weight:400;
+  line-height:1;
+  text-shadow:0 1px 2px #000,0 0 4px #000;
+  pointer-events:none;
+}
+
+/* Hand-drawn attribute symbols replace the old abstract markers. */
+.stat-list dt::before { display:none!important; }
+.stat-list dt {
+  gap:9px;
+}
+.stats { height:132px; }
+.stat-list div { height:19px;padding:0;align-items:center; }
+.stat-list dt,
+.stat-list dd { line-height:18px; }
+.stat-icon {
+  width:18px;
+  height:18px;
+  flex:0 0 18px;
+  display:grid;
+  place-items:center;
+  color:#c7a455;
+  filter:drop-shadow(0 1px 1px #000) drop-shadow(0 0 3px rgba(194,150,65,.16));
+}
+.stat-icon svg {
+  width:18px;
+  height:18px;
+  overflow:visible;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.45;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.strength-icon { color:#cf9e51; }
+.intelligence-icon { color:#d2bd79; }
+.wisdom-icon { color:#b99ae9; }
+.dexterity-icon { color:#9fbc78; }
+.constitution-icon { color:#aeb9b6; }
+.charisma-icon { color:#e1bc4e; }
+.constitution-icon svg { stroke-width:1.35; }
+.charisma-icon svg { stroke-width:1.25; }
+
+.line-icon {
+  width:18px;
+  height:18px;
+  display:grid;
+  place-items:center;
+}
+.line-icon svg {
+  width:18px;
+  height:18px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.4;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  filter:drop-shadow(0 1px 1px #000) drop-shadow(0 0 3px currentColor);
+}
+.sanity-icon { color:#b174e4; }
+.shield-icon { color:#b8c2bd; }
+.sanity-armor:not(.wide-vitals-active) {
+  height:47px;
+  padding-top:4px;
+  padding-bottom:4px;
+  grid-template-rows:18px 18px;
+  align-content:center;
+  gap:1px;
+}
+
+/* TomeNET encumbrance status line (PKT_ENCUMBERMENT). */
+.encumbrance-strip {
+  height:39px;
+  min-height:39px;
+  padding:7px 9px;
+}
+.encumbrance-slots {
+  position:relative;
+  width:100%;
+  height:25px;
+  display:grid;
+  grid-template-columns:repeat(12,minmax(0,1fr));
+  align-items:center;
+  border:1px solid #5e5235;
+  background:rgba(1,3,2,.72);
+  box-shadow:0 0 0 1px #20231f,inset 0 3px 7px #000;
+}
+.encumbrance-slot {
+  position:relative;
+  height:100%;
+  display:grid;
+  place-items:center;
+  border-right:1px solid rgba(111,95,58,.16);
+}
+.encumbrance-slot:last-child { border-right:0; }
+.encumbrance-state {
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  color:var(--enc-color);
+  opacity:0;
+  transform:scale(.72);
+  transition:opacity .14s ease,transform .14s ease;
+  pointer-events:none;
+}
+.encumbrance-state.active {
+  opacity:1;
+  transform:scale(1);
+  pointer-events:auto;
+  filter:drop-shadow(0 1px 1px #000) drop-shadow(0 0 4px color-mix(in srgb,var(--enc-color),transparent 56%));
+}
+.encumbrance-state svg,
+.encumbrance-control-icon svg {
+  width:17px;
+  height:17px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.45;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.encumbrance-slots.is-clear::after {
+  content:"No encumbrance";
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  color:#555b55;
+  font:9px var(--terminal);
+  letter-spacing:.04em;
+  white-space:nowrap;
+}
+
+.encumbrance-control-list {
+  display:grid;
+  gap:4px;
+  margin-top:6px;
+}
+.encumbrance-control {
+  min-height:31px;
+  margin:0!important;
+  padding:4px 7px;
+  display:grid!important;
+  grid-template-columns:23px minmax(0,1fr) 18px!important;
+  align-items:center;
+  gap:8px!important;
+  border:1px solid #403824;
+  background:rgba(2,4,3,.72);
+  cursor:pointer;
+}
+.encumbrance-control:hover { background:rgba(42,37,23,.7); }
+.encumbrance-control-icon {
+  width:21px;
+  height:21px;
+  display:grid;
+  place-items:center;
+  color:var(--enc-color);
+  filter:drop-shadow(0 0 3px color-mix(in srgb,var(--enc-color),transparent 68%));
+}
+.encumbrance-control span:nth-child(2) { min-width:0; font-size:12px; }
+.controls-drawer .encumbrance-control input {
+  grid-column:3;
+  width:16px;
+  height:16px;
+  margin:0;
+  accent-color:#a98740;
+}
+.controls-page[data-controls-page="encumbrance"] .controls-tip { margin-top:9px; }
+
+@media (max-width:1400px) {
+  .encumbrance-strip { padding-left:7px;padding-right:7px; }
+  .encumbrance-state svg { width:15px;height:15px; }
+}
+
+/* Conditional enemy health below the player's resource stack. */
+.enemy-health-card {
+  height:39px;
+  min-height:39px;
+  padding:8px 7px;
+}
+.enemy-health-meter {
+  width:100%;
+  height:23px;
+  overflow:hidden;
+  border:1px solid #846440;
+  border-radius:2px;
+  background:#070303;
+  box-shadow:0 0 0 1px #171914,0 0 0 2px #42443d,inset 0 4px 8px #000;
+}
+.enemy-health-fill {
+  height:100%;
+  background:
+    linear-gradient(180deg,rgba(255,194,171,.28),transparent 28%),
+    linear-gradient(180deg,#b92d27,#74130f 62%,#3e0907);
+  box-shadow:inset 0 -5px 8px rgba(0,0,0,.34),0 0 8px rgba(171,31,26,.16);
+  transition:width .15s ease,opacity .15s ease;
+}
+.enemy-health-card.is-inactive .enemy-health-meter {
+  border-color:#252821;
+  background:#020302;
+  box-shadow:0 0 0 1px #10120f,inset 0 3px 7px #000;
+  opacity:.58;
+}
+.enemy-health-card.is-inactive .enemy-health-fill {
+  opacity:0;
+}
+.enemy-health-control.is-disabled {
+  opacity:.48;
+}
+
+/* Renderer-neutral combat indicators sourced from TomeNET status packets. */
+.combat-metric {
+  --metric-color:#62d354;
+  height:34px;
+  min-height:34px;
+  padding:5px 9px;
+  display:grid;
+  grid-template-columns:22px minmax(0,1fr) auto;
+  align-items:center;
+  gap:8px;
+  border-left-color:#494c44;
+}
+.combat-metric-icon {
+  width:20px;
+  height:20px;
+  display:grid;
+  place-items:center;
+  color:var(--metric-color);
+  filter:drop-shadow(0 1px 1px #000) drop-shadow(0 0 4px color-mix(in srgb,var(--metric-color),transparent 65%));
+}
+.combat-metric-icon svg,
+.status-icon-tile svg,
+.status-control-icon svg {
+  width:100%;
+  height:100%;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.45;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.combat-metric-label {
+  color:#c9bea8;
+  font:13px var(--book);
+  letter-spacing:.02em;
+}
+.combat-metric strong {
+  color:var(--metric-color);
+  font:12px var(--terminal);
+  font-weight:400;
+  text-shadow:0 1px 2px #000,0 0 5px color-mix(in srgb,var(--metric-color),transparent 72%);
+}
+
+.effects {
+  position:relative;
+  min-height:57px;
+  margin-bottom:0;
+  padding:7px 8px 8px;
+}
+.effects h2 {
+  margin-bottom:6px;
+  color:#d5b75d;
+  font:11px var(--book);
+  letter-spacing:.075em;
+}
+.status-icon-grid {
+  display:grid;
+  grid-template-columns:repeat(8,minmax(0,1fr));
+  gap:3px;
+}
+.status-icon-tile {
+  --status-color:#ddd;
+  position:relative;
+  min-width:0;
+  height:28px;
+  display:grid;
+  place-items:center;
+  color:var(--status-color);
+  border:1px solid color-mix(in srgb,var(--status-color),#242820 64%);
+  border-radius:2px;
+  background:
+    radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--status-color),transparent 83%),transparent 68%),
+    linear-gradient(180deg,#191c18,#070907);
+  box-shadow:inset 0 0 0 1px #080a08,inset 0 1px rgba(255,255,255,.07),0 1px 2px #000;
+  filter:drop-shadow(0 0 3px color-mix(in srgb,var(--status-color),transparent 77%));
+  transition:opacity .14s ease,border-color .14s ease,filter .14s ease,background .14s ease;
+}
+.status-icon-tile svg { width:20px;height:20px; }
+.status-icon-tile.inactive {
+  opacity:.25;
+  border-color:#424740;
+  background:linear-gradient(180deg,#121512,#050705);
+  box-shadow:inset 0 0 0 1px #060806,inset 0 1px rgba(255,255,255,.035);
+  filter:grayscale(.88) saturate(.28);
+}
+.status-icon-tile.active { opacity:1; }
+.status-icon-tile.severity-2 { box-shadow:inset 0 0 0 1px #080a08,inset 0 1px rgba(255,255,255,.07),0 0 5px color-mix(in srgb,var(--status-color),transparent 72%); }
+.status-icon-tile.severity-3,
+.status-icon-tile.severity-4 {
+  border-color:var(--status-color);
+  background:
+    linear-gradient(135deg,transparent 0 44%,rgba(0,0,0,.52) 45% 49%,transparent 50%),
+    radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--status-color),transparent 72%),transparent 70%),#100b09;
+  box-shadow:inset 0 0 0 1px #170806,0 0 7px color-mix(in srgb,var(--status-color),transparent 54%);
+}
+.status-icon-tile.severity-4 { animation:status-danger-pulse 1.25s ease-in-out infinite alternate; }
+@keyframes status-danger-pulse { to { filter:brightness(1.22) drop-shadow(0 0 5px var(--status-color)); } }
+.status-shield-mark {
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  padding-top:1px;
+  color:currentColor;
+  font:700 10px var(--terminal);
+  text-shadow:0 1px 2px #000;
+}
+.status-slot-reserved {
+  height:28px;
+  border:1px solid rgba(66,71,64,.16);
+  background:rgba(1,3,2,.2);
+  box-shadow:inset 0 0 0 1px rgba(6,8,6,.28);
+}
+
+/* Four prototype-control tabs and the status packet controls. */
+.controls-tabs { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.controls-tabs button:nth-child(2n) { border-right:0; }
+.controls-tabs button:nth-child(-n+2) { border-bottom:1px solid #5d5033; }
+.status-controls-page { padding-bottom:2px; }
+.status-control-section {
+  margin:7px 0 10px;
+  padding:8px;
+  border:1px solid #423922;
+  background:rgba(1,3,2,.62);
+  box-shadow:inset 0 1px rgba(220,230,225,.035),inset 0 -4px 10px rgba(0,0,0,.22);
+}
+.status-control-section h3 {
+  margin:0 0 8px;
+  color:#d1ae56;
+  font:11px var(--book);
+  font-weight:500;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+}
+.controls-drawer select {
+  width:100%;
+  height:28px;
+  margin-top:5px;
+  padding:3px 7px;
+  border:1px solid #51452b;
+  border-radius:1px;
+  color:#d2ccbd;
+  background:#080a08;
+  font:11px var(--terminal);
+}
+.controls-drawer select:focus { outline:1px solid #9d8047;outline-offset:1px; }
+.status-toggle-list { display:grid;gap:4px;margin-bottom:9px; }
+.status-toggle-control {
+  min-height:30px;
+  margin:0!important;
+  padding:4px 6px;
+  display:grid!important;
+  grid-template-columns:22px minmax(0,1fr) 18px!important;
+  align-items:center;
+  gap:7px!important;
+  border:1px solid #373323;
+  background:rgba(5,7,5,.72);
+  cursor:pointer;
+}
+.status-toggle-control:hover { background:rgba(48,42,24,.62); }
+.status-control-icon {
+  width:19px;
+  height:19px;
+  display:grid;
+  place-items:center;
+  color:var(--status-color);
+  filter:drop-shadow(0 0 3px color-mix(in srgb,var(--status-color),transparent 68%));
+}
+.status-toggle-control > span:nth-child(2) { font-size:11px; }
+.controls-drawer .status-toggle-control input {
+  grid-column:3;
+  width:16px;
+  height:16px;
+  margin:0;
+  accent-color:#a98740;
+}
+.condition-control-list { display:grid;gap:7px; }
+.condition-control-list label { margin:0; }
+
+@media (max-width:1400px) {
+  .combat-metric { padding-left:7px;padding-right:7px; }
+  .effects { padding:5px 6px; }
+  .effects h2 { margin-bottom:3px;font-size:10px; }
+  .status-icon-grid { gap:2px; }
+  .status-icon-tile,.status-slot-reserved { height:22px; }
+  .status-icon-tile svg { width:15px;height:15px; }
+  .status-shield-mark { font-size:8px; }
+}
+
+/* Alternative TomeNET-style huge MP / SN / HP bars. */
+.sanity-armor.wide-vitals-active {
+  height:39px;
+  min-height:39px;
+  margin-bottom:7px;
+  padding-top:7px;
+  padding-bottom:7px;
+  gap:0;
+}
+.vitals.wide-vitals-active {
+  height:var(--standard-vitals-height,47px);
+  min-height:var(--standard-vitals-height,47px);
+  padding:4px;
+}
+.vitals.wide-vitals-active .stamina-resource { margin:0; }
+.wide-vitals {
+  height:136px;
+  min-height:136px;
+  padding:8px 10px 0;
+  display:grid;
+  grid-template-columns:repeat(var(--wide-vital-count,3),minmax(0,1fr));
+  gap:8px;
+  border-bottom:0;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.025),transparent 35%,rgba(0,0,0,.18)),
+    rgba(1,3,2,.76);
+}
+.wide-vital {
+  min-width:0;
+  position:relative;
+}
+.wide-vital[hidden] { display:none; }
+.wide-vital-meter {
+  position:relative;
+  width:100%;
+  height:100%;
+  min-height:0;
+  overflow:hidden;
+  border:1px solid #71613e;
+  border-radius:2px 2px 1px 1px;
+  box-shadow:0 0 0 1px #171a16,0 0 0 2px #3f443d,inset 0 5px 10px rgba(0,0,0,.72);
+}
+.mp-wide .wide-vital-meter {
+  background:linear-gradient(90deg,#030b25,#07194b 48%,#02081f);
+}
+.sn-wide .wide-vital-meter {
+  background:linear-gradient(90deg,#321008,#651e0d 48%,#290b05);
+}
+.hp-wide .wide-vital-meter {
+  background:linear-gradient(90deg,#390504,#760b08 48%,#300302);
+}
+.wide-vital-fill {
+  position:absolute;
+  inset:auto 0 0;
+  height:100%;
+  transition:height .16s ease;
+  box-shadow:inset 7px 0 9px rgba(0,0,0,.25),inset -7px 0 9px rgba(0,0,0,.25),inset 0 6px 8px rgba(255,255,255,.12),0 -2px 6px rgba(255,255,255,.08);
+}
+.mp-wide .wide-vital-fill {
+  background:
+    linear-gradient(90deg,rgba(213,236,255,.3),transparent 22% 76%,rgba(0,0,0,.18)),
+    linear-gradient(180deg,#398cff,#0759ef 54%,#022db7);
+  box-shadow:inset 7px 0 9px rgba(0,0,0,.18),inset -7px 0 9px rgba(0,0,0,.2),inset 0 6px 8px rgba(255,255,255,.2),0 -2px 9px rgba(41,111,255,.55);
+}
+.sn-wide .wide-vital-fill {
+  background:
+    linear-gradient(90deg,rgba(228,255,194,.28),transparent 22% 76%,rgba(0,0,0,.18)),
+    linear-gradient(180deg,#7df044,#37c523 56%,#138d16);
+  box-shadow:inset 7px 0 9px rgba(0,0,0,.18),inset -7px 0 9px rgba(0,0,0,.2),inset 0 6px 8px rgba(255,255,255,.18),0 -2px 9px rgba(73,218,47,.42);
+}
+.hp-wide .wide-vital-fill {
+  background:
+    linear-gradient(90deg,rgba(255,218,199,.3),transparent 22% 76%,rgba(0,0,0,.18)),
+    linear-gradient(180deg,#ff493d,#ed110d 54%,#a90705);
+  box-shadow:inset 7px 0 9px rgba(0,0,0,.18),inset -7px 0 9px rgba(0,0,0,.2),inset 0 6px 8px rgba(255,255,255,.2),0 -2px 9px rgba(255,41,31,.5);
+}
+@media (max-width:1400px), (max-height:760px) {
+  .wide-vitals {
+    height:96px;
+    min-height:96px;
+    padding:6px 9px 0;
+    gap:7px;
+  }
+}
+
+/* In wide mode the vertical meters consume every free pixel below effects. */
+.panel-scroll.wide-vitals-layout {
+  display:flex;
+  flex-direction:column;
+}
+.panel-scroll.wide-vitals-layout > .block {
+  flex:0 0 auto;
+}
+.panel-scroll.wide-vitals-layout > .wide-vitals {
+  flex:1 1 auto;
+  height:auto;
+  min-height:96px;
+}

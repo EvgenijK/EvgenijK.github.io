@@ -1,0 +1,50 @@
+.guide-window-overlay {
+  position:absolute;
+  inset:0;
+  z-index:16;
+  display:grid;
+  place-items:center;
+  padding:28px;
+  background:rgba(0,2,1,.68);
+  backdrop-filter:blur(2px) saturate(.72);
+}
+.guide-window {
+  width:min(720px,76vw);
+  height:min(680px,78vh);
+  min-width:0;
+  min-height:0;
+  display:grid;
+  grid-template-rows:44px auto minmax(0,1fr) 28px;
+  overflow:hidden;
+  border:1px solid #9a7b3d;
+  background:var(--forged-surface);
+  color:#c9c7bd;
+  box-shadow:inset 0 0 0 2px #090c09,inset 0 0 0 3px rgba(174,181,169,.42),0 20px 70px rgba(0,0,0,.92);
+}
+.guide-window-head {
+  display:grid;
+  grid-template-columns:1fr 42px;
+  border-bottom:1px solid #8d7138;
+  background:linear-gradient(180deg,rgba(141,112,55,.16),transparent 70%),#080b08;
+}
+.guide-window-head > div { display:flex;align-items:center;gap:12px;min-width:0;padding:0 14px; }
+.guide-window-head span { color:#82704a;font:9px/1 var(--terminal);letter-spacing:.14em; }
+.guide-window-head strong { overflow:hidden;color:#e4c453;font:500 13px/1 var(--terminal);letter-spacing:.08em;text-overflow:ellipsis;white-space:nowrap; }
+.guide-window-close {
+  border:0;border-left:1px solid rgba(109,88,43,.66);background:rgba(0,0,0,.14);color:#aaa99f;
+  font:20px/1 var(--terminal);cursor:pointer;
+}
+.guide-window-close:hover,.guide-window-close:focus-visible { color:#f1cf5d;background:rgba(158,119,48,.15);outline:1px solid #a27f3c;outline-offset:-2px; }
+.guide-window-reference { padding:7px 16px;border-bottom:1px solid rgba(126,101,48,.36);color:#55d9e8;background:#050b08;font:10px/1.2 var(--terminal); }
+.guide-window-body {
+  min-height:0;overflow:auto;padding:20px 24px 28px;background:var(--forged-inset);scrollbar-color:#80672f #070b08;
+}
+.guide-window-body h2 { margin:0 0 16px;color:#f0ca5a;font:500 17px/1.15 var(--serif);letter-spacing:.04em; }
+.guide-window-body p { max-width:72ch;margin:0 0 13px;color:#c9c7bd;font:13px/1.5 var(--serif); }
+.guide-window-body p:last-child { margin-bottom:0; }
+.guide-window-body:focus-visible { outline:1px solid rgba(211,171,80,.72);outline-offset:-2px; }
+.guide-window-help { display:flex;align-items:center;padding:0 14px;border-top:1px solid rgba(126,101,48,.36);color:#777b73;background:#070a07;font:9px/1 var(--terminal); }
+@media (max-width:760px) {
+  .guide-window-overlay { padding:12px; }
+  .guide-window { width:92vw;height:84vh; }
+}

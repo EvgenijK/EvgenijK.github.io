@@ -1,0 +1,65 @@
+html[data-cursor-theme="mithril"] {
+  --cursor-default:url("../assets/cursors/mithril/default.svg") 2 2, default;
+  --cursor-interactive:url("../assets/cursors/mithril/interactive.svg") 2 2, pointer;
+  --cursor-target:url("../assets/cursors/mithril/target.svg") 16 16, crosshair;
+  --cursor-pan:url("../assets/cursors/mithril/pan.svg") 15 15, grabbing;
+  --cursor-unavailable:url("../assets/cursors/mithril/unavailable.svg") 2 2, not-allowed;
+}
+html[data-cursor-theme="gondor"] {
+  --cursor-default:url("../assets/cursors/gondor/default.svg") 2 2, default;
+  --cursor-interactive:url("../assets/cursors/gondor/interactive.svg") 2 2, pointer;
+  --cursor-target:url("../assets/cursors/gondor/target.svg") 16 16, crosshair;
+  --cursor-pan:url("../assets/cursors/gondor/pan.svg") 15 15, grabbing;
+  --cursor-unavailable:url("../assets/cursors/gondor/unavailable.svg") 2 2, not-allowed;
+}
+html[data-cursor-theme="mallorn"] {
+  --cursor-default:url("../assets/cursors/mallorn/default.svg") 3 3, default;
+  --cursor-interactive:url("../assets/cursors/mallorn/interactive.svg") 3 3, pointer;
+  --cursor-target:url("../assets/cursors/mallorn/target.svg") 16 16, crosshair;
+  --cursor-pan:url("../assets/cursors/mallorn/pan.svg") 15 15, grabbing;
+  --cursor-unavailable:url("../assets/cursors/mallorn/unavailable.svg") 3 3, not-allowed;
+}
+html[data-cursor-theme="dunedain"] {
+  --cursor-default:url("../assets/cursors/dunedain/default.svg") 2 2, default;
+  --cursor-interactive:url("../assets/cursors/dunedain/interactive.svg") 2 2, pointer;
+  --cursor-target:url("../assets/cursors/dunedain/target.svg") 16 16, crosshair;
+  --cursor-pan:url("../assets/cursors/dunedain/pan.svg") 15 15, grabbing;
+  --cursor-unavailable:url("../assets/cursors/dunedain/unavailable.svg") 2 2, not-allowed;
+}
+html[data-cursor-theme="palantir"] {
+  --cursor-default:url("../assets/cursors/palantir/default.svg") 4 4, default;
+  --cursor-interactive:url("../assets/cursors/palantir/interactive.svg") 4 4, pointer;
+  --cursor-target:url("../assets/cursors/palantir/target.svg") 16 16, crosshair;
+  --cursor-pan:url("../assets/cursors/palantir/pan.svg") 15 15, grabbing;
+  --cursor-unavailable:url("../assets/cursors/palantir/unavailable.svg") 4 4, not-allowed;
+}
+
+html[data-cursor-theme] body { cursor:var(--cursor-default); }
+html[data-cursor-theme] :is(button:not(:disabled),a,[role="button"],[data-item-source],label.toggle-control,input[type="range"],input[type="checkbox"],select) { cursor:var(--cursor-interactive); }
+html[data-cursor-theme] .map-canvas { cursor:var(--cursor-default); }
+html[data-cursor-theme] .map-canvas.is-panning { cursor:var(--cursor-pan); }
+html[data-cursor-theme] .throw-targeting { cursor:var(--cursor-target); }
+html[data-cursor-theme] :is(input[type="text"],input[type="number"],textarea,[contenteditable="true"]) { cursor:text; }
+html[data-cursor-theme] .splitter { cursor:col-resize; }
+html[data-cursor-theme] :is(button:disabled,[disabled],[aria-disabled="true"],.is-disabled) { cursor:var(--cursor-unavailable); }
+
+.cursor-theme-list { display:grid;gap:8px; }
+.cursor-theme-card {
+  width:100%;
+  display:grid;
+  gap:8px;
+  padding:9px;
+  border:1px solid #40361f;
+  background:#070a07;
+  color:#a9a79e;
+  text-align:left;
+}
+.cursor-theme-card:hover,.cursor-theme-card:focus-visible { border-color:#8d7138;outline:none;background:#0d100c; }
+.cursor-theme-card.active { border-color:#d0a642;box-shadow:inset 3px 0 #e2bc52,inset 0 0 18px rgba(184,143,50,.1); }
+.cursor-theme-copy { display:flex;align-items:baseline;justify-content:space-between;gap:8px; }
+.cursor-theme-copy strong { color:#d8c477;font:12px/1 var(--terminal);letter-spacing:.04em; }
+.cursor-theme-copy small { color:#6f746d;font:8px/1.2 var(--terminal);text-align:right; }
+.cursor-state-previews { display:grid;grid-template-columns:repeat(5,1fr);gap:3px; }
+.cursor-state-previews > span { min-width:0;display:grid;place-items:center;gap:2px;padding:4px 1px;border:1px solid #24291f;background:#020402; }
+.cursor-state-previews img { width:32px;height:32px;image-rendering:auto; }
+.cursor-state-previews small { max-width:100%;overflow:hidden;color:#686d66;font:7px/1 var(--terminal);text-overflow:ellipsis; }

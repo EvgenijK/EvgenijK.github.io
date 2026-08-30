@@ -1,0 +1,111 @@
+/* Primary game-window shortcuts. Inventory is active; the others are placeholders. */
+.left-panel {
+  display:grid;
+  grid-template-rows:minmax(0,1fr) 100px;
+}
+.left-panel > .panel-scroll {
+  height:auto;
+  min-height:0;
+}
+.game-shortcuts {
+  position:relative;
+  z-index:5;
+  width:100%;
+  height:100px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-rows:repeat(2,42px);
+  gap:4px;
+  padding:5px;
+  border:1px solid rgba(112,91,48,.72);
+  border-top-color:#8e7138;
+  background:rgba(3,5,4,.82);
+  box-shadow:inset 0 1px rgba(188,151,72,.13),inset 0 0 0 1px rgba(16,19,15,.8),0 -3px 12px rgba(0,0,0,.4);
+  backdrop-filter:blur(2px);
+}
+.game-shortcut {
+  position:relative;
+  width:100%;
+  height:42px;
+  padding:7px;
+  border:1px solid #67552f;
+  border-radius:1px;
+  background:
+    linear-gradient(145deg,rgba(130,109,63,.16),transparent 42%),
+    #0b0e0c;
+  color:#b9b7aa;
+  box-shadow:inset 0 0 0 1px #20251f,inset 0 -5px 10px rgba(0,0,0,.34);
+  cursor:pointer;
+  transition:color .12s ease,border-color .12s ease,background .12s ease,transform .08s ease;
+}
+.game-shortcut svg {
+  width:22px;
+  height:22px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.45;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  pointer-events:none;
+}
+.game-shortcut kbd {
+  position:absolute;
+  right:2px;
+  bottom:1px;
+  min-width:10px;
+  padding:0 1px;
+  border:0;
+  background:rgba(0,0,0,.62);
+  color:#d4b758;
+  font:8px/10px var(--terminal);
+  text-align:center;
+  pointer-events:none;
+}
+.game-shortcut:hover,
+.game-shortcut:focus-visible {
+  z-index:2;
+  border-color:#b18c43;
+  background:linear-gradient(180deg,rgba(161,128,61,.19),transparent 55%),#121510;
+  color:#eee4ca;
+  outline:none;
+  box-shadow:inset 0 0 0 1px #343a30,0 0 8px rgba(194,153,66,.25);
+}
+.game-shortcut:active { transform:translateY(1px); }
+.game-shortcut-menu {
+  border-color:#a98339;
+  color:#e1bd5c;
+  box-shadow:inset 0 0 0 2px #211b0d,inset 0 0 0 3px rgba(165,130,52,.5),0 0 5px rgba(0,0,0,.55);
+}
+.game-shortcut::after {
+  content:attr(data-tooltip);
+  position:absolute;
+  left:50%;
+  bottom:calc(100% + 7px);
+  width:max-content;
+  max-width:180px;
+  padding:4px 6px;
+  border:1px solid #68552e;
+  background:rgba(5,7,6,.96);
+  color:#d5cbb5;
+  font:10px/1.2 var(--terminal);
+  white-space:nowrap;
+  box-shadow:0 3px 9px rgba(0,0,0,.55);
+  opacity:0;
+  visibility:hidden;
+  transform:translate(-50%,3px);
+  transition:opacity .12s ease,transform .12s ease,visibility .12s ease;
+  pointer-events:none;
+}
+.game-shortcut:nth-child(3n+1)::after { left:0;transform:translate(0,3px); }
+.game-shortcut:nth-child(3n)::after { right:0;left:auto;transform:translate(0,3px); }
+.game-shortcut:hover::after,
+.game-shortcut:focus-visible::after {
+  opacity:1;
+  visibility:visible;
+  transform:translate(-50%,0);
+}
+.game-shortcut:nth-child(3n+1):hover::after,
+.game-shortcut:nth-child(3n+1):focus-visible::after,
+.game-shortcut:nth-child(3n):hover::after,
+.game-shortcut:nth-child(3n):focus-visible::after { transform:translate(0,0); }
+
