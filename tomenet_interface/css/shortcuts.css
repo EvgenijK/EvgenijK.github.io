@@ -1,4 +1,4 @@
-/* Primary game-window shortcuts. Inventory is active; the others are placeholders. */
+/* Primary game-window shortcuts; Game Menu remains the only placeholder. */
 .left-panel {
   display:grid;
   grid-template-rows:minmax(0,1fr) 100px;
@@ -108,4 +108,3 @@
 .game-shortcut:nth-child(3n+1):focus-visible::after,
 .game-shortcut:nth-child(3n):hover::after,
 .game-shortcut:nth-child(3n):focus-visible::after { transform:translate(0,0); }
-

@@ -24,7 +24,7 @@
   windowManager.register({kind:"inventory",layer:"primary",blocksGameplay:true,allowsChat:true,focusTarget:selectedInventoryRow,onClose:finalizeInventoryClosedUi});
   windowManager.register({kind:"item-context",layer:"context",blocksGameplay:true,allowsChat:true,focusTarget:() => activeItemContext?.row});
   windowManager.register({kind:"item-action",layer:"dialog",blocksGameplay:true,allowsChat:true,focusTarget:() => itemActionDialog.querySelector("input,button:not([disabled])")});
-  windowManager.register({kind:"item-target",layer:"target",blocksGameplay:true,allowsChat:false,focusTarget:() => throwTargeting});
+  windowManager.register({kind:"map-target",layer:"target",blocksGameplay:true,allowsChat:false,focusTarget:() => throwTargeting});
 
   const COMMON_INVENTORY_ACTIONS = [
     {id:"inspect",label:"Inspect",key:"I"},
@@ -586,7 +586,7 @@
       col:playerCol >= 0 && playerCol < viewport.width ? playerCol : Math.floor(viewport.width / 2),
       row:playerRow >= 0 && playerRow < viewport.height ? playerRow : Math.floor(viewport.height / 2)
     };
-    windowManager.push("item-target",{action:action.id,index},{opener:activeItemContext?.row});
+    windowManager.push("map-target",{action:action.id,index},{opener:activeItemContext?.row});
     if (hostWindow !== "browse") {
       inventoryOverlay.hidden = true;
       inventoryOverlay.setAttribute("aria-hidden","true");
@@ -615,16 +615,45 @@
     });
   }
 
+  function requestMapTarget({label="Target",subject="power",opener=document.activeElement,onConfirm,onCancel}={}) {
+    if (throwTargetState) return false;
+    const viewport = mapViewport();
+    const playerCol = mapState.playerX - mapState.cameraX;
+    const playerRow = mapState.playerY - mapState.cameraY;
+    const action = {id:"external",label};
+    const item = {name:subject};
+    throwTargetState = {
+      action,item,index:-1,hostWindow:"external",external:true,onConfirm,onCancel,
+      col:playerCol >= 0 && playerCol < viewport.width ? playerCol : Math.floor(viewport.width / 2),
+      row:playerRow >= 0 && playerRow < viewport.height ? playerRow : Math.floor(viewport.height / 2)
+    };
+    windowManager.push("map-target",{action:"external"},{opener});
+    throwTargeting.hidden = false;
+    throwTargeting.setAttribute("aria-hidden","false");
+    $("#throwTargetAction").textContent = label.toUpperCase();
+    $("#throwTargetText").textContent = `${label}: choose a target cell for ${subject}`;
+    $("#throwTargetHelp").textContent = `Mouse or arrows · Enter to use · Esc to cancel`;
+    updateThrowTarget(throwTargetState.col,throwTargetState.row);
+    renderMap();
+    requestAnimationFrame(() => { if (throwTargetState) throwTargeting.focus(); });
+    return true;
+  }
+
   function endThrowTargeting(restoreInventory = true,completeAction = false) {
     if (!throwTargetState) return;
     const completedTarget = {...throwTargetState};
     const targetSource = activeItemContext?.source;
     const hostWindow = throwTargetState.hostWindow;
-    windowManager.closeKind("item-target",{restoreFocus:false,force:true});
+    windowManager.closeKind("map-target",{restoreFocus:false,force:true});
     throwTargetState = null;
     throwTargeting.hidden = true;
     throwTargeting.setAttribute("aria-hidden","true");
     renderMap();
+    if (completedTarget.external) {
+      if (completeAction) completedTarget.onConfirm?.(completedTarget);
+      else completedTarget.onCancel?.();
+      return;
+    }
     if (restoreInventory && completedTarget.browseWasVisible && hostWindow === "browse") {
       browseOverlay.hidden = false;
       browseOverlay.setAttribute("aria-hidden","false");
@@ -977,7 +1006,7 @@
   }
 
   return {
-    getThrowTarget:() => throwTargetState, updateThrowTarget, restoreFocus,
+    getThrowTarget:() => throwTargetState, updateThrowTarget,requestMapTarget,restoreFocus,
     openItemContextMenu:openInventoryContextMenu,closeItemContextMenu:closeInventoryContextMenu,
     invokeItemActionForRow,canInvokeSelectionAction,getSelectionActionAvailability,invokeSelectionAction,
     openInventoryWindow,closeInventoryWindow,isInventoryOpen:() => inventoryOpen,

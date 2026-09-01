@@ -9,6 +9,8 @@
     const equipmentList = $("#combinedEquipmentList");
     const inventoryShortcut = $("#inventoryShortcut");
     const equipmentShortcut = $("#equipmentShortcut");
+    const inventoryWidgetTitle = $("#inventoryWidgetTitle");
+    const equipmentWidgetTitle = $("#equipmentWidgetTitle");
     let activeSection = "inventory";
     let selectedInventorySlot = null;
     let selectedEquipmentSlot = null;
@@ -142,6 +144,8 @@
       $("#combinedItemsWindowControl").checked = state.combinedItemsWindow;
       inventoryShortcut.setAttribute("aria-controls",state.combinedItemsWindow ? "combinedItemsOverlay" : "inventoryOverlay");
       equipmentShortcut.setAttribute("aria-controls",state.combinedItemsWindow ? "combinedItemsOverlay" : "equipmentOverlay");
+      inventoryWidgetTitle.setAttribute("aria-controls",state.combinedItemsWindow ? "combinedItemsOverlay" : "inventoryOverlay");
+      equipmentWidgetTitle.setAttribute("aria-controls",state.combinedItemsWindow ? "combinedItemsOverlay" : "equipmentOverlay");
     }
     function applyModeChange(enabled) {
       const inventoryFeature = getInventoryFeature();

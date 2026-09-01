@@ -11,6 +11,17 @@
     return {lower:index * 100,upper:(index + 1) * 100};
   }
 
+  function renderWideVitalTicks(id, max) {
+    const layer = $(`#wide${id}Ticks`);
+    if (!layer || layer.dataset.max === String(max)) return;
+    const ticks = [];
+    for (let value = 100; value < max; value += 100) {
+      ticks.push(`<i style="--wide-vital-tick-position:${value / max * 100}%"></i>`);
+    }
+    layer.innerHTML = ticks.join("");
+    layer.dataset.max = max;
+  }
+
   function applyVitals() {
     state.ping = clamp(Math.round(state.ping), 0, 1000);
     state.hp = clamp(Math.round(state.hp), 0, 1912);
@@ -52,9 +63,21 @@
     $("#wideMpFill").style.height = `${state.mp / 275 * 100}%`;
     $("#wideSnFill").style.height = `${state.sanity}%`;
     $("#wideHpFill").style.height = `${state.hp / 1912 * 100}%`;
-    $("#wideMpMeter").setAttribute("aria-valuenow", state.mp);
-    $("#wideSnMeter").setAttribute("aria-valuenow", state.sanity);
-    $("#wideHpMeter").setAttribute("aria-valuenow", state.hp);
+    const wideValues = [
+      {id:"Mp",current:state.mp,max:275},
+      {id:"Sn",current:state.sanity,max:100},
+      {id:"Hp",current:state.hp,max:1912}
+    ];
+    wideValues.forEach(({id,current,max}) => {
+      const formattedCurrent = formatNumber.format(current);
+      const formattedMax = formatNumber.format(max);
+      $(`#wide${id}Value`).textContent = formattedCurrent;
+      $(`#wide${id}Max`).textContent = `/ ${formattedMax}`;
+      const meter = $(`#wide${id}Meter`);
+      meter.setAttribute("aria-valuenow", current);
+      meter.setAttribute("aria-valuetext", `${formattedCurrent} / ${formattedMax}`);
+      renderWideVitalTicks(id, max);
+    });
     const wideVitalsCount = [state.wideMp,state.wideSanity,state.wideHp].filter(Boolean).length;
     const standardVitalsCount = 3 - Number(state.wideHp) - Number(state.wideMp);
     $("#healthResource").hidden = state.wideHp;
@@ -65,6 +88,7 @@
     $("#wideHpBar").hidden = !state.wideHp;
     $("#wideVitals").hidden = wideVitalsCount === 0;
     $("#wideVitals").style.setProperty("--wide-vital-count", wideVitalsCount);
+    $$(".wide-vital-value").forEach(value => { value.hidden = !state.wideVitalValues; });
     $(".vitals").style.setProperty("--standard-vitals-height", `${11 + standardVitalsCount * 36}px`);
     $(".vitals").classList.toggle("wide-vitals-active", state.wideHp || state.wideMp);
     $(".sanity-armor").classList.toggle("wide-vitals-active", state.wideSanity);
@@ -82,6 +106,7 @@
     $("#wideHpControl").checked = state.wideHp;
     $("#wideMpControl").checked = state.wideMp;
     $("#wideSanityControl").checked = state.wideSanity;
+    $("#wideVitalValuesControl").checked = state.wideVitalValues;
     renderCharacter();
   }
 
@@ -111,9 +136,10 @@
     if (!tile) return;
     const current = {...slot,...presentation};
     const severity = active ? clamp(current.severity || 0, 0, 4) : 0;
+    const critical = active && (current.critical || severity >= 3);
     const inactiveState = current.label && current.label !== slot.label ? current.label : "inactive";
     const description = active ? current.label : `${slot.label}: ${inactiveState}`;
-    tile.className = `status-icon-tile ${active ? "active" : "inactive"} severity-${severity}`;
+    tile.className = `status-icon-tile ${active ? "active" : "inactive"} severity-${severity}${critical ? " is-critical" : ""}`;
     tile.dataset.active = active ? "true" : "false";
     tile.style.setProperty("--status-color", current.color || slot.color);
     tile.title = description;
@@ -124,7 +150,7 @@
   function buildStatusUi() {
     $("#speedIcon").innerHTML = STATUS_ICONS.speed;
     $("#bprIcon").innerHTML = STATUS_ICONS.bpr;
-    $("#statusIconGrid").innerHTML = `${STATUS_SLOTS.map(statusTile).join("")}<span class="status-slot-reserved" aria-hidden="true"></span>`;
+    $("#statusIconGrid").innerHTML = STATUS_SLOTS.map(statusTile).join("");
     $("#statusIndicatorControls").innerHTML = STATUS_INDICATORS.map(status => `
       <label class="status-toggle-control" style="--status-color:${status.color}">
         <span class="status-control-icon">${STATUS_ICONS[status.icon]}</span><span>${status.label}</span>
@@ -160,6 +186,19 @@
     $("#bprValue").textContent = bprText;
     $("#bprCard").style.setProperty("--metric-color", bprColor);
     $("#bprCard").title = bprText;
+    const stanceMeta={balanced:{short:"Bl",name:"Balanced stance",color:"#9d9d9d"},defensive:{short:"Df",name:"Defensive stance",color:"#5ccbe4"},offensive:{short:"Of",name:"Offensive stance",color:"#ff8d00"}};
+    const stance=stanceMeta[state.combatStance]||stanceMeta.balanced;
+    const stanceRank=state.combatStanceRank||"STANDARD";
+    const stanceBadge=$("#combatStanceBadge");
+    stanceBadge.textContent=stance.short;stanceBadge.style.setProperty("--badge-color",stance.color);stanceBadge.title=`${stance.name} · ${stanceRank} · Click to switch`;stanceBadge.setAttribute("aria-label",`${stance.name}, ${stanceRank}. Switch combat stance`);
+    const dualHand=state.dualWieldMode!=="main-hand";
+    state.dualWieldMode=dualHand?"dual-hand":"main-hand";
+    const dualBadge=$("#dualWieldBadge");
+    dualBadge.textContent=dualHand?"DH":"MH";
+    dualBadge.style.setProperty("--badge-color",dualHand?"#62d354":"#d5b75d");
+    const dualLabel=dualHand?"Dual-hand mode":"Main-hand mode";
+    dualBadge.title=`${dualLabel} · Click to switch`;
+    dualBadge.setAttribute("aria-label",`${dualLabel}. Switch hand mode`);
 
     STATUS_INDICATORS.forEach(status => updateStatusTile(status, status, Boolean(state.indicators[status.id])));
     const shieldSlot = STATUS_SLOTS.find(slot => slot.kind === "shield");
@@ -171,6 +210,9 @@
       state.conditions[condition.id] = selected.value;
       updateStatusTile(slot, selected.icon ? selected : {label:selected.label,icon:slot.icon,color:slot.color}, Boolean(selected.icon));
     });
+    const mycorrhizaSlot=STATUS_SLOTS.find(slot=>slot.kind==="mycorrhiza");
+    const mycorrhiza=state.mycorrhiza;
+    updateStatusTile(mycorrhizaSlot,mycorrhiza?{label:`Mycorrhiza: ${mycorrhiza.name}`,icon:"mushroom",color:"#69bd66"}:mycorrhizaSlot,Boolean(mycorrhiza));
 
     $("#speedControl").value = state.speed;
     $("#speedControlValue").value = state.speed > 0 ? `+${state.speed}` : state.speed;

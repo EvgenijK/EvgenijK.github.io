@@ -1,7 +1,7 @@
 (() => {
   window.TomeNetPrototype.createBrowseWindowFeature = ({
     state,$,$$,clamp,escapeHtml,INVENTORY_ITEMS,INVENTORY_ICONS,BAGS,windowManager,
-    openItemContextMenu,closeItemContextMenu,invokeItemActionForRow
+    openItemContextMenu,closeItemContextMenu,invokeItemActionForRow,spellbookFeature
   }) => {
     const overlay = $("#browseOverlay");
     const windowElement = $("#browseWindow");
@@ -58,10 +58,6 @@
       return `<div class="browse-bag-summary" style="--browse-color:${bag.color}"><span>${INVENTORY_ICONS[bag.icon]}</span><strong>${escapeHtml(bag.name)}</strong><span>${bag.items.length} / ${bag.capacity}</span></div><div class="browse-bag-list" role="listbox" aria-label="Contents of ${escapeHtml(bag.name)}">${rows}</div>`;
     }
 
-    function bookMarkup(item) {
-      return `<div class="browse-book-placeholder"><span>${INVENTORY_ICONS.book}</span><strong>${escapeHtml(item.name)}</strong><p>Book browsing is represented by this placeholder. The complete Spellbook and spell-list interface remains a separate menu task.</p></div>`;
-    }
-
     function selectCurrent(index,focus = true) {
       if (page === "selector") {
         const entries = browsableItems();
@@ -116,12 +112,6 @@
         help.textContent = "Letter opens actions · Arrows + Enter · s to unstow · Backspace to list · Esc to close";
         body.innerHTML = bag ? bagMarkup(bag) : stateMarkup("unavailable");
         requestAnimationFrame(() => { body.scrollTop = bagScrollTop.get(selectedBagSlot) || 0;selectCurrent(selectedBagItem,focus); });
-      } else {
-        const entry = browsableItems()[selectedBrowseIndex];
-        title.textContent = entry ? `BROWSE · ${entry.item.name.toUpperCase()}` : "BROWSE";
-        help.textContent = "Backspace to list · Esc to close";
-        body.innerHTML = entry ? bookMarkup(entry.item) : stateMarkup("unavailable");
-        if (focus) requestAnimationFrame(() => back.focus());
       }
     }
 
@@ -167,10 +157,7 @@
       if (position < 0) return false;
       closeItemContextMenu(false);
       selectedBrowseIndex = position;
-      page = "book";
-      if (isOpen()) render();
-      else windowManager.push("browse",{page:"book",browseIndex:position},{opener});
-      return true;
+      return Boolean(spellbookFeature.openBrowseBook(inventoryIndex,opener));
     }
     function closeBrowse() { return windowManager.closeKind("browse"); }
     function goBack() {
@@ -210,7 +197,6 @@
       }
       if (event.key === "Escape") { closeBrowse();return true; }
       if (event.key === "Backspace") { event.preventDefault();goBack();return true; }
-      if (page === "book") return true;
       if (event.key === "ArrowUp") selectCurrent((page === "selector" ? selectedBrowseIndex : selectedBagItem) - 1);
       else if (event.key === "ArrowDown") selectCurrent((page === "selector" ? selectedBrowseIndex : selectedBagItem) + 1);
       else if (["Enter"," "].includes(event.key)) activateSelected();

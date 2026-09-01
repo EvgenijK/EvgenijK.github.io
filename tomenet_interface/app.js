@@ -4,7 +4,9 @@
     PY_MAX_EXP,PLAYER_EXP,INVENTORY_CAPACITY,BAGS_DEFAULT_ROW_LIMIT,INVENTORY_ICONS,INVENTORY_ITEMS,BAGS,FLOOR_ITEMS,
     EQUIPMENT_ICONS,CHARACTER_SOURCE_ICONS,TERM_COLORS,EQUIPMENT_SLOT_META,EQUIPMENT_ITEMS,MESSAGE_STREAM,RIGHT_PANEL_WIDGETS,DEFAULT_RIGHT_PANEL_ORDER,
     CHARACTER_DATA,CHARACTER_SOURCES,CHARACTER_SOURCE_EQUIPMENT,CHARACTER_RESIST_GROUPS,ENCUMBRANCE_STATUSES,STATUS_ICONS,STATUS_INDICATORS,
-    SHIELD_OPTIONS,CONDITION_DEFINITIONS,CONDITION_BASES,STATUS_SLOTS,DEFAULT_INDICATORS,DEFAULT_CONDITIONS,DEFAULT_ENCUMBRANCE,SKILL_TREE_DATA
+    SHIELD_OPTIONS,CONDITION_DEFINITIONS,CONDITION_BASES,STATUS_SLOTS,DEFAULT_INDICATORS,DEFAULT_CONDITIONS,DEFAULT_ENCUMBRANCE,SKILL_TREE_DATA,ABILITY_DATA,
+    SPELL_DEFINITIONS,SPELLBOOK_SOURCES,MIMIC_POWERS,MIMIC_FORMS,MIMIC_IMMUNITIES,COMBAT_STANCES,MELEE_TECHNIQUES,RANGED_TECHNIQUES,DRAGON_BREATH_ELEMENTS,DRAGON_LINEAGES,
+    RUNES,RUNE_MODES,RUNE_TYPES,RUNE_ENHANCED_TYPES,calculateRuneSpell
   } = window.TomeNetPrototype.data;
   const storedNumber = (key, fallback) => {
     const value = localStorage.getItem(`tomenet.${key}`);
@@ -48,6 +50,7 @@
     wideHp: storedBoolean("wideHp", storedBoolean("wideVitals", false)),
     wideMp: storedBoolean("wideMp", storedBoolean("wideVitals", false)),
     wideSanity: storedBoolean("wideSanity", storedBoolean("wideVitals", false)),
+    wideVitalValues: storedBoolean("wideVitalValues", true),
     enemyPresent: storedBoolean("enemyPresent", true),
     enemyHealth: storedNumber("enemyHealth", 72),
     speed: storedNumber("speed", 41),
@@ -99,6 +102,30 @@
     characterWindowFontSize: storedNumber("characterWindowFontSize", 12),
     skillsWindowFontSize: storedNumber("skillsWindowFontSize", 12),
     skillsShowUnavailable: storedBoolean("skillsShowUnavailable", false),
+    abilitiesWindowFontSize: storedNumber("abilitiesWindowFontSize", 12),
+    abilitiesExpanded: storedBoolean("abilitiesExpanded", true),
+    spellbookWindowFontSize: storedNumber("spellbookWindowFontSize", 12),
+    mimicPowersFontSize: storedNumber("mimicPowersFontSize", 12),
+    combatStancesFontSize: storedNumber("combatStancesFontSize", 12),
+    meleeTechniquesFontSize: storedNumber("meleeTechniquesFontSize", 12),
+    rangedTechniquesFontSize: storedNumber("rangedTechniquesFontSize", 12),
+    rangedDemoLauncher: storedString("rangedDemoLauncher", "bow"),
+    rangedDemoShield: storedBoolean("rangedDemoShield", false),
+    rangedDemoAmmo: storedNumber("rangedDemoAmmo", 42),
+    rangedDemoAmmoCondition: storedString("rangedDemoAmmoCondition", "normal"),
+    rangedDemoAmmoProtected: storedBoolean("rangedDemoAmmoProtected", false),
+    rangedDemoOil: storedBoolean("rangedDemoOil", true),
+    rangedDemoMaterials: storedString("rangedDemoMaterials", "inventory"),
+    dragonBreathFontSize: storedNumber("dragonBreathFontSize", 12),
+    runecraftFontSize: storedNumber("runecraftFontSize", 12),
+    dragonDemoLineage: storedString("dragonDemoLineage", "multi"),
+    dragonDemoForm: storedString("dragonDemoForm", "native"),
+    ghostDemoState: storedString("ghostDemoState", "living"),
+    stanceDemoLoadout: storedString("stanceDemoLoadout", "shield"),
+    combatStance:"balanced",
+    combatStanceRank:"STANDARD",
+    dualWieldMode:"dual-hand",
+    mycorrhiza:null,
     characterPage: storedString("characterPage", "profile"),
     characterSummaryPage: storedString("characterSummaryPage", "profile"),
     characterResistsLegendHidden: storedBoolean("characterResistsLegendHidden", false),
@@ -126,6 +153,17 @@
   let itemDeviceFeature = null;
   let itemEquipFeature = null;
   let skillsWindowFeature = null;
+  let abilitiesWindowFeature = null;
+  let spellbookWindowFeature = null;
+  let mimicPowersFeature = null;
+  let combatStancesFeature = null;
+  let meleeTechniquesFeature = null;
+  let rangedTechniquesFeature = null;
+  let dragonBreathFeature = null;
+  let runecraftFeature = null;
+  let ghostPowersFeature = null;
+  let mycorrhizaFeature = null;
+  let trappingFeature = null;
   const mapFeature = window.TomeNetPrototype.createMapFeature({
     state,persist,$,clamp,
     getThrowTarget:() => itemFeature?.getThrowTarget() || null,
@@ -141,7 +179,8 @@
   });
   const {applyVitals,applyEnemyHealth,buildStatusUi,applyCombatStatuses,experienceRange,applyExperience} = hudFeature;
   function persist() {
-    for (const [k,v] of Object.entries(state)) localStorage.setItem(`tomenet.${k}`, typeof v === "object" ? JSON.stringify(v) : v);
+    const sessionOnly=new Set(["combatStance","combatStanceRank","dualWieldMode","mycorrhiza"]);
+    for (const [k,v] of Object.entries(state)) if(!sessionOnly.has(k))localStorage.setItem(`tomenet.${k}`, typeof v === "object" ? JSON.stringify(v) : v);
     localStorage.setItem("tomenet.layoutVersion", layoutVersion);
   }
 
@@ -153,7 +192,7 @@
 
   const messageFeature = window.TomeNetPrototype.createMessageFeature({
     $,$$,state,persist,clamp,MESSAGE_STREAM,escapeHtml,scrollMessagesToBottom,
-    restoreFocus:() => skillsWindowFeature?.isOpen() ? skillsWindowFeature.restoreFocus() : combinedItemsWindowFeature?.isOpen() ? combinedItemsWindowFeature.restoreFocus() : equipmentWindowFeature?.isOpen() ? equipmentWindowFeature.restoreFocus() : itemFeature?.restoreFocus(),
+    restoreFocus:() => runecraftFeature?.isOpen() ? runecraftFeature.restoreFocus() : dragonBreathFeature?.isOpen() ? dragonBreathFeature.restoreFocus() : rangedTechniquesFeature?.isOpen() ? rangedTechniquesFeature.restoreFocus() : meleeTechniquesFeature?.isOpen() ? meleeTechniquesFeature.restoreFocus() : combatStancesFeature?.isOpen() ? combatStancesFeature.restoreFocus() : mimicPowersFeature?.isOpen() ? mimicPowersFeature.restoreFocus() : spellbookWindowFeature?.isOpen() ? spellbookWindowFeature.restoreFocus() : abilitiesWindowFeature?.isOpen() ? abilitiesWindowFeature.restoreFocus() : skillsWindowFeature?.isOpen() ? skillsWindowFeature.restoreFocus() : combinedItemsWindowFeature?.isOpen() ? combinedItemsWindowFeature.restoreFocus() : equipmentWindowFeature?.isOpen() ? equipmentWindowFeature.restoreFocus() : itemFeature?.restoreFocus(),
     closePrimaryWindow:() => combinedItemsWindowFeature?.isOpen() ? combinedItemsWindowFeature.closeWindow() : itemFeature?.closeInventoryWindow(),windowManager
   });
   const {buildMessageFeeds,appendDemoMessage,appendGameMessage,setPinnedMessageMode,openMapChatEditor,closeMapChatEditor,mapChatEditor,handleKeydown:handleMessageKeydown,applyHistoryControls} = messageFeature;
@@ -177,6 +216,53 @@
     state,$,clamp,persist,windowManager,guideFeature:guideWindowFeature,appendGameMessage,escapeHtml,skillsData:SKILL_TREE_DATA
   });
   const {handleKeydown:handleSkillsWindowKeydown,applyControls:applySkillsWindowControls} = skillsWindowFeature;
+  spellbookWindowFeature = window.TomeNetPrototype.createSpellbookWindowFeature({
+    state,$,clamp,persist,windowManager,appendGameMessage,escapeHtml,INVENTORY_ITEMS,INVENTORY_ICONS,
+    spellDefinitions:SPELL_DEFINITIONS,spellbookSources:SPELLBOOK_SOURCES,skillsFeature:skillsWindowFeature
+  });
+  const {handleKeydown:handleSpellbookKeydown,applyControls:applySpellbookControls} = spellbookWindowFeature;
+  mimicPowersFeature = window.TomeNetPrototype.createMimicPowersWindowFeature({
+    state,$,clamp,persist,windowManager,appendGameMessage,escapeHtml,forms:MIMIC_FORMS,powers:MIMIC_POWERS,immunities:MIMIC_IMMUNITIES,
+    CHARACTER_DATA,renderCharacter,getTargetingFeature:()=>itemFeature
+  });
+  const {handleKeydown:handleMimicPowersKeydown,applyControls:applyMimicPowersControls} = mimicPowersFeature;
+  combatStancesFeature = window.TomeNetPrototype.createCombatStancesWindowFeature({
+    state,$,clamp,persist,windowManager,appendGameMessage,escapeHtml,stances:COMBAT_STANCES,CHARACTER_DATA,applyCombatStatuses
+  });
+  const {handleKeydown:handleCombatStancesKeydown,applyControls:applyCombatStancesControls} = combatStancesFeature;
+  meleeTechniquesFeature = window.TomeNetPrototype.createMeleeTechniquesWindowFeature({
+    state,$,clamp,persist,windowManager,appendGameMessage,escapeHtml,techniques:MELEE_TECHNIQUES,CHARACTER_DATA,skillsFeature:skillsWindowFeature
+  });
+  const {handleKeydown:handleMeleeTechniquesKeydown,applyControls:applyMeleeTechniquesControls} = meleeTechniquesFeature;
+  rangedTechniquesFeature = window.TomeNetPrototype.createRangedTechniquesWindowFeature({
+    state,$,clamp,persist,windowManager,appendGameMessage,escapeHtml,techniques:RANGED_TECHNIQUES,skillsFeature:skillsWindowFeature
+  });
+  const {handleKeydown:handleRangedTechniquesKeydown,applyControls:applyRangedTechniquesControls} = rangedTechniquesFeature;
+  dragonBreathFeature = window.TomeNetPrototype.createDragonBreathWindowFeature({
+    state,$,$$,clamp,persist,windowManager,appendGameMessage,escapeHtml,lineages:DRAGON_LINEAGES,elements:DRAGON_BREATH_ELEMENTS,getTargetingFeature:()=>itemFeature
+  });
+  const {handleKeydown:handleDragonBreathKeydown,applyControls:applyDragonBreathControls} = dragonBreathFeature;
+  runecraftFeature = window.TomeNetPrototype.createRunecraftWindowFeature({
+    state,$,clamp,persist,windowManager,appendGameMessage,escapeHtml,runes:RUNES,modes:RUNE_MODES,types:RUNE_TYPES,enhancedTypes:RUNE_ENHANCED_TYPES,
+    calculate:calculateRuneSpell,skillsFeature:skillsWindowFeature,getTargetingFeature:()=>itemFeature
+  });
+  const {handleKeydown:handleRunecraftKeydown,applyControls:applyRunecraftControls} = runecraftFeature;
+  ghostPowersFeature = window.TomeNetPrototype.createGhostPowersFeature({state,$});
+  const {applyControls:applyGhostPowersControls} = ghostPowersFeature;
+  mycorrhizaFeature = window.TomeNetPrototype.createMycorrhizaFeature({
+    state,windowManager,appendGameMessage,escapeHtml,applyCombatStatuses,
+    getItemSelectorFeature:()=>itemSelectorFeature,getAbilitiesFeature:()=>abilitiesWindowFeature
+  });
+  trappingFeature = window.TomeNetPrototype.createTrappingFeature({
+    state,windowManager,appendGameMessage,escapeHtml,
+    getItemSelectorFeature:()=>itemSelectorFeature,getAbilitiesFeature:()=>abilitiesWindowFeature
+  });
+  abilitiesWindowFeature = window.TomeNetPrototype.createAbilitiesWindowFeature({
+    state,$,$$,clamp,persist,windowManager,appendGameMessage,escapeHtml,applyCombatStatuses,abilitiesData:ABILITY_DATA,skillsFeature:skillsWindowFeature,spellbookFeature:spellbookWindowFeature,mimicPowersFeature,combatStancesFeature,meleeTechniquesFeature,rangedTechniquesFeature,dragonBreathFeature,runecraftFeature,ghostPowersFeature,mycorrhizaFeature,trappingFeature
+  });
+  const {handleKeydown:handleAbilitiesWindowKeydown,applyControls:applyAbilitiesWindowControls} = abilitiesWindowFeature;
+  $("#combatStanceBadge").addEventListener("click",()=>combatStancesFeature.cycleFromHud());
+  $("#dualWieldBadge").addEventListener("click",()=>abilitiesWindowFeature.toggleDualMode());
   const characterWindowFeature = window.TomeNetPrototype.createCharacterWindowFeature({
     state,$,$$,clamp,persist,renderCharacter,setCharacterPage,CHARACTER_PAGES,windowManager,
     guideFeature:guideWindowFeature,appendGameMessage,escapeHtml,CHARACTER_DATA,
@@ -228,7 +314,7 @@
   }
 
   function activateWindowControlsTab(name) {
-    const target = ["items","browse","selector","devices","inventory","messages","equipment","character","skills"].includes(name) ? name : "inventory";
+    const target = ["items","browse","selector","devices","inventory","messages","equipment","character","skills","abilities","spellbook","mimic-powers","combat-stances","melee-techniques","ranged-techniques","dragon-breath","runecraft","ghost-powers"].includes(name) ? name : "inventory";
     state.windowControlsTab = target;
     $$('[data-window-controls-tab]').forEach(button => {
       const active = button.dataset.windowControlsTab === target;
@@ -278,7 +364,7 @@
     state,$,$$,clamp,escapeHtml,INVENTORY_ITEMS,INVENTORY_ICONS,BAGS,windowManager,
     openItemContextMenu:itemFeature.openItemContextMenu,
     closeItemContextMenu:itemFeature.closeItemContextMenu,
-    invokeItemActionForRow:itemFeature.invokeItemActionForRow
+    invokeItemActionForRow:itemFeature.invokeItemActionForRow,spellbookFeature:spellbookWindowFeature
   });
   combinedItemsWindowFeature = window.TomeNetPrototype.createCombinedItemsWindowFeature({
     state,$,$$,clamp,EQUIPMENT_ITEMS,INVENTORY_ITEMS,windowManager,
@@ -297,6 +383,17 @@
   const {handleKeydown:handleEquipmentWindowKeydown,applyControls:applyEquipmentWindowControls} = equipmentWindowFeature;
   const {handleKeydown:handleCombinedItemsKeydown,applyControls:applyCombinedItemsControls} = combinedItemsWindowFeature;
   const {handleKeydown:handleBrowseKeydown,applyControls:applyBrowseControls} = browseWindowFeature;
+  $("#messagesWidgetTitle").addEventListener("click",event => messageFeature.openHistory(state.rightPanelMessageMode,event.currentTarget));
+  $("#inventoryWidgetTitle").addEventListener("click",event => {
+    if(state.combinedItemsWindow)combinedItemsWindowFeature.openSection("inventory",event.currentTarget);
+    else itemFeature.openInventoryWindow(event.currentTarget);
+  });
+  $("#equipmentWidgetTitle").addEventListener("click",event => {
+    if(state.combinedItemsWindow)combinedItemsWindowFeature.openSection("equipment",event.currentTarget);
+    else equipmentWindowFeature.openWindow(event.currentTarget);
+  });
+  $("#bagsWidgetTitle").addEventListener("click",event => browseWindowFeature.openBrowse(event.currentTarget));
+  $("#characterWidgetTitle").addEventListener("click",event => characterWindowFeature.openWindow(event.currentTarget));
   mapCanvas.addEventListener("pointerdown", event => {
     mapCanvas.focus();
     if (!event.shiftKey || event.button !== 0 || itemFeature?.getThrowTarget()) return;
@@ -351,6 +448,14 @@
   });
   inputRouter.registerHandler("message-history",450,event => handleMessageKeydown(event));
   inputRouter.registerHandler("guide-window",440,event => guideWindowFeature.handleKeydown(event));
+  inputRouter.registerHandler("mimic-powers-window",439,event => handleMimicPowersKeydown(event));
+  inputRouter.registerHandler("combat-stances-window",439,event => handleCombatStancesKeydown(event));
+  inputRouter.registerHandler("melee-techniques-window",439,event => handleMeleeTechniquesKeydown(event));
+  inputRouter.registerHandler("ranged-techniques-window",439,event => handleRangedTechniquesKeydown(event));
+  inputRouter.registerHandler("dragon-breath-window",439,event => handleDragonBreathKeydown(event));
+  inputRouter.registerHandler("runecraft-window",439,event => handleRunecraftKeydown(event));
+  inputRouter.registerHandler("spellbook-window",438,event => handleSpellbookKeydown(event));
+  inputRouter.registerHandler("abilities-window",435,event => handleAbilitiesWindowKeydown(event));
   inputRouter.registerHandler("skills-window",430,event => handleSkillsWindowKeydown(event));
   inputRouter.registerHandler("character-window",425,event => handleCharacterWindowKeydown(event));
   inputRouter.registerHandler("item-windows",400,event => {
@@ -388,14 +493,15 @@
   $("#mapRecenterControl").addEventListener("click", () => { recenterMapCamera(true);persist(); });
   $("#mapResetPlayerControl").addEventListener("click", () => { resetMapPlayer();persist(); });
   $("#pingControl").addEventListener("input", e => { state.ping = +e.target.value; applyVitals(); persist(); });
-  $("#hpControl").addEventListener("input", e => { state.hp = +e.target.value; applyVitals(); persist(); });
-  $("#mpControl").addEventListener("input", e => { state.mp = +e.target.value; applyVitals(); persist(); });
-  $("#stControl").addEventListener("input", e => { state.st = +e.target.value; applyVitals(); persist(); });
+  $("#hpControl").addEventListener("input", e => { state.hp = +e.target.value; applyVitals();dragonBreathFeature.refreshAvailability();persist(); });
+  $("#mpControl").addEventListener("input", e => { state.mp = +e.target.value; applyVitals();runecraftFeature.refreshPreview();persist(); });
+  $("#stControl").addEventListener("input", e => { state.st = +e.target.value; applyVitals();meleeTechniquesFeature.refreshAvailability();rangedTechniquesFeature.refreshAvailability();dragonBreathFeature.refreshAvailability();persist(); });
   $("#sanityControl").addEventListener("input", e => { state.sanity = +e.target.value; applyVitals(); persist(); });
   $("#sanityDisplayControl").addEventListener("change", e => { state.sanityDisplay = e.target.value; applyVitals(); persist(); });
   $("#wideHpControl").addEventListener("change", e => { state.wideHp = e.target.checked; applyVitals(); persist(); });
   $("#wideMpControl").addEventListener("change", e => { state.wideMp = e.target.checked; applyVitals(); persist(); });
   $("#wideSanityControl").addEventListener("change", e => { state.wideSanity = e.target.checked; applyVitals(); persist(); });
+  $("#wideVitalValuesControl").addEventListener("change", e => { state.wideVitalValues = e.target.checked; applyVitals(); persist(); });
   $("#enemyPresentControl").addEventListener("change", e => { state.enemyPresent = e.target.checked; applyEnemyHealth(); persist(); });
   $("#enemyHealthControl").addEventListener("input", e => { state.enemyHealth = +e.target.value; applyEnemyHealth(); persist(); });
   $("#rightPanelHeadersHiddenControl").addEventListener("change", e => { state.rightPanelHeadersHidden = e.target.checked; applyRightPanel(); persist(); });
@@ -419,6 +525,58 @@
   $("#characterWindowFontSizeControl").addEventListener("input", e => { state.characterWindowFontSize = +e.target.value; applyCharacterWindowControls(); persist(); });
   $("#skillsWindowFontSizeControl").addEventListener("input", e => { state.skillsWindowFontSize = +e.target.value; applySkillsWindowControls(); persist(); });
   $("#skillsShowUnavailableControl").addEventListener("change", e => { state.skillsShowUnavailable = e.target.checked; applySkillsWindowControls(); persist(); });
+  $("#abilitiesWindowFontSizeControl").addEventListener("input", e => { state.abilitiesWindowFontSize = +e.target.value; applyAbilitiesWindowControls(); persist(); });
+  $("#abilitiesExpandedControl").addEventListener("change", e => { state.abilitiesExpanded = e.target.checked; applyAbilitiesWindowControls(); persist(); });
+  $("#abilitiesDemoOpen").addEventListener("click", () => {
+    windowManager.closeKind("prototype-controls",{restoreFocus:false,force:true});
+    requestAnimationFrame(() => abilitiesWindowFeature.openWindow($("#openControls")));
+  });
+  $("#spellbookWindowFontSizeControl").addEventListener("input", e => { state.spellbookWindowFontSize = +e.target.value; applySpellbookControls(); persist(); });
+  $("#spellbookDemoOpen").addEventListener("click", () => {
+    windowManager.closeKind("prototype-controls",{restoreFocus:false,force:true});
+    requestAnimationFrame(() => spellbookWindowFeature.openBrowse($("#openControls")));
+  });
+  $("#mimicPowersFontSizeControl").addEventListener("input", e => { state.mimicPowersFontSize = +e.target.value; applyMimicPowersControls(); persist(); });
+  $("#mimicPowersDemoOpen").addEventListener("click", () => {
+    windowManager.closeKind("prototype-controls",{restoreFocus:false,force:true});
+    requestAnimationFrame(() => mimicPowersFeature.openUse($("#openControls")));
+  });
+  $("#combatStancesFontSizeControl").addEventListener("input", e => { state.combatStancesFontSize = +e.target.value; applyCombatStancesControls(); persist(); });
+  $("#stanceDemoLoadoutControl").addEventListener("change", e => { state.stanceDemoLoadout=e.target.value;applyCombatStancesControls({announce:true});persist(); });
+  $("#combatStancesDemoOpen").addEventListener("click", () => {
+    windowManager.closeKind("prototype-controls",{restoreFocus:false,force:true});
+    requestAnimationFrame(() => combatStancesFeature.openUse($("#openControls")));
+  });
+  $("#meleeTechniquesFontSizeControl").addEventListener("input", e => { state.meleeTechniquesFontSize=+e.target.value;applyMeleeTechniquesControls();persist(); });
+  $("#meleeTechniquesDemoOpen").addEventListener("click", () => {
+    windowManager.closeKind("prototype-controls",{restoreFocus:false,force:true});
+    requestAnimationFrame(() => meleeTechniquesFeature.openUse($("#openControls")));
+  });
+  $("#rangedTechniquesFontSizeControl").addEventListener("input", e => { state.rangedTechniquesFontSize=+e.target.value;applyRangedTechniquesControls();persist(); });
+  $("#rangedDemoLauncherControl").addEventListener("change", e => { state.rangedDemoLauncher=e.target.value;applyRangedTechniquesControls();persist(); });
+  $("#rangedDemoShieldControl").addEventListener("change", e => { state.rangedDemoShield=e.target.checked;applyRangedTechniquesControls();persist(); });
+  $("#rangedDemoAmmoControl").addEventListener("input", e => { state.rangedDemoAmmo=+e.target.value;applyRangedTechniquesControls();persist(); });
+  $("#rangedDemoAmmoConditionControl").addEventListener("change", e => { state.rangedDemoAmmoCondition=e.target.value;applyRangedTechniquesControls();persist(); });
+  $("#rangedDemoAmmoProtectedControl").addEventListener("change", e => { state.rangedDemoAmmoProtected=e.target.checked;applyRangedTechniquesControls();persist(); });
+  $("#rangedDemoOilControl").addEventListener("change", e => { state.rangedDemoOil=e.target.checked;applyRangedTechniquesControls();persist(); });
+  $("#rangedDemoMaterialsControl").addEventListener("change", e => { state.rangedDemoMaterials=e.target.value;applyRangedTechniquesControls();persist(); });
+  $("#rangedTechniquesDemoOpen").addEventListener("click", () => {
+    windowManager.closeKind("prototype-controls",{restoreFocus:false,force:true});
+    requestAnimationFrame(() => rangedTechniquesFeature.openUse($("#openControls")));
+  });
+  $("#dragonBreathFontSizeControl").addEventListener("input", e => { state.dragonBreathFontSize=+e.target.value;applyDragonBreathControls();persist(); });
+  $("#dragonDemoLineageControl").addEventListener("change", e => { state.dragonDemoLineage=e.target.value;applyDragonBreathControls();persist(); });
+  $("#dragonDemoFormControl").addEventListener("change", e => { state.dragonDemoForm=e.target.value;applyDragonBreathControls();persist(); });
+  $("#dragonBreathDemoOpen").addEventListener("click", () => {
+    windowManager.closeKind("prototype-controls",{restoreFocus:false,force:true});
+    requestAnimationFrame(() => dragonBreathFeature.openElementPicker($("#openControls")));
+  });
+  $("#runecraftFontSizeControl").addEventListener("input", e => { state.runecraftFontSize=+e.target.value;applyRunecraftControls();persist(); });
+  $("#runecraftDemoOpen").addEventListener("click", () => {
+    windowManager.closeKind("prototype-controls",{restoreFocus:false,force:true});
+    requestAnimationFrame(() => runecraftFeature.openDraw($("#openControls")));
+  });
+  $("#ghostDemoStateControl").addEventListener("change", e => {state.ghostDemoState=e.target.value;applyGhostPowersControls();persist();});
   $("#equipmentVisibleControl").addEventListener("change", e => { state.equipmentVisible = e.target.checked; applyRightPanel(); persist(); });
   $("#equipmentFontSizeControl").addEventListener("input", e => { state.equipmentFontSize = +e.target.value; applyRightPanel(); persist(); });
   $("#equipmentWindowFontSizeControl").addEventListener("input", e => { state.equipmentWindowFontSize = +e.target.value; applyEquipmentWindowControls(); applyCombinedItemsControls(); persist(); });
@@ -473,9 +631,9 @@
     const select = e.target.closest("[data-condition-control]");
     if (!select) return;
     state.conditions[select.dataset.conditionControl] = select.value;
-    applyCombatStatuses(); persist();
+    applyCombatStatuses();rangedTechniquesFeature.refreshAvailability();dragonBreathFeature.refreshAvailability();runecraftFeature.refreshPreview();persist();
   });
-  $("#levelControl").addEventListener("input", e => { state.xpLevel = +e.target.value; applyExperience(); persist(); });
+  $("#levelControl").addEventListener("input", e => { state.xpLevel = +e.target.value; applyExperience(); skillsWindowFeature.refreshLimit();combatStancesFeature.refreshLevel();meleeTechniquesFeature.refreshAvailability();rangedTechniquesFeature.refreshAvailability();dragonBreathFeature.refreshAvailability();persist(); });
   $("#xpProgressControl").addEventListener("input", e => { state.xpProgress = +e.target.value; applyExperience(); persist(); });
   $("#drainedAmountControl").addEventListener("input", e => { state.xpDrainPercent = +e.target.value; applyExperience(); persist(); });
   $("#hideXpNumber").addEventListener("change", e => {
@@ -506,21 +664,21 @@
 
   $("#resetControls").addEventListener("click", () => {
     Object.assign(state, {
-      leftWidth:defaultLeftWidth,rightWidth:defaultRightWidth,ping:193,hp:1912,mp:275,st:10,sanity:100,sanityDisplay:"word",wideHp:false,wideMp:false,wideSanity:false,enemyPresent:true,enemyHealth:72,
+      leftWidth:defaultLeftWidth,rightWidth:defaultRightWidth,ping:193,hp:1912,mp:275,st:10,sanity:100,sanityDisplay:"word",wideHp:false,wideMp:false,wideSanity:false,wideVitalValues:true,enemyPresent:true,enemyHealth:72,
       speed:41,speedBoosted:false,noTele:false,bpr:4,bprBoosted:false,bprMode:"numeric",
       indicators:{...DEFAULT_INDICATORS},shield:"none",conditions:{...DEFAULT_CONDITIONS},
       xpLevel:57,xpProgress:68,xpHideNumber:false,xpDrained:false,
       xpDrainPercent:20,xpRemainingOnly:false,encumbrance:{...DEFAULT_ENCUMBRANCE},
       rightPanelHeadersHidden:false,rightPanelHeaderHeight:30,
       msgChatVisible:true,msgChatRows:10,msgChatFontSize:12,rightPanelMessageMode:"all",messageHistoryMode:"all",messageHistoryFontSize:14,messageHistoryOpacity:70,messageHistoryDataState:"ready",inventoryVisible:true,inventoryFontSize:12,inventoryWindowFontSize:14,equipmentVisible:false,equipmentFontSize:12,equipmentWindowFontSize:14,combinedItemsWindow:false,browseWindowFontSize:14,browseDataState:"ready",browseInventoryFull:false,itemSelectorDemoAction:"inspect",deviceOutcome:"success",deviceReadiness:"data",deviceWrappingSkill:"sufficient",bagsVisible:true,bagsFontSize:12,bagsRowLimit:BAGS_DEFAULT_ROW_LIMIT,
-      characterVisible:true,characterHeight:30,characterFontSize:9,characterWindowFontSize:12,skillsWindowFontSize:12,skillsShowUnavailable:false,characterPage:"profile",characterSummaryPage:"profile",characterResistsLegendHidden:false,
+      characterVisible:true,characterHeight:30,characterFontSize:9,characterWindowFontSize:12,skillsWindowFontSize:12,skillsShowUnavailable:false,abilitiesWindowFontSize:12,abilitiesExpanded:true,spellbookWindowFontSize:12,mimicPowersFontSize:12,combatStancesFontSize:12,meleeTechniquesFontSize:12,rangedTechniquesFontSize:12,rangedDemoLauncher:"bow",rangedDemoShield:false,rangedDemoAmmo:42,rangedDemoAmmoCondition:"normal",rangedDemoAmmoProtected:false,rangedDemoOil:true,rangedDemoMaterials:"inventory",dragonBreathFontSize:12,dragonDemoLineage:"multi",dragonDemoForm:"native",runecraftFontSize:12,ghostDemoState:"living",stanceDemoLoadout:"shield",combatStance:"balanced",combatStanceRank:"STANDARD",dualWieldMode:"dual-hand",mycorrhiza:null,characterPage:"profile",characterSummaryPage:"profile",characterResistsLegendHidden:false,
       rightPanelOrder:[...DEFAULT_RIGHT_PANEL_ORDER],mapGrid:false,mapCellInfo:true,mapFollow:true,cursorTheme:"mithril",controlsTab:"general",windowControlsTab:"inventory"
     });
     $("#itemSelectorDemoActionControl").value = state.itemSelectorDemoAction;
     $("#deviceOutcomeControl").value = state.deviceOutcome;
     $("#deviceReadinessControl").value = state.deviceReadiness;
     $("#deviceWrappingSkillControl").value = state.deviceWrappingSkill;
-    skillsWindowFeature.resetSimulation();combinedItemsWindowFeature.applyModeChange(false);resetMapPlayer();buildMessageFeeds();applyLayout(); applyRightPanel(); applyHistoryControls(); applyCharacterWindowControls(); applySkillsWindowControls(); applyEquipmentWindowControls(); applyCombinedItemsControls(); applyBrowseControls(); scrollMessagesToBottom(); applyVitals(); applyEnemyHealth(); applyCombatStatuses(); applyExperience(); applyEncumbrance(); applyCursorTheme(); activateControlsTab(state.controlsTab); activateWindowControlsTab(state.windowControlsTab); persist();
+    skillsWindowFeature.resetSimulation();ghostPowersFeature.resetSimulation();mycorrhizaFeature.resetSimulation();trappingFeature.resetSimulation();abilitiesWindowFeature.resetSimulation();spellbookWindowFeature.resetSimulation();mimicPowersFeature.resetSimulation();combatStancesFeature.resetSimulation();meleeTechniquesFeature.resetSimulation();rangedTechniquesFeature.resetSimulation();dragonBreathFeature.resetSimulation();runecraftFeature.resetSimulation();combinedItemsWindowFeature.applyModeChange(false);resetMapPlayer();buildMessageFeeds();applyLayout(); applyRightPanel(); applyHistoryControls(); applyCharacterWindowControls(); applySkillsWindowControls(); applyAbilitiesWindowControls(); applySpellbookControls(); applyMimicPowersControls(); applyCombatStancesControls(); applyMeleeTechniquesControls(); applyRangedTechniquesControls(); applyDragonBreathControls(); applyRunecraftControls(); applyGhostPowersControls(); applyEquipmentWindowControls(); applyCombinedItemsControls(); applyBrowseControls(); scrollMessagesToBottom(); applyVitals(); applyEnemyHealth(); applyCombatStatuses(); applyExperience(); applyEncumbrance(); applyCursorTheme(); activateControlsTab(state.controlsTab); activateWindowControlsTab(state.windowControlsTab); persist();
   });
 
   // Draggable splitters
@@ -569,6 +727,15 @@
   applyHistoryControls();
   applyCharacterWindowControls();
   applySkillsWindowControls();
+  applyGhostPowersControls();
+  applyAbilitiesWindowControls();
+  applySpellbookControls();
+  applyMimicPowersControls();
+  applyCombatStancesControls();
+  applyMeleeTechniquesControls();
+  applyRangedTechniquesControls();
+  applyDragonBreathControls();
+  applyRunecraftControls();
   applyEquipmentWindowControls();
   applyCombinedItemsControls();
   applyBrowseControls();

@@ -263,7 +263,7 @@
     linear-gradient(rgba(38,50,43,.12) 1px,transparent 1px) 0 0/100% 18px,
     #010201;
   color:#d2d2ca;
-  font:13px/1.42 var(--terminal);
+  font:13px/1.28 var(--terminal);
 }
 .item-inspect-name {
   margin:0 0 16px;
@@ -273,7 +273,7 @@
   font:14px/1.25 var(--terminal);
   font-weight:400;
 }
-.item-inspect-lines { display:grid;gap:5px; }
+.item-inspect-lines { display:grid;gap:2px; }
 .item-inspect-lines p { margin:0; }
 .item-inspect-lines .is-dim { color:#878c84; }
 .item-inspect-lines .is-info { color:#65dfec; }

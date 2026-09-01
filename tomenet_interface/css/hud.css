@@ -281,6 +281,10 @@
   gap:8px;
   border-left-color:#494c44;
 }
+#bprCard{grid-template-columns:22px minmax(0,1fr) auto auto}
+.combat-mode-badges{display:flex;align-items:center;gap:4px;margin-left:4px}
+.combat-stance-badge,.dual-wield-badge{display:grid;place-items:center;min-width:25px;height:21px;padding:0;border:1px solid color-mix(in srgb,var(--badge-color,#9d9d9d),#574724 45%);background:color-mix(in srgb,var(--badge-color,#9d9d9d),transparent 88%);color:var(--badge-color,#9d9d9d);font:10px/1 var(--terminal);letter-spacing:.04em;text-shadow:0 1px 2px #000;box-shadow:inset 0 0 6px rgba(0,0,0,.55);cursor:pointer}
+.combat-stance-badge:hover,.dual-wield-badge:hover,.combat-stance-badge:focus-visible,.dual-wield-badge:focus-visible{border-color:var(--badge-color,#9d9d9d);background:color-mix(in srgb,var(--badge-color,#9d9d9d),transparent 78%);outline:none;box-shadow:inset 0 0 6px rgba(0,0,0,.55),0 0 7px color-mix(in srgb,var(--badge-color,#9d9d9d),transparent 45%)}
 .combat-metric-icon {
   width:20px;
   height:20px;
@@ -356,16 +360,49 @@
 }
 .status-icon-tile.active { opacity:1; }
 .status-icon-tile.severity-2 { box-shadow:inset 0 0 0 1px #080a08,inset 0 1px rgba(255,255,255,.07),0 0 5px color-mix(in srgb,var(--status-color),transparent 72%); }
-.status-icon-tile.severity-3,
-.status-icon-tile.severity-4 {
+.status-icon-tile.is-critical {
+  --critical-cycle:1.25s;
+  --critical-dim-opacity:.78;
+  --critical-brightness:1.2;
+  --critical-near-glow:7px;
+  --critical-far-glow:3px;
   border-color:var(--status-color);
   background:
     linear-gradient(135deg,transparent 0 44%,rgba(0,0,0,.52) 45% 49%,transparent 50%),
     radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--status-color),transparent 72%),transparent 70%),#100b09;
   box-shadow:inset 0 0 0 1px #170806,0 0 7px color-mix(in srgb,var(--status-color),transparent 54%);
+  animation:status-critical-pulse var(--critical-cycle) ease-in-out infinite alternate;
 }
-.status-icon-tile.severity-4 { animation:status-danger-pulse 1.25s ease-in-out infinite alternate; }
-@keyframes status-danger-pulse { to { filter:brightness(1.22) drop-shadow(0 0 5px var(--status-color)); } }
+.status-icon-tile.severity-4 {
+  --critical-cycle:.9s;
+  --critical-dim-opacity:.72;
+  --critical-brightness:1.3;
+  --critical-near-glow:11px;
+  --critical-far-glow:5px;
+}
+@keyframes status-critical-pulse {
+  from {
+    opacity:var(--critical-dim-opacity);
+    border-color:color-mix(in srgb,var(--status-color),transparent 26%);
+    filter:brightness(.92) saturate(.92) drop-shadow(0 0 2px color-mix(in srgb,var(--status-color),transparent 48%));
+    box-shadow:inset 0 0 0 1px #170806,0 0 var(--critical-far-glow) color-mix(in srgb,var(--status-color),transparent 58%);
+  }
+  to {
+    opacity:1;
+    border-color:color-mix(in srgb,var(--status-color),white 12%);
+    filter:brightness(var(--critical-brightness)) saturate(1.14) drop-shadow(0 0 var(--critical-near-glow) color-mix(in srgb,var(--status-color),transparent 12%));
+    box-shadow:inset 0 0 0 1px #250a07,0 0 var(--critical-near-glow) color-mix(in srgb,var(--status-color),transparent 25%),0 0 var(--critical-far-glow) var(--status-color);
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  .status-icon-tile.is-critical {
+    animation:none;
+    opacity:1;
+    border-color:color-mix(in srgb,var(--status-color),white 8%);
+    filter:brightness(1.12) saturate(1.08) drop-shadow(0 0 var(--critical-far-glow) color-mix(in srgb,var(--status-color),transparent 30%));
+    box-shadow:inset 0 0 0 1px #210907,0 0 var(--critical-near-glow) color-mix(in srgb,var(--status-color),transparent 38%);
+  }
+}
 .status-shield-mark {
   position:absolute;
   inset:0;
@@ -376,13 +413,6 @@
   font:700 10px var(--terminal);
   text-shadow:0 1px 2px #000;
 }
-.status-slot-reserved {
-  height:28px;
-  border:1px solid rgba(66,71,64,.16);
-  background:rgba(1,3,2,.2);
-  box-shadow:inset 0 0 0 1px rgba(6,8,6,.28);
-}
-
 /* Four prototype-control tabs and the status packet controls. */
 .controls-tabs { grid-template-columns:repeat(2,minmax(0,1fr)); }
 .controls-tabs button:nth-child(2n) { border-right:0; }
@@ -453,7 +483,7 @@
   .effects { padding:5px 6px; }
   .effects h2 { margin-bottom:3px;font-size:10px; }
   .status-icon-grid { gap:2px; }
-  .status-icon-tile,.status-slot-reserved { height:22px; }
+  .status-icon-tile { height:22px; }
   .status-icon-tile svg { width:15px;height:15px; }
   .status-shield-mark { font-size:8px; }
 }
@@ -511,6 +541,7 @@
 }
 .wide-vital-fill {
   position:absolute;
+  z-index:1;
   inset:auto 0 0;
   height:100%;
   transition:height .16s ease;
@@ -534,6 +565,65 @@
     linear-gradient(180deg,#ff493d,#ed110d 54%,#a90705);
   box-shadow:inset 7px 0 9px rgba(0,0,0,.18),inset -7px 0 9px rgba(0,0,0,.2),inset 0 6px 8px rgba(255,255,255,.2),0 -2px 9px rgba(255,41,31,.5);
 }
+.wide-vital-value {
+  position:absolute;
+  z-index:3;
+  top:50%;
+  left:50%;
+  width:min(74px,calc(100% - 8px));
+  min-width:0;
+  padding:5px 3px 4px;
+  display:grid;
+  place-items:center;
+  gap:2px;
+  transform:translate(-50%,-50%);
+  overflow:hidden;
+  border:1px solid rgba(190,163,99,.48);
+  border-radius:2px;
+  background:linear-gradient(180deg,rgba(20,23,19,.88),rgba(2,4,3,.82));
+  box-shadow:inset 0 1px rgba(255,255,255,.08),inset 0 0 0 1px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.58);
+  color:#f0ede2;
+  font-family:var(--terminal);
+  font-variant-numeric:tabular-nums lining-nums;
+  text-align:center;
+  text-shadow:0 1px 2px #000,0 0 4px rgba(255,255,255,.13);
+  pointer-events:none;
+}
+.wide-vital-value[hidden] { display:none; }
+.wide-vital-ticks {
+  position:absolute;
+  z-index:2;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+}
+.wide-vital-ticks i {
+  position:absolute;
+  right:7px;
+  bottom:var(--wide-vital-tick-position);
+  left:7px;
+  height:1px;
+  display:block;
+  background:linear-gradient(90deg,transparent,rgba(239,232,205,.14) 14% 86%,transparent);
+  box-shadow:0 1px rgba(0,0,0,.22);
+  opacity:.5;
+}
+.wide-vital-value strong {
+  max-width:100%;
+  overflow:hidden;
+  color:#fffdf3;
+  font:500 13px/1 var(--terminal);
+  letter-spacing:-.025em;
+  white-space:nowrap;
+}
+.wide-vital-value small {
+  max-width:100%;
+  overflow:hidden;
+  color:#aaa99f;
+  font:8px/1 var(--terminal);
+  letter-spacing:-.02em;
+  white-space:nowrap;
+}
 @media (max-width:1400px), (max-height:760px) {
   .wide-vitals {
     height:96px;
@@ -541,6 +631,7 @@
     padding:6px 9px 0;
     gap:7px;
   }
+  .wide-vital-value { padding-top:4px;padding-bottom:3px; }
 }
 
 /* In wide mode the vertical meters consume every free pixel below effects. */

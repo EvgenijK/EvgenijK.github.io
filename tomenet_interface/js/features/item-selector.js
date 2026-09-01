@@ -212,11 +212,11 @@
       const opener = options.opener || document.activeElement;
       session = {
         source:null,bagSlot:null,selected:0,
-        options:{title:"Select an item",filter:null,availability:null,onSelect:null,onCancel:null,preferredSource:"inventory",...options,allowedSources}
+        options:{title:"Select an item",filter:null,availability:null,onSelect:null,onCancel:null,preferredSource:"inventory",bagsEscapeSource:null,...options,allowedSources}
       };
       session.source = firstAvailableSource(session.options.preferredSource);
       title.textContent = session.options.title;
-      help.textContent = "Letters select · ↑↓ move · Tab sources · / pack/equipment · ! bags · − floor · Esc cancel";
+      help.textContent = `Letters select · ↑↓ move · Tab sources · / pack/equipment · ! bags · − floor · Esc ${session.options.bagsEscapeSource ? "back/cancel" : "cancel"}`;
       overlay.hidden = false;
       overlay.setAttribute("aria-hidden","false");
       windowManager.push("item-selector",{allowedSources,source:session.source},{opener});
@@ -240,6 +240,7 @@
       if (editing) return true;
       if (event.key === "Escape") {
         if (session.source === "bags" && session.bagSlot) { session.bagSlot = null;session.selected = 0;renderList();updateSelection(); }
+        else if (session.source === "bags" && session.options.bagsEscapeSource) selectSource(session.options.bagsEscapeSource);
         else close(true);
       } else if (event.key === "Backspace" && session.source === "bags" && session.bagSlot) {
         session.bagSlot = null;session.selected = 0;renderList();updateSelection();

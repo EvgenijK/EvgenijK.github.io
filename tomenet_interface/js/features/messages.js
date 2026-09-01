@@ -177,6 +177,7 @@
     function showHistoryWindow() {
       historyOverlay.hidden = false;
       historyOverlay.setAttribute("aria-hidden","false");
+      historyEditor.hidden = false;
       renderHistory({switching:true});
       requestAnimationFrame(() => historyFeed.focus());
     }
@@ -237,16 +238,12 @@
     function openHistoryChatEditor(initialValue = "") {
       if (!isHistoryOpen()) return;
       if (!windowManager.has("history-chat-input")) windowManager.open("history-chat-input",{initialValue},{opener:document.activeElement});
-      historyWindow.classList.add("is-editing");
-      historyEditor.hidden = false;
       historyInput.value = initialValue;
       requestAnimationFrame(() => historyInput.focus());
     }
 
     function closeHistoryChatEditor(returnFocus = true) {
       windowManager.closeKind("history-chat-input",{restoreFocus:false,force:true});
-      historyWindow.classList.remove("is-editing");
-      historyEditor.hidden = true;
       historyInput.value = "";
       historyInput.blur();
       if (returnFocus && isHistoryOpen()) requestAnimationFrame(() => historyFeed.focus());
@@ -288,8 +285,9 @@
         if (ctrlOnly && event.key.toLowerCase() === "o") { openHistory("chat");return true; }
         return false;
       }
-      if (!historyEditor.hidden) {
+      if (windowManager.has("history-chat-input")) {
         if (event.key === "Escape") { closeHistoryChatEditor();return true; }
+        if (event.key === "Tab") { trapHistoryFocus(event);return true; }
         return false;
       }
       if (ctrlOnly && event.key.toLowerCase() === "p") { setHistoryMode("all");return true; }
@@ -312,7 +310,11 @@
       if (text) appendChatMessage(text,true);
       closeHistoryChatEditor();
     });
-    $("#messageExpand").addEventListener("click",event => openHistory(state.rightPanelMessageMode,event.currentTarget));
+    historyInput.addEventListener("focus",() => {
+      if (isHistoryOpen() && !windowManager.has("history-chat-input")) {
+        windowManager.open("history-chat-input",{}, {opener:historyFeed});
+      }
+    });
     $(".right-message-view-switch").addEventListener("click",event => {
       const button = event.target.closest("[data-right-message-mode]");
       if (button) setPinnedMessageMode(button.dataset.rightMessageMode);

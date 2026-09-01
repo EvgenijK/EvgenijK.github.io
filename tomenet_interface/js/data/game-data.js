@@ -19,6 +19,7 @@
     scroll:'<svg viewBox="0 0 24 24"><path d="M7 3h11v15c0 2-1.5 3-3 3H6c2 0 3-1 3-3V6c0-2-1-3-3-3h1zM12 8h4M12 12h4M12 16h3"/></svg>',
     rod:'<svg viewBox="0 0 24 24"><path d="M5 20L18 7M15 4l5 5M4 21l4-1-3-3zM10 13l2 2"/></svg>',
     wand:'<svg viewBox="0 0 24 24"><path d="M5 19L17 7M15 5l4 4M4 20l3-1-2-2zM17 3v2M21 7h-2M19.5 4.5l-1.5 1.5"/></svg>',
+    ammo:'<svg viewBox="0 0 24 24"><path d="M5 20L18 7M15 5l4-1-1 4M4 21l4-1-3-3zM8 17l-3-3M11 14l-3-3"/></svg>',
     staff:'<svg viewBox="0 0 24 24"><path d="M6 21L17 6M15 4l3-2 2 3-2 3M8 16l3 2M5 18l3 3"/></svg>',
     potion:'<svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v5l-4 6v6h12v-6l-4-6V3M7 14h10"/></svg>',
     oil:'<svg viewBox="0 0 24 24"><path d="M8 3h8M9 3v5l-3 4v8h12v-8l-3-4V3M7 13h10"/><path d="M12 11c2 3 3 4 3 6a3 3 0 0 1-6 0c0-2 1-3 3-6z"/></svg>',
@@ -50,7 +51,12 @@
     {name:"The Adamantite Crown 'Elenath'",weight:4.0,icon:"crown",color:"#ffe34d",magic:true,trueArtifact:true,type:"equipment",slot:"head",equipKind:"armour",eligibleEquipSlots:["head"],quantity:1,itemLevel:85,artifactLevel:85},
     {name:"3 Flasks of Oil",weight:2.1,icon:"oil",color:"#ffff00",type:"fuel",subtype:"oil",quantity:3,fuelPerItem:7500},
     {name:"5 Potions of Cure Critical Wounds",weight:2.0,icon:"potion",color:"#e45b59",type:"potion",subtype:"cure-critical",quantity:5,useProfile:{effect:"Critical wounds close and the pain recedes.",message:"You feel much better.",resource:"quantity"}},
-    {name:"Handbook of Beginner Cantrips",weight:3.0,icon:"book",color:"#62d8ff",type:"book",subtype:"handbook",quantity:1,browsable:true}
+    {name:"Handbook of Beginner Cantrips",weight:3.0,icon:"book",color:"#62d8ff",type:"book",subtype:"handbook",quantity:1,browsable:true,spellSourceId:"beginner-cantrips"},
+    {name:"Divine Race Tome",weight:5.0,icon:"book",color:"#e59a3c",type:"book",subtype:"divine-race-tome",quantity:1,browsable:true,spellSourceId:"divine-race-tome"},
+    {name:"Spell Scroll of Power Bolt I",weight:0.5,icon:"scroll",color:"#e59a3c",type:"book",subtype:"spell-scroll",quantity:1,browsable:true,spellSourceId:"power-bolt-scroll"},
+    {name:"30 Rounded Pebbles",weight:6.0,icon:"ammo",color:"#c79d55",type:"ammo",subtype:"rounded-pebbles",trapAmmoType:"shot",quantity:30},
+    {name:"24 Seeker Bolts",weight:4.8,icon:"ammo",color:"#ffb044",type:"ammo",subtype:"seeker-bolts",trapAmmoType:"bolt",quantity:24},
+    {name:"2 Runes of Protection",weight:1.0,icon:"scroll",color:"#b96de1",type:"rune",subtype:"protection",quantity:2}
   ];
   const BAGS = [
     {slot:"a",name:"Potion Belt",capacity:5,icon:"bag",color:"#cf5b43",acceptsTypes:["potion"],items:[
@@ -68,12 +74,18 @@
       {name:"Smattering of Saltpetre",weight:0.1,icon:"ingredient",color:"#d7d5cd",type:"ingredient",quantity:1}
     ]},
     {slot:"d",name:"Trap Kit Bag",capacity:8,icon:"bag",color:"#4d83d8",acceptsTypes:["trap"],items:[
+      {name:"Catapult Trap Kit",weight:1.5,icon:"trap",color:"#d48b42",type:"trap",subtype:"catapult",quantity:1},
       {name:"Arrow Trap Kit",weight:1.5,icon:"trap",color:"#c95b4b",type:"trap",subtype:"arrow",quantity:1},
+      {name:"Bolt Trap Kit",weight:1.5,icon:"trap",color:"#e45a4b",type:"trap",subtype:"bolt",quantity:1},
+      {name:"Fumes Trap Kit",weight:1.5,icon:"trap",color:"#4d83d8",type:"trap",subtype:"fumes",quantity:1},
+      {name:"Magic Trap Kit",weight:1.5,icon:"trap",color:"#b96de1",type:"trap",subtype:"magic",quantity:1},
       {name:"Device Trap Kit",weight:1.5,icon:"trap",color:"#aeb1aa",type:"trap",subtype:"device",quantity:1}
     ]},
     {slot:"e",name:"Food Bag",capacity:6,icon:"bag",color:"#9c6b4b",acceptsTypes:["food"],items:[
       {name:"Rations of Food",weight:1.0,icon:"food",color:"#c49d58",type:"food",quantity:15,useProfile:{effect:"The meal relieves your hunger.",message:"That tastes good.",resource:"quantity"}},
-      {name:"Mushrooms of Cure Poison",weight:0.1,icon:"food",color:"#69bd66",type:"food",subtype:"cure-poison",quantity:3,useProfile:{effect:"The poison is purged from your body.",message:"You are no longer poisoned.",resource:"quantity"}},
+      {name:"Mushrooms of Cure Poison",weight:0.1,icon:"food",color:"#69bd66",type:"food",subtype:"cure-poison",fungus:true,fungusId:"cure-poison",quantity:3,useProfile:{effect:"The poison is purged from your body.",message:"You are no longer poisoned.",resource:"quantity"}},
+      {name:"Mushrooms of Paranoia",weight:0.1,icon:"food",color:"#b77ad7",type:"food",subtype:"paranoia",fungus:true,fungusId:"paranoia",quantity:2,useProfile:{effect:"Uneasy thoughts crowd your mind.",message:"You feel terribly paranoid.",resource:"quantity"}},
+      {name:"Slime Mold",weight:0.1,icon:"food",color:"#80a95c",type:"food",subtype:"slime-mold",fungus:true,fungusId:"slime-mold",quantity:1,useProfile:{effect:"The slime mold nourishes you.",message:"That tastes good.",resource:"quantity"}},
       {name:"Pints of Fine Ale",weight:1.0,icon:"potion",color:"#c68a43",type:"potion",subtype:"ale",quantity:6,useProfile:{effect:"A pleasant warmth spreads through you.",message:"That tastes good.",resource:"quantity"}}
     ]}
   ];
@@ -138,7 +150,7 @@
     {key:"j",equipSlotId:"head",slot:"hat",slotName:"(hat)",equipKind:"armour",eligibleEquipSlots:["head"],name:"Iron Crown of Telepathy",weight:3.0,tone:"violet"},
     {key:"k",equipSlotId:"hands",slot:"gloves",slotName:"(gloves)",equipKind:"armour",eligibleEquipSlots:["hands"],name:"Gauntlets of Combat",weight:2.5,tone:"orange"},
     {key:"l",equipSlotId:"feet",slot:"boots",slotName:"(boots)",equipKind:"armour",eligibleEquipSlots:["feet"],name:"Soft Leather Boots of Speed",weight:2.0,tone:"l-green"},
-    {key:"m",equipSlotId:"ammo",slot:"quiver",slotName:"(quiver)",equipKind:"ammo",eligibleEquipSlots:["ammo"],name:"42 Seeker Arrows",weight:4.2,tone:"yellow",ironTrade:true,quantity:42},
+    {key:"m",equipSlotId:"ammo",slot:"quiver",slotName:"(quiver)",equipKind:"ammo",eligibleEquipSlots:["ammo"],name:"42 Seeker Arrows",weight:4.2,tone:"yellow",ironTrade:true,trapAmmoType:"arrow",quantity:42},
     {key:"n",equipSlotId:"tool",slot:"tool",slotName:"(tool)",equipKind:"tool",eligibleEquipSlots:["tool"]}
   ];
   const MESSAGE_ARCHIVE_PATTERNS = [
@@ -195,8 +207,8 @@
   ];
   const DEFAULT_RIGHT_PANEL_ORDER = RIGHT_PANEL_WIDGETS.map(widget => widget.id);
   const CHARACTER_DATA = {
-    name:"MaiaMage", sex:"Female", race:"Maia", className:"Runemaster",
-    body:"Player", trait:"Enlightened", mode:"Everlasting (infinite lives)", status:"Alive",
+    name:"MaiaMage", sex:"Female", race:"Maia", className:"Mimic",
+    body:"Vampire", trait:"Enlightened", mode:"Everlasting (infinite lives)", status:"Alive", totalWinner:false,
     age:124, height:72, weight:146, socialClass:57, armor:193,
     stats:[
       ["STR","18 / 180","l-umber"],["INT","18 / 180","l-umber"],["WIS","18 / 160","l-umber"],
@@ -278,6 +290,7 @@
     pfe:'<svg viewBox="0 0 24 24"><path d="M12 3c2.7 1.7 5.3 2.5 8 2.8v5.4c0 5-3 8.2-8 9.8-5-1.6-8-4.8-8-9.8V5.8C6.7 5.5 9.3 4.7 12 3z"/><path d="M8 15l4-7 4 7M9.5 12h5"/></svg>',
     crit:'<svg viewBox="0 0 24 24"><path d="M12 2l2.2 7.3L22 12l-7.8 2.7L12 22l-2.2-7.3L2 12l7.8-2.7z"/><path d="M8 5l8 14M17 6l-2 2M7 16l2-2"/></svg>',
     shield:'<svg viewBox="0 0 24 24"><path d="M12 3c2.7 1.7 5.3 2.5 8 2.8v5.4c0 5-3 8.2-8 9.8-5-1.6-8-4.8-8-9.8V5.8C6.7 5.5 9.3 4.7 12 3z"/><path d="M8 12h8M12 8v8"/></svg>',
+    mushroom:'<svg viewBox="0 0 24 24"><path d="M3 12c.7-5.5 4-9 9-9s8.3 3.5 9 9H3zM9 12v3.5L7 21h10l-2-5.5V12"/><path d="M7 9l1-1M12 7V5M17 9l-1-1"/></svg>',
     food:'<svg viewBox="0 0 24 24"><path d="M4 12h16c0 5-3 8-8 8s-8-3-8-8zM3 12h18M8 8c0-2 2-2 2-4M13 9c0-2 2-2 2-5"/></svg>',
     blind:'<svg viewBox="0 0 24 24"><path d="M2 12c3-5 6-7 10-7s7 2 10 7c-3 5-6 7-10 7S5 17 2 12zM4 4l16 16"/><path d="M10 10a3 3 0 0 0 4 4"/></svg>',
     hallu:'<svg viewBox="0 0 24 24"><path d="M3 12c3-5 6-7 9-7s6 2 9 7c-3 5-6 7-9 7s-6-2-9-7z"/><path d="M12 9c4 0 4 6 0 6s-4-4-1-5c2-.7 3 2 1 2"/></svg>',
@@ -306,14 +319,14 @@
     {value:"plasma",label:"Plasma Shield",color:"#ee725f",mark:"✦"}, {value:"mystic",label:"Mystic Shield",color:"#b16ee0",mark:"◇"}
   ];
   const CONDITION_DEFINITIONS = [
-    {id:"food",label:"Food",options:[{value:"normal",label:"Normal"},{value:"hungry",label:"Hungry",icon:"food",color:"#d9bd43"},{value:"starved",label:"Starved",icon:"food",color:"#e27e34",severity:2},{value:"fainting",label:"Starved (fainting)",icon:"food",color:"#ef5445",severity:3},{value:"full",label:"Full",icon:"food",color:"#64c95c"},{value:"gorged",label:"Gorged",icon:"food",color:"#319c4c",severity:2}]},
-    {id:"vision",label:"Vision",options:[{value:"none",label:"Normal"},{value:"blind",label:"Blind",icon:"blind",color:"#e08137",severity:2},{value:"hallu",label:"Hallucinating",icon:"hallu",color:"#e4c641"},{value:"blind_hallu",label:"Blind & Hallucinating",icon:"blind",color:"#ee6246",severity:3}]},
-    {id:"confusion",label:"Confusion",options:[{value:"none",label:"None"},{value:"confused",label:"Confused",icon:"confused",color:"#df8436",severity:2}]},
-    {id:"fear",label:"Fear",options:[{value:"none",label:"None"},{value:"afraid",label:"Afraid",icon:"fear",color:"#df8436",severity:2}]},
-    {id:"poison",label:"Poison / Disease",options:[{value:"none",label:"None"},{value:"poisoned",label:"Poisoned",icon:"poison",color:"#e78035",severity:2},{value:"slow_poison",label:"Poisoned (slowed)",icon:"poison",color:"#d5c140"},{value:"diseased",label:"Diseased",icon:"disease",color:"#ee6946",severity:3}]},
-    {id:"activity",label:"State",options:[{value:"none",label:"None"},{value:"searching",label:"Searching",icon:"search",color:"#d9d5c9"},{value:"resting",label:"Resting",icon:"rest",color:"#8ba9c9"},{value:"paralyzed",label:"Paralyzed",icon:"paralysis",color:"#e44b3e",severity:2},{value:"stasis",label:"In Stasis",icon:"paralysis",color:"#da5145",severity:3},{value:"suspended",label:"Suspended",icon:"paralysis",color:"#bd6bdc",severity:3}]},
+    {id:"food",label:"Food",options:[{value:"normal",label:"Normal"},{value:"hungry",label:"Hungry",icon:"food",color:"#d9bd43"},{value:"starved",label:"Starved",icon:"food",color:"#e27e34",severity:2,critical:true},{value:"fainting",label:"Starved (fainting)",icon:"food",color:"#ef5445",severity:3},{value:"full",label:"Full",icon:"food",color:"#64c95c"},{value:"gorged",label:"Gorged",icon:"food",color:"#319c4c",severity:2}]},
+    {id:"vision",label:"Vision",options:[{value:"none",label:"Normal"},{value:"blind",label:"Blind",icon:"blind",color:"#e08137",severity:2,critical:true},{value:"hallu",label:"Hallucinating",icon:"hallu",color:"#e4c641"},{value:"blind_hallu",label:"Blind & Hallucinating",icon:"blind",color:"#ee6246",severity:3}]},
+    {id:"confusion",label:"Confusion",options:[{value:"none",label:"None"},{value:"confused",label:"Confused",icon:"confused",color:"#df8436",severity:2,critical:true}]},
+    {id:"fear",label:"Fear",options:[{value:"none",label:"None"},{value:"afraid",label:"Afraid",icon:"fear",color:"#df8436",severity:2,critical:true}]},
+    {id:"poison",label:"Poison / Disease",options:[{value:"none",label:"None"},{value:"poisoned",label:"Poisoned",icon:"poison",color:"#e78035",severity:2,critical:true},{value:"slow_poison",label:"Poisoned (slowed)",icon:"poison",color:"#d5c140"},{value:"diseased",label:"Diseased",icon:"disease",color:"#ee6946",severity:3}]},
+    {id:"activity",label:"State",options:[{value:"none",label:"None"},{value:"searching",label:"Searching",icon:"search",color:"#d9d5c9"},{value:"resting",label:"Resting",icon:"rest",color:"#8ba9c9"},{value:"paralyzed",label:"Paralyzed",icon:"paralysis",color:"#e44b3e",severity:2,critical:true},{value:"stasis",label:"In Stasis",icon:"paralysis",color:"#da5145",severity:3},{value:"suspended",label:"Suspended",icon:"paralysis",color:"#bd6bdc",severity:3}]},
     {id:"cut",label:"Wounds",options:[{value:"none",label:"None"},{value:"graze",label:"Graze",icon:"wound",color:"#dec647",severity:1},{value:"light",label:"Light Cut",icon:"wound",color:"#e1ba3d",severity:1},{value:"bad",label:"Bad Cut",icon:"wound",color:"#df8734",severity:2},{value:"nasty",label:"Nasty Cut",icon:"wound",color:"#e36b37",severity:2},{value:"severe",label:"Severe Cut",icon:"wound",color:"#df4539",severity:3},{value:"deep",label:"Deep Gash",icon:"wound",color:"#e23632",severity:3},{value:"mortal",label:"Mortal Wound",icon:"wound",color:"#fa493e",severity:4}]},
-    {id:"stun",label:"Stun",options:[{value:"none",label:"None"},{value:"stun",label:"Stunned",icon:"stun",color:"#e4a03a",severity:1},{value:"heavy",label:"Heavy Stun",icon:"stun",color:"#e47731",severity:2},{value:"knocked",label:"Knocked Out",icon:"stun",color:"#e5483b",severity:4}]}
+    {id:"stun",label:"Stun",options:[{value:"none",label:"None"},{value:"stun",label:"Stunned",icon:"stun",color:"#e4a03a",severity:1},{value:"heavy",label:"Heavy Stun",icon:"stun",color:"#e47731",severity:2,critical:true},{value:"knocked",label:"Knocked Out",icon:"stun",color:"#e5483b",severity:4}]}
   ];
   const CONDITION_BASES = {
     food:{icon:"food",color:"#8b8d80"}, vision:{icon:"esp",color:"#8b8d80"},
@@ -323,6 +336,7 @@
   };
   const STATUS_SLOTS = [
     ...STATUS_INDICATORS.map(status => ({...status,kind:"indicator"})),
+    {id:"mycorrhiza",kind:"mycorrhiza",label:"Mycorrhiza",icon:"mushroom",color:"#69bd66"},
     {id:"shield",kind:"shield",label:"Reactive Shield",icon:"shield",color:"#8b8d80"},
     ...CONDITION_DEFINITIONS.map(condition => ({
       id:`condition-${condition.id}`,kind:"condition",conditionId:condition.id,label:condition.label,...CONDITION_BASES[condition.id]

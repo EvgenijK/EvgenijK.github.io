@@ -21,6 +21,14 @@
   <link rel="stylesheet" href="css/character-window.css" />
   <link rel="stylesheet" href="css/guide-window.css" />
   <link rel="stylesheet" href="css/skills-window.css" />
+  <link rel="stylesheet" href="css/abilities-window.css" />
+  <link rel="stylesheet" href="css/spellbook-window.css" />
+  <link rel="stylesheet" href="css/mimic-powers-window.css" />
+  <link rel="stylesheet" href="css/combat-stances-window.css" />
+  <link rel="stylesheet" href="css/melee-techniques-window.css" />
+  <link rel="stylesheet" href="css/ranged-techniques-window.css" />
+  <link rel="stylesheet" href="css/dragon-breath-window.css" />
+  <link rel="stylesheet" href="css/runecraft-window.css" />
   <link rel="stylesheet" href="css/cursors.css" />
 </head>
 <body>
@@ -127,6 +135,10 @@
           <span class="combat-metric-icon" id="bprIcon" aria-hidden="true"></span>
           <span class="combat-metric-label">Blows / Round</span>
           <strong id="bprValue">4 BpR</strong>
+          <span class="combat-mode-badges">
+            <button class="combat-stance-badge" id="combatStanceBadge" type="button" aria-label="Balanced stance. Switch combat stance">Bl</button>
+            <button class="dual-wield-badge" id="dualWieldBadge" type="button" aria-label="Dual-hand mode. Switch hand mode">DH</button>
+          </span>
         </section>
 
         <section class="effects block" aria-label="Status effects">
@@ -138,16 +150,22 @@
           <div class="wide-vital mp-wide" id="wideMpBar">
             <div class="wide-vital-meter" id="wideMpMeter" role="progressbar" aria-label="Mana" aria-valuemin="0" aria-valuemax="275" aria-valuenow="275">
               <div class="wide-vital-fill" id="wideMpFill" style="height:100%"></div>
+              <span class="wide-vital-ticks" id="wideMpTicks" aria-hidden="true"></span>
+              <span class="wide-vital-value" aria-hidden="true"><strong id="wideMpValue">275</strong><small id="wideMpMax">/ 275</small></span>
             </div>
           </div>
           <div class="wide-vital sn-wide" id="wideSnBar">
             <div class="wide-vital-meter" id="wideSnMeter" role="progressbar" aria-label="Sanity" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
               <div class="wide-vital-fill" id="wideSnFill" style="height:100%"></div>
+              <span class="wide-vital-ticks" id="wideSnTicks" aria-hidden="true"></span>
+              <span class="wide-vital-value" aria-hidden="true"><strong id="wideSnValue">100</strong><small id="wideSnMax">/ 100</small></span>
             </div>
           </div>
           <div class="wide-vital hp-wide" id="wideHpBar">
             <div class="wide-vital-meter" id="wideHpMeter" role="progressbar" aria-label="Health" aria-valuemin="0" aria-valuemax="1912" aria-valuenow="1912">
               <div class="wide-vital-fill" id="wideHpFill" style="height:100%"></div>
+              <span class="wide-vital-ticks" id="wideHpTicks" aria-hidden="true"></span>
+              <span class="wide-vital-value" aria-hidden="true"><strong id="wideHpValue">1,912</strong><small id="wideHpMax">/ 1,912</small></span>
             </div>
           </div>
         </section>
@@ -161,9 +179,9 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V6h10v2M6 9h12l2 4v8H4v-8zM8 13h8M9 16h6"/></svg>
           <kbd>i</kbd>
         </button>
-        <button class="game-shortcut" type="button" aria-disabled="true" aria-label="Mini-map — Not implemented" data-tooltip="Mini-map · Not implemented">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15M15 6v15"/><path d="M11 9l2 2-2 3 3 2"/></svg>
-          <kbd>M</kbd>
+        <button class="game-shortcut" id="abilitiesShortcut" type="button" aria-label="Open Abilities" aria-haspopup="dialog" aria-controls="abilitiesWindowOverlay" aria-expanded="false" data-tooltip="Abilities · m">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7zM18.5 3.5v3M20 5h-3M5.5 16v4M7.5 18h-4"/></svg>
+          <kbd>m</kbd>
         </button>
         <button class="game-shortcut" id="equipmentShortcut" type="button" aria-label="Open Equipment" aria-haspopup="dialog" aria-controls="equipmentOverlay" aria-expanded="false" data-tooltip="Equipment · e">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c2.3 1.6 4.7 2.4 7 2.8v5.1c0 4.7-2.6 7.8-7 9.3-4.4-1.5-7-4.6-7-9.3V5.8C7.3 5.4 9.7 4.6 12 3z"/><path d="M8 15L16 7M14 6l3 3M7 16l3-.7-2.3-2.3z"/></svg>
@@ -220,13 +238,12 @@
     <aside class="right-panel configurable-right-panel">
       <section class="right-widget msg-chat-widget" id="msgChatWidget" aria-label="Messages">
         <header class="right-widget-head">
-          <strong>MESSAGES</strong>
+          <button class="right-widget-title" id="messagesWidgetTitle" type="button" aria-label="Open Message History" aria-haspopup="dialog" aria-controls="messageHistoryOverlay"><strong>MESSAGES</strong></button>
           <span class="message-widget-actions">
             <span class="right-message-view-switch" role="group" aria-label="Message view">
               <button type="button" data-right-message-mode="chat" aria-pressed="false">CHAT</button>
               <button type="button" data-right-message-mode="all" aria-pressed="true">ALL</button>
             </span>
-            <button id="messageExpand" type="button" aria-label="Open message history" aria-haspopup="dialog" aria-controls="messageHistoryOverlay" title="Open message history">↗</button>
           </span>
         </header>
         <div class="message-feed" id="msgChatFeed" role="log" aria-label="Messages"></div>
@@ -234,7 +251,7 @@
 
       <section class="right-widget inventory-widget" id="inventoryWidget" aria-label="Inventory">
         <header class="right-widget-head">
-          <strong>INVENTORY</strong>
+          <button class="right-widget-title" id="inventoryWidgetTitle" type="button" aria-label="Open Inventory" aria-haspopup="dialog" aria-controls="inventoryOverlay"><strong>INVENTORY</strong></button>
           <span id="inventoryCount">9 / 23</span>
         </header>
         <div class="inventory-list" id="inventoryList" role="list" aria-label="Inventory slots a through w"></div>
@@ -242,14 +259,14 @@
 
       <section class="right-widget equipment-widget" id="equipmentWidget" aria-label="Equipment" hidden>
         <header class="right-widget-head">
-          <strong>EQUIPMENT</strong>
+          <button class="right-widget-title" id="equipmentWidgetTitle" type="button" aria-label="Open Equipment" aria-haspopup="dialog" aria-controls="equipmentOverlay"><strong>EQUIPMENT</strong></button>
         </header>
         <div class="equipment-list" id="equipmentList" role="list" aria-label="Equipment slots a through n"></div>
       </section>
 
       <section class="right-widget bags-widget" id="bagsWidget" aria-label="Bags">
         <header class="right-widget-head">
-          <strong>BAGS</strong>
+          <button class="right-widget-title" id="bagsWidgetTitle" type="button" aria-label="Browse containers" aria-haspopup="dialog" aria-controls="browseOverlay"><strong>BAGS</strong></button>
           <span id="bagsCount">5 CONTAINERS</span>
         </header>
         <div class="bags-list" id="bagsList" aria-label="Bag contents"></div>
@@ -257,7 +274,7 @@
 
       <section class="right-widget character-widget character-surface" id="characterWidget" aria-label="Character">
         <header class="right-widget-head character-widget-head">
-          <strong>CHARACTER</strong>
+          <button class="right-widget-title" id="characterWidgetTitle" type="button" aria-label="Open Character Sheet" aria-haspopup="dialog" aria-controls="characterWindowOverlay"><strong>CHARACTER</strong></button>
           <nav class="character-tabs" role="tablist" aria-label="Character views">
             <button data-character-tab="summary" role="tab">PROFILE / SKILLS</button>
             <button data-character-tab="resists" role="tab">RESISTS</button>
@@ -363,13 +380,17 @@
       <section class="skills-window" id="skillsWindow" role="dialog" aria-modal="true" aria-labelledby="skillsWindowTitle">
         <header class="skills-window-head">
           <strong id="skillsWindowTitle">CHARACTER SKILLS</strong>
+          <span class="skills-limit" title="Character level + 2, capped at 50">CURRENT LIMIT <b id="skillsCurrentLimit">50.000</b></span>
           <span class="skills-points">SKILL POINTS <b id="skillsPointsValue">5</b></span>
           <button class="skills-unavailable-toggle" id="skillsUnavailableToggle" type="button" aria-pressed="false">SHOW UNAVAILABLE</button>
           <button class="skills-window-close" id="skillsWindowClose" type="button" aria-label="Close Character Skills">×</button>
         </header>
         <div class="skills-window-body">
           <section class="skills-tree-pane" aria-label="Skill tree">
-            <div class="skills-tree" id="skillsTree" role="tree" tabindex="0"></div>
+            <div class="skills-tree" id="skillsTree" role="tree" tabindex="0">
+              <div class="skills-table-head" aria-hidden="true"><span>SKILL</span><span>CURRENT</span><span>INCREASE / POINT</span></div>
+              <div class="skills-tree-rows" id="skillsTreeRows" role="presentation"></div>
+            </div>
           </section>
           <aside class="skills-detail" id="skillsDetail" aria-live="polite"></aside>
         </div>
@@ -379,7 +400,181 @@
           <button id="skillsPromptApply" type="button">APPLY</button>
           <button id="skillsPromptCancel" type="button">CANCEL</button>
         </div>
-        <footer class="skills-window-help">2/8 move · 6 train · Enter fold · ? guide · / search · Esc close</footer>
+        <footer class="skills-window-help">2/8 move · 6 train · Enter fold · Tab guide · PgUp/PgDn scroll · ? full guide · Esc close</footer>
+      </section>
+    </div>
+
+    <div class="abilities-window-overlay" id="abilitiesWindowOverlay" aria-hidden="true" hidden>
+      <section class="abilities-window" id="abilitiesWindow" role="dialog" aria-modal="true" aria-labelledby="abilitiesWindowTitle">
+        <header class="abilities-window-head">
+          <strong id="abilitiesWindowTitle">ABILITIES</strong>
+          <span id="abilitiesWindowCount">0 AVAILABLE</span>
+          <button class="abilities-window-close" id="abilitiesWindowClose" type="button" aria-label="Close Abilities">×</button>
+        </header>
+        <div class="abilities-window-body">
+          <section class="abilities-list-pane" aria-label="Available abilities">
+            <div class="abilities-list" id="abilitiesList" role="listbox" tabindex="0"></div>
+            <nav class="abilities-pages" id="abilitiesPages" aria-label="Ability pages" hidden>
+              <button id="abilitiesPagePrevious" type="button" aria-label="Previous ability page">−</button>
+              <span id="abilitiesPageStatus"></span>
+              <button id="abilitiesPageNext" type="button" aria-label="Next ability page">+</button>
+            </nav>
+          </section>
+        </div>
+        <form class="abilities-prompt" id="abilitiesPrompt" hidden>
+          <label for="abilitiesPromptInput">ABILITY NAME / MKEY</label>
+          <input id="abilitiesPromptInput" type="text" autocomplete="off" />
+          <button type="submit">SELECT</button>
+          <button id="abilitiesPromptCancel" type="button">CANCEL</button>
+          <span id="abilitiesPromptError" role="alert"></span>
+        </form>
+        <footer class="abilities-window-help">click/a–t activate · 2/8 move · Enter activate · +/- page · @ find · */?/Space compact · Esc close</footer>
+      </section>
+    </div>
+
+    <div class="ability-placeholder-overlay" id="abilityPlaceholderOverlay" aria-hidden="true" hidden>
+      <section class="ability-placeholder" role="dialog" aria-modal="true" aria-labelledby="abilityPlaceholderTitle">
+        <header><strong id="abilityPlaceholderTitle">ABILITY</strong><button id="abilityPlaceholderClose" type="button" aria-label="Close ability scenario">×</button></header>
+        <div><span class="ability-placeholder-rune" aria-hidden="true">✦</span><p id="abilityPlaceholderText"></p><small>PROTOTYPE · SCENARIO NOT IMPLEMENTED</small></div>
+        <button id="abilityPlaceholderReturn" type="button">RETURN TO ABILITIES</button>
+      </section>
+    </div>
+
+    <div class="spellbook-overlay" id="spellbookOverlay" aria-hidden="true" hidden>
+      <section class="spellbook-window" id="spellbookWindow" role="dialog" aria-modal="true" aria-labelledby="spellbookWindowTitle">
+        <header class="spellbook-head">
+          <strong id="spellbookWindowTitle">SPELLBOOK</strong>
+          <span id="spellbookModeLabel">BROWSE</span>
+          <button class="spellbook-close" id="spellbookClose" type="button" aria-label="Close Spellbook">×</button>
+        </header>
+        <div class="spellbook-body">
+          <section class="spellbook-books-pane" aria-label="Carried spellbooks">
+            <h2>CARRIED BOOKS</h2>
+            <div class="spellbook-books" id="spellbookBooks" role="listbox" aria-label="Carried spellbooks"></div>
+          </section>
+          <section class="spellbook-spells-pane" aria-label="Spells in selected book">
+            <div class="spellbook-table-head" aria-hidden="true"><span>SPELL</span><span>SCHOOL</span><span>LEVEL</span><span>COST</span><span>FAIL</span></div>
+            <div class="spellbook-spells" id="spellbookSpells" role="listbox" aria-label="Spells" tabindex="0"></div>
+          </section>
+          <aside class="spellbook-detail" id="spellbookDetail" aria-live="polite"></aside>
+        </div>
+        <footer class="spellbook-help" id="spellbookHelp">Tab/←/→ pane · 2/8 move · letters select · Esc close</footer>
+      </section>
+    </div>
+
+    <div class="mimic-powers-overlay" id="mimicPowersOverlay" aria-hidden="true" hidden>
+      <section class="mimic-powers-window" id="mimicPowersWindow" role="dialog" aria-modal="true" aria-labelledby="mimicPowersTitle">
+        <header class="mimic-powers-head">
+          <strong id="mimicPowersTitle">MIMIC POWERS</strong>
+          <span id="mimicPowersFormLabel">VAMPIRE</span>
+          <button class="mimic-powers-close" id="mimicPowersClose" type="button" aria-label="Close Mimic powers">×</button>
+        </header>
+        <div class="mimic-powers-body">
+          <section class="mimic-actions-pane" id="mimicActionsPane" aria-label="Form and mimic controls">
+            <div class="mimic-form-summary" id="mimicFormSummary"></div>
+            <div class="mimic-actions" id="mimicActions" role="listbox" aria-label="Mimic form actions"></div>
+          </section>
+          <section class="mimic-powers-pane" id="mimicPowersPane" aria-label="Powers of the current form">
+            <div class="mimic-powers-table-head" aria-hidden="true"><span>POWER</span><span>COST</span><span>FAIL</span><span>TARGET</span></div>
+            <div class="mimic-powers-list" id="mimicPowersList" role="listbox" aria-label="Mimic powers" tabindex="0"></div>
+          </section>
+        </div>
+        <form class="mimic-powers-prompt" id="mimicPowersPrompt" hidden>
+          <label for="mimicPowersPromptInput">POWER</label><input id="mimicPowersPromptInput" type="text" autocomplete="off" />
+          <button type="submit">FIND</button><button id="mimicPowersPromptCancel" type="button">CANCEL</button>
+          <span id="mimicPowersPromptError" role="alert"></span>
+        </form>
+        <footer class="mimic-powers-help">a–d actions · e–z powers now · Tab/←/→ pane · 2/8 move · @ find · Esc close</footer>
+      </section>
+      <div class="mimic-picker-overlay" id="mimicPickerOverlay" aria-hidden="true" hidden>
+        <section class="mimic-picker" role="dialog" aria-modal="true" aria-labelledby="mimicPickerTitle">
+          <header><strong id="mimicPickerTitle">CHOOSE FORM</strong><button id="mimicPickerClose" type="button" aria-label="Close picker">×</button></header>
+          <div class="mimic-picker-search" id="mimicPickerSearch" hidden>
+            <label for="mimicPickerSearchInput">SEARCH</label>
+            <input id="mimicPickerSearchInput" type="text" maxlength="20" autocomplete="off" spellcheck="false" aria-describedby="mimicPickerSearchHint" />
+            <small id="mimicPickerSearchHint">name · #code · !symbol</small>
+          </div>
+          <div class="mimic-picker-list" id="mimicPickerList" role="listbox"></div>
+          <div class="mimic-picker-confirm" id="mimicPickerConfirm" hidden><button id="mimicPickerConfirmButton" type="button">SET PREFERRED · (Enter)</button></div>
+          <footer id="mimicPickerHelp">2/8 move · letter/Enter choose · Esc cancel</footer>
+        </section>
+      </div>
+    </div>
+
+    <div class="combat-stances-overlay" id="combatStancesOverlay" aria-hidden="true" hidden>
+      <section class="combat-stances-window" id="combatStancesWindow" role="dialog" aria-modal="true" aria-labelledby="combatStancesTitle">
+        <header class="combat-stances-head">
+          <strong id="combatStancesTitle">COMBAT STANCES</strong>
+          <span id="combatStancesCurrent">Bl · BALANCED STANCE</span>
+          <button class="combat-stances-close" id="combatStancesClose" type="button" aria-label="Close Combat stances">×</button>
+        </header>
+        <div class="combat-stances-table-head" aria-hidden="true"><span>STANCE</span><span>MASTERY</span><span>STATE</span></div>
+        <div class="combat-stances-list" id="combatStancesList" role="listbox" aria-label="Combat stances" tabindex="0"></div>
+        <footer class="combat-stances-help">a–c apply · - previous · 2/8 move · Enter apply · <span id="combatStancesLoadout">SWORD + SHIELD</span> · Esc close</footer>
+      </section>
+    </div>
+
+    <div class="melee-techniques-overlay" id="meleeTechniquesOverlay" aria-hidden="true" hidden>
+      <section class="melee-techniques-window" id="meleeTechniquesWindow" role="dialog" aria-modal="true" aria-labelledby="meleeTechniquesTitle">
+        <header class="melee-techniques-head">
+          <strong id="meleeTechniquesTitle">MELEE TECHNIQUES</strong>
+          <span id="meleeTechniquesContext">MIMIC · LEVEL 57 · ST 10</span>
+          <button class="melee-techniques-close" id="meleeTechniquesClose" type="button" aria-label="Close Melee techniques">×</button>
+        </header>
+        <div class="melee-techniques-table-head" aria-hidden="true"><span>TECHNIQUE</span><span>COST</span><span>REQUIRES</span><span>STATE</span></div>
+        <div class="melee-techniques-list" id="meleeTechniquesList" role="listbox" aria-label="Melee techniques" tabindex="0"></div>
+        <form class="melee-techniques-prompt" id="meleeTechniquesPrompt" hidden>
+          <label for="meleeTechniquesPromptInput">TECHNIQUE</label><input id="meleeTechniquesPromptInput" type="text" autocomplete="off" />
+          <button type="submit">FIND</button><button id="meleeTechniquesPromptCancel" type="button">CANCEL</button>
+          <span id="meleeTechniquesPromptError" role="alert"></span>
+        </form>
+        <footer class="melee-techniques-help">a–z use · 2/8 move · Enter use · @ find · Esc close</footer>
+      </section>
+    </div>
+
+    <div class="ranged-techniques-overlay" id="rangedTechniquesOverlay" aria-hidden="true" hidden>
+      <section class="ranged-techniques-window" id="rangedTechniquesWindow" role="dialog" aria-modal="true" aria-labelledby="rangedTechniquesTitle">
+        <header class="ranged-techniques-head">
+          <strong id="rangedTechniquesTitle">RANGED TECHNIQUES</strong>
+          <span id="rangedTechniquesContext">ARCHERY 25.000 · ST 10</span>
+          <button class="ranged-techniques-close" id="rangedTechniquesClose" type="button" aria-label="Close Ranged techniques">×</button>
+        </header>
+        <div class="ranged-techniques-table-head" aria-hidden="true"><span>TECHNIQUE</span><span>COST</span><span>REQUIRES</span><span>STATE</span></div>
+        <div class="ranged-techniques-list" id="rangedTechniquesList" role="listbox" aria-label="Ranged techniques" tabindex="0"></div>
+        <form class="ranged-techniques-prompt" id="rangedTechniquesPrompt" hidden>
+          <label for="rangedTechniquesPromptInput">TECHNIQUE</label><input id="rangedTechniquesPromptInput" type="text" autocomplete="off" />
+          <button type="submit">FIND</button><button id="rangedTechniquesPromptCancel" type="button">CANCEL</button>
+          <span id="rangedTechniquesPromptError" role="alert"></span>
+        </form>
+        <footer class="ranged-techniques-help">a–e use · 2/8 move · Enter use · @ find · Esc close <span id="rangedTechniquesLoadout">BOW · 42 AMMO</span></footer>
+      </section>
+    </div>
+
+    <div class="dragon-breath-overlay" id="dragonBreathOverlay" aria-hidden="true" hidden>
+      <section class="dragon-breath-window" id="dragonBreathWindow" role="dialog" aria-modal="true" aria-labelledby="dragonBreathTitle">
+        <header class="dragon-breath-head">
+          <strong id="dragonBreathTitle">PICK BREATH ELEMENT</strong>
+          <span id="dragonBreathContext">MULTI-HUED · RANDOM</span>
+          <button class="dragon-breath-close" id="dragonBreathClose" type="button" aria-label="Close Pick breath element">×</button>
+        </header>
+        <div class="dragon-breath-pane" id="dragonBreathPane" tabindex="0"></div>
+        <footer class="dragon-breath-help" id="dragonBreathHelp">click select · a–f set now · 2/8 move · Enter set · Esc close</footer>
+      </section>
+    </div>
+
+    <div class="runecraft-overlay" id="runecraftOverlay" aria-hidden="true" hidden>
+      <section class="runecraft-window" id="runecraftWindow" role="dialog" aria-modal="true" aria-labelledby="runecraftTitle">
+        <header class="runecraft-head">
+          <strong id="runecraftTitle">DRAW A RUNE</strong>
+          <span>RUNECRAFT · MKEY 12</span>
+          <button class="runecraft-close" id="runecraftClose" type="button" aria-label="Close Draw a rune">×</button>
+        </header>
+        <div class="runecraft-progress" id="runecraftProgress" aria-label="Runespell construction progress"></div>
+        <div class="runecraft-step-title" id="runecraftStepTitle">CHOOSE FIRST RUNE</div>
+        <div class="runecraft-warning" id="runecraftWarning" aria-live="polite"></div>
+        <div class="runecraft-table-head is-runes" id="runecraftTableHead" aria-hidden="true"></div>
+        <div class="runecraft-list is-runes" id="runecraftList" role="listbox" aria-label="Runecraft choices" tabindex="0"></div>
+        <footer class="runecraft-help">a–h choose now · 2/8 move · Enter choose · Backspace previous · Esc close</footer>
       </section>
     </div>
 
@@ -426,7 +621,7 @@
           <div class="message-history-feed" id="messageHistoryFeed" role="log" aria-live="polite" tabindex="0"></div>
           <button class="message-history-new" id="messageHistoryNew" type="button" hidden>NEW MESSAGES</button>
         </div>
-        <form class="message-history-editor" id="messageHistoryEditor" hidden>
+        <form class="message-history-editor" id="messageHistoryEditor">
           <label for="messageHistoryInput">Message:</label>
           <input id="messageHistoryInput" type="text" maxlength="255" autocomplete="off" spellcheck="false" aria-label="General chat message" />
           <small>Enter to send · Esc to cancel</small>
@@ -509,6 +704,7 @@
         <label class="toggle-control"><span>Wide HP bar</span><input id="wideHpControl" type="checkbox" /></label>
         <label class="toggle-control"><span>Wide MP bar</span><input id="wideMpControl" type="checkbox" /></label>
         <label class="toggle-control"><span>Wide SN bar</span><input id="wideSanityControl" type="checkbox" /></label>
+        <label class="toggle-control"><span>Wide bar values</span><input id="wideVitalValuesControl" type="checkbox" /></label>
         <label class="toggle-control"><span>Enemy present</span><input id="enemyPresentControl" type="checkbox" /></label>
         <label class="enemy-health-control" id="enemyHealthControlGroup">Enemy health <output id="enemyHealthControlValue"></output>
           <input id="enemyHealthControl" type="range" min="0" max="100" step="1" />
@@ -591,6 +787,15 @@
           <button type="button" role="tab" aria-selected="false" data-window-controls-tab="equipment">Equipment</button>
           <button type="button" role="tab" aria-selected="false" data-window-controls-tab="character">Character</button>
           <button type="button" role="tab" aria-selected="false" data-window-controls-tab="skills">Skills</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="abilities">Abilities</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="spellbook">Spellbook</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="mimic-powers">Mimic powers</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="combat-stances">Combat stances</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="melee-techniques">Melee techniques</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="ranged-techniques">Ranged techniques</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="dragon-breath">Dragon breath</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="runecraft">Runecraft</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="ghost-powers">Ghost powers</button>
         </nav>
         <section class="window-controls-subpage" data-window-controls-page="items" role="tabpanel">
           <label class="toggle-control"><span>Combined Equipment + Inventory</span><input id="combinedItemsWindowControl" type="checkbox" /></label>
@@ -694,6 +899,102 @@
           <label class="toggle-control"><span>Show unavailable skills</span><input id="skillsShowUnavailableControl" type="checkbox" /></label>
           <p class="controls-tip">Значения навыков и пять демонстрационных очков меняются только в памяти вкладки.</p>
         </section>
+        <section class="window-controls-subpage" data-window-controls-page="abilities" role="tabpanel">
+          <label>Font size <output id="abilitiesWindowFontSizeValue"></output>
+            <input id="abilitiesWindowFontSizeControl" type="range" min="8" max="20" step="1" />
+          </label>
+          <label class="toggle-control"><span>Start with full list</span><input id="abilitiesExpandedControl" type="checkbox" /></label>
+          <button type="button" id="abilitiesDemoOpen">Open Abilities</button>
+          <p class="controls-tip">Список строится из текущих значений демонстрационного дерева Skills; одинаковые mkey объединяются.</p>
+        </section>
+        <section class="window-controls-subpage" data-window-controls-page="spellbook" role="tabpanel">
+          <label>Font size <output id="spellbookWindowFontSizeValue"></output>
+            <input id="spellbookWindowFontSizeControl" type="range" min="8" max="20" step="1" />
+          </label>
+          <button type="button" id="spellbookDemoOpen">Open Spellbook</button>
+          <p class="controls-tip">Демонстрация открывает безопасный Browse всех переносимых книг и spell scrolls.</p>
+        </section>
+        <section class="window-controls-subpage" data-window-controls-page="mimic-powers" role="tabpanel">
+          <label>Font size <output id="mimicPowersFontSizeValue"></output>
+            <input id="mimicPowersFontSizeControl" type="range" min="8" max="20" step="1" />
+          </label>
+          <button type="button" id="mimicPowersDemoOpen">Open Mimic powers</button>
+          <p class="controls-tip">Формы, preferred immunity и результаты применения существуют только в памяти вкладки.</p>
+        </section>
+        <section class="window-controls-subpage" data-window-controls-page="combat-stances" role="tabpanel">
+          <label>Font size <output id="combatStancesFontSizeValue"></output>
+            <input id="combatStancesFontSizeControl" type="range" min="8" max="20" step="1" />
+          </label>
+          <label>Demo loadout
+            <select id="stanceDemoLoadoutControl">
+              <option value="shield">Sword + shield</option>
+              <option value="two-handed">Two-handed weapon</option>
+            </select>
+          </label>
+          <button type="button" id="combatStancesDemoOpen">Open Combat stances</button>
+          <p class="controls-tip">Loadout влияет только на доступность стоек в этом сценарии и не меняет демонстрационный Equipment.</p>
+        </section>
+        <section class="window-controls-subpage" data-window-controls-page="melee-techniques" role="tabpanel">
+          <label>Font size <output id="meleeTechniquesFontSizeValue"></output>
+            <input id="meleeTechniquesFontSizeControl" type="range" min="8" max="20" step="1" />
+          </label>
+          <button type="button" id="meleeTechniquesDemoOpen">Open Melee techniques</button>
+          <p class="controls-tip">Список вычисляется из класса, уровня и Skills; применение не расходует Stamina и не меняет игровые показатели.</p>
+        </section>
+        <section class="window-controls-subpage" data-window-controls-page="ranged-techniques" role="tabpanel">
+          <label>Font size <output id="rangedTechniquesFontSizeValue"></output>
+            <input id="rangedTechniquesFontSizeControl" type="range" min="8" max="20" step="1" />
+          </label>
+          <label>Demo launcher
+            <select id="rangedDemoLauncherControl">
+              <option value="bow">Bow</option><option value="crossbow">Crossbow</option><option value="sling">Sling</option><option value="boomerang">Boomerang</option><option value="none">None</option>
+            </select>
+          </label>
+          <label class="toggle-control"><span>Shield equipped</span><input id="rangedDemoShieldControl" type="checkbox" /></label>
+          <label>Ammunition <output id="rangedDemoAmmoValue"></output>
+            <input id="rangedDemoAmmoControl" type="range" min="0" max="99" step="1" />
+          </label>
+          <label>Ammo condition
+            <select id="rangedDemoAmmoConditionControl"><option value="normal">Normal</option><option value="charred">Charred</option></select>
+          </label>
+          <label class="toggle-control"><span>Ammo protected by !k</span><input id="rangedDemoAmmoProtectedControl" type="checkbox" /></label>
+          <label class="toggle-control"><span>Flask of Oil available</span><input id="rangedDemoOilControl" type="checkbox" /></label>
+          <label>Craft materials
+            <select id="rangedDemoMaterialsControl"><option value="inventory">Bones / broken sticks</option><option value="rubble">Nearby rubble</option><option value="none">None</option></select>
+          </label>
+          <button type="button" id="rangedTechniquesDemoOpen">Open Ranged techniques</button>
+          <p class="controls-tip">Demo context влияет только на этот сценарий; применение не расходует Stamina, ammo, oil или materials.</p>
+        </section>
+        <section class="window-controls-subpage" data-window-controls-page="dragon-breath" role="tabpanel">
+          <label>Font size <output id="dragonBreathFontSizeValue"></output>
+            <input id="dragonBreathFontSizeControl" type="range" min="8" max="20" step="1" />
+          </label>
+          <label>Demo lineage
+            <select id="dragonDemoLineageControl">
+              <option value="blue">Blue</option><option value="white">White</option><option value="red">Red</option><option value="black">Black</option><option value="green">Green</option><option value="multi">Multi-hued</option><option value="bronze">Bronze</option><option value="silver">Silver</option><option value="gold">Gold</option><option value="law">Law</option><option value="chaos">Chaos</option><option value="balance">Balance</option>
+            </select>
+          </label>
+          <label>Demo body
+            <select id="dragonDemoFormControl">
+              <option value="native">Native body</option><option value="reptile">Reptile form</option><option value="dragon">Dragon form</option><option value="incompatible">Incompatible form</option>
+            </select>
+          </label>
+          <button type="button" id="dragonBreathDemoOpen">Open Pick breath element</button>
+          <p class="controls-tip">Независимый Draconian context не меняет Maia/Mimic Character; элемент живёт до Reset, а дыхание не расходует HP или Stamina.</p>
+        </section>
+        <section class="window-controls-subpage" data-window-controls-page="runecraft" role="tabpanel">
+          <label>Font size <output id="runecraftFontSizeValue"></output>
+            <input id="runecraftFontSizeControl" type="range" min="8" max="20" step="1" />
+          </label>
+          <button type="button" id="runecraftDemoOpen">Open Draw a rune</button>
+          <p class="controls-tip">Формула использует текущие rune skills, MP, blindness и stun; применение не меняет ресурсы персонажа.</p>
+        </section>
+        <section class="window-controls-subpage" data-window-controls-page="ghost-powers" role="tabpanel">
+          <label>Demo player state
+            <select id="ghostDemoStateControl"><option value="living">Living</option><option value="ghost">Ghost</option></select>
+          </label>
+          <p class="controls-tip">Независимое demo-состояние влияет только на наличие Ghost powers в Abilities. Текущий Maia/Mimic Character не меняется.</p>
+        </section>
       </div>
 
       <div class="controls-page" data-controls-page="map">
@@ -779,10 +1080,29 @@
   <script src="js/core/input-router.js"></script>
   <script src="js/data/game-data.js"></script>
   <script src="js/data/skills-data.js"></script>
+  <script src="js/data/abilities-data.js"></script>
+  <script src="js/data/spellbook-data.js"></script>
+  <script src="js/data/mimic-powers-data.js"></script>
+  <script src="js/data/combat-stances-data.js"></script>
+  <script src="js/data/melee-techniques-data.js"></script>
+  <script src="js/data/ranged-techniques-data.js"></script>
+  <script src="js/data/dragon-breath-data.js"></script>
+  <script src="js/data/runecraft-data.js"></script>
   <script src="js/features/map.js"></script>
   <script src="js/features/character.js"></script>
   <script src="js/features/guide-window.js"></script>
   <script src="js/features/skills-window.js"></script>
+  <script src="js/features/spellbook-window.js"></script>
+  <script src="js/features/mimic-powers-window.js"></script>
+  <script src="js/features/combat-stances-window.js"></script>
+  <script src="js/features/melee-techniques-window.js"></script>
+  <script src="js/features/ranged-techniques-window.js"></script>
+  <script src="js/features/dragon-breath-window.js"></script>
+  <script src="js/features/runecraft-window.js"></script>
+  <script src="js/features/ghost-powers.js"></script>
+  <script src="js/features/mycorrhiza.js"></script>
+  <script src="js/features/trapping.js"></script>
+  <script src="js/features/abilities-window.js"></script>
   <script src="js/features/character-window.js"></script>
   <script src="js/features/equipment-window.js"></script>
   <script src="js/features/combined-items-window.js"></script>

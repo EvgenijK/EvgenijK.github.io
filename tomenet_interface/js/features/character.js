@@ -146,18 +146,18 @@
   }
 
   function characterResistsMarkup() {
-    const sourceHeads = CHARACTER_SOURCES.map(([key,title]) => `<th scope="col" title="${title}">${key}</th>`).join("");
+    const sourceHeads = CHARACTER_SOURCES.map(([key,title],sourceIndex) => `<th scope="col" title="${title}" data-matrix-source="${sourceIndex}">${key}</th>`).join("");
     const equipmentFoot = CHARACTER_SOURCES.map(([key,title],sourceIndex) => {
       const item = CHARACTER_SOURCE_EQUIPMENT[sourceIndex];
       const content = item.empty ? "" : CHARACTER_SOURCE_ICONS[item.icon];
-      return `<td class="matrix-source-item${item.empty ? " is-empty" : ""}" title="${key}) ${title}: ${item.name}" style="--matrix-source-color:${TERM_COLORS[item.tone]}"><span aria-hidden="true">${content}</span></td>`;
+      return `<td class="matrix-source-item${item.empty ? " is-empty" : ""}" title="${key}) ${title}: ${item.name}" data-matrix-source="${sourceIndex}" style="--matrix-source-color:${TERM_COLORS[item.tone]}"><span aria-hidden="true">${content}</span></td>`;
     }).join("");
     const groups = CHARACTER_RESIST_GROUPS.map((group, groupIndex) => {
       const rows = group.rows.map((label, rowIndex) => {
         const values = CHARACTER_SOURCES.map((source, sourceIndex) => characterMatrixMark(group,groupIndex,rowIndex,sourceIndex));
         const cells = CHARACTER_SOURCES.map((source, sourceIndex) => {
           const value = values[sourceIndex];
-          return `<td class="matrix-${value.type}" title="${source[1]} · ${label}: ${value.title}">${value.mark}</td>`;
+          return `<td class="matrix-${value.type}" title="${source[1]} · ${label}: ${value.title}" data-matrix-source="${sourceIndex}">${value.mark}</td>`;
         }).join("");
         return `<tr><th class="matrix-row-${characterMatrixRowTone(group,rowIndex,values)}" scope="row">${label}</th>${cells}</tr>`;
       }).join("");
@@ -232,6 +232,28 @@
     renderCharacter();
     return true;
   }
+
+  function clearMatrixColumnGuide(table) {
+    table.querySelectorAll(".is-column-guide").forEach(cell => cell.classList.remove("is-column-guide"));
+    delete table.dataset.matrixGuideSource;
+  }
+  function showMatrixColumnGuide(cell) {
+    const table = cell.closest(".resist-group table");
+    if (!table || table.dataset.matrixGuideSource === cell.dataset.matrixSource) return;
+    clearMatrixColumnGuide(table);
+    table.dataset.matrixGuideSource = cell.dataset.matrixSource;
+    table.querySelectorAll(`[data-matrix-source="${cell.dataset.matrixSource}"]`).forEach(entry => entry.classList.add("is-column-guide"));
+  }
+  $$('[data-character-content]').forEach(content => {
+    content.addEventListener("pointerover",event => {
+      const cell = event.target.closest("[data-matrix-source]");
+      if (cell && content.contains(cell)) showMatrixColumnGuide(cell);
+    });
+    content.addEventListener("pointerout",event => {
+      const table = event.target.closest(".resist-group table");
+      if (table && !table.contains(event.relatedTarget)) clearMatrixColumnGuide(table);
+    });
+  });
 
   return {CHARACTER_PAGES,renderCharacter,setCharacterPage,characterFieldsForPage,getSelectedCharacterField,selectCharacterField};
   };
