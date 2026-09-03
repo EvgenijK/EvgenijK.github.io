@@ -1,3 +1,48 @@
+/* Clickable character-level badge leading to Skills. */
+.xp-level {
+  appearance:none;
+  padding:0;
+  cursor:pointer;
+  transition:
+    transform .14s ease,
+    border-color .14s ease,
+    background .14s ease,
+    box-shadow .14s ease;
+}
+.xp-level::before { transition:border-color .14s ease,box-shadow .14s ease; }
+.xp-level span { transition:color .14s ease,text-shadow .14s ease; }
+.xp-level:hover,
+.xp-level:focus-visible {
+  border-color:#f0c95f;
+  background:
+    radial-gradient(circle,#4a3b1d 0,#201b0e 52%,#070805 56%),
+    #080907;
+  box-shadow:
+    inset 0 0 0 2px #080906,
+    inset 0 0 0 3px #8e7132,
+    0 0 0 1px #0a0905,
+    0 0 11px rgba(240,201,95,.62),
+    0 2px 7px #000;
+  transform:translateY(-50%) rotate(45deg) scale(1.08);
+}
+.xp-level:hover::before,
+.xp-level:focus-visible::before {
+  border-color:rgba(255,225,126,.8);
+  box-shadow:inset 0 0 5px rgba(244,199,84,.24);
+}
+.xp-level:hover span,
+.xp-level:focus-visible span {
+  color:#fff3a6;
+  text-shadow:0 1px 2px #000,0 0 6px rgba(255,220,99,.85);
+}
+.xp-level:focus-visible { outline:1px solid #fff0a0;outline-offset:4px; }
+
+@media (prefers-reduced-motion:reduce) {
+  .xp-level,
+  .xp-level::before,
+  .xp-level span { transition:none; }
+}
+
 /* Gold value shares one line with its label. */
 .currency > div {
   min-width:0;

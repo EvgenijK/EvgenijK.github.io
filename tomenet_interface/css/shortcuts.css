@@ -1,4 +1,4 @@
-/* Primary game-window shortcuts; Game Menu remains the only placeholder. */
+/* Primary game-window shortcuts, including the Esc Game Menu entry point. */
 .left-panel {
   display:grid;
   grid-template-rows:minmax(0,1fr) 100px;

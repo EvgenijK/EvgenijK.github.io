@@ -1,5 +1,5 @@
 (() => {
-  window.TomeNetPrototype.createItemsFeature = ({state,$, $$, clamp, escapeHtml, INVENTORY_ITEMS, INVENTORY_ICONS, EQUIPMENT_ITEMS, TERM_COLORS, BAGS, FLOOR_ITEMS, mapCanvas, mapViewport, mapPointerCell, mapState, renderMap, openMapChatEditor, windowManager,itemUseFeature,itemDeviceFeature,itemEquipFeature,getItemSelectorFeature,getCombinedItemsFeature,getBrowseFeature}) => {
+  window.TomeNetPrototype.createItemsFeature = ({state,$, $$, clamp, escapeHtml, INVENTORY_ITEMS, INVENTORY_ICONS, EQUIPMENT_ITEMS, TERM_COLORS, BAGS, FLOOR_ITEMS, mapCanvas, mapViewport, mapPointerCell, mapState, renderMap, openMapChatEditor, appendGameMessage, windowManager,itemUseFeature,itemDeviceFeature,itemEquipFeature,rangedActionFeature,PLAYER_GOLD,formatNumber,getItemSelectorFeature,getCombinedItemsFeature,getBrowseFeature}) => {
   let inventoryOpen = false;
   let selectedInventorySlot = null;
   let inventoryReturnFocus = null;
@@ -37,6 +37,8 @@
   ];
   const USE_ACTION_IDS = new Set(["quaff","eat","read","activate"]);
   const DEVICE_ACTION_IDS = new Set(["aim","use-staff","zap"]);
+  const RANGED_ACTION_IDS = new Set(["fire"]);
+  const AMOUNT_ACTION_IDS = new Set(["drop","drop-gold"]);
   const EQUIP_ACTION_IDS = new Set(["wield","wield-secondary","take-off","swap"]);
   const USE_COMMANDS = {
     q:{actionId:"quaff",title:"Quaff which potion?",sources:["inventory","bags"]},
@@ -390,6 +392,21 @@
     renderUseResult(action,item,details);
   }
 
+  function renderRangedResult(action,item,details = {}) {
+    const result = rangedActionFeature.complete(details.target);
+    itemActionState.result = true;
+    itemActionDialog.classList.remove("is-compact","is-inspect");
+    $("#itemActionTitle").textContent = result.title;
+    $("#itemActionBody").innerHTML = rangedActionFeature.resultMarkup(result);
+    $("#itemActionFooter").innerHTML = '<button class="item-action-button" type="button" data-action-cancel>Close</button>';
+    requestAnimationFrame(() => $("#itemActionFooter button")?.focus());
+  }
+
+  function showRangedResult(action,item,index,details = {}) {
+    openItemActionDialog(action,item,index,true,details.target?.returnFocus);
+    renderRangedResult(action,item,details);
+  }
+
   function openUseCommand(command,opener = document.activeElement) {
     const selector = getItemSelectorFeature?.();
     if (!selector) return false;
@@ -433,16 +450,70 @@
     });
   }
 
-  function openItemActionDialog(action, item, index, track = true) {
+  function openDropGoldCommand(opener = document.activeElement) {
+    activeItemContext = null;
+    openItemActionDialog({id:"drop-gold",label:"Drop gold"},{name:"Gold",quantity:PLAYER_GOLD},-1,true,opener);
+    return true;
+  }
+
+  function openFireCommand(opener = document.activeElement) {
+    const availability = rangedActionFeature.availability();
+    if (!availability.allowed) {
+      rangedActionFeature.reportUnavailable(availability.reason);
+      return true;
+    }
+    activeItemContext = null;
+    const action = {id:"fire",label:"Fire"};
+    const item = rangedActionFeature.subject();
+    beginMapTargeting(action,item,-1,{hostWindow:"global",opener});
+    return true;
+  }
+
+  function amountActionProfile(action,item) {
+    if (action.id === "drop-gold") return {
+      maximum:PLAYER_GOLD,
+      availableLabel:"Current gold",
+      availableValue:formatNumber.format(PLAYER_GOLD),
+      amountLabel:"How much gold?",
+      help:"Press a or Space to drop all gold immediately.",
+      confirmLabel:"Drop gold",
+      resultTitle:"GOLD DROP READY",
+      resultName:amount => `${formatNumber.format(amount)} pieces of gold`,
+      resourceLabel:"Gold",
+      message:amount => `You drop ${formatNumber.format(amount)} pieces of gold.`,
+      unchanged:"Balance and floor data were not changed."
+    };
+    const quantity = Math.max(1,Math.round(Number(item.quantity) || 1));
+    return {
+      maximum:quantity,
+      availableLabel:"Current stack",
+      availableValue:formatNumber.format(quantity),
+      amountLabel:"How many items?",
+      help:"Press a or Space to drop the whole stack immediately.",
+      confirmLabel:"Drop",
+      resultTitle:"ITEM DROP READY",
+      resultName:amount => `${formatNumber.format(amount)} × ${item.name}`,
+      resourceLabel:"Stack",
+      message:amount => `You drop ${formatNumber.format(amount)} × ${item.name}.`,
+      unchanged:"Item and floor data were not changed."
+    };
+  }
+
+  function amountActionMarkup(action,item) {
+    const profile = amountActionProfile(action,item);
+    return `<dl class="item-action-details"><dt>${escapeHtml(profile.availableLabel)}</dt><dd>${escapeHtml(profile.availableValue)}</dd></dl><div class="item-action-form"><label for="itemActionAmount">${escapeHtml(profile.amountLabel)}</label><input id="itemActionAmount" type="number" min="1" max="${profile.maximum}" value="${profile.maximum}" inputmode="numeric" /><p>${escapeHtml(profile.help)}</p></div>`;
+  }
+
+  function openItemActionDialog(action, item, index, track = true, opener = activeItemContext?.row) {
     closeInventoryContextMenu(false);
-    if (track) windowManager.push("item-action",{action:action.id,index},{opener:activeItemContext?.row});
-    itemActionState = {action,item,index,source:activeItemContext?.source,bag:activeItemContext?.bag,result:false};
+    if (track) windowManager.push("item-action",{action:action.id,index},{opener});
+    itemActionState = {action,item,index,source:activeItemContext?.source,bag:activeItemContext?.bag,result:false,returnFocus:opener};
     const title = $("#itemActionTitle");
     const body = $("#itemActionBody");
     const footer = $("#itemActionFooter");
-    itemActionDialog.classList.toggle("is-compact", ["drop","destroy"].includes(action.id));
+    itemActionDialog.classList.toggle("is-compact", ["drop","drop-gold","destroy"].includes(action.id));
     itemActionDialog.classList.toggle("is-inspect", action.id === "inspect");
-    title.textContent = `${action.label.toUpperCase()} · ${item.name}`;
+    title.textContent = action.id === "drop-gold" ? "DROP GOLD" : `${action.label.toUpperCase()} · ${item.name}`;
     footer.innerHTML = "";
 
     if (action.id === "open-bag") {
@@ -471,9 +542,10 @@
     } else if (action.id === "take-off" && item.quantity > 1) {
       body.innerHTML = `<div class="item-action-form"><label for="itemActionAmount">Amount to take off</label><input id="itemActionAmount" type="number" min="1" max="${item.quantity}" value="${item.quantity}" /></div>`;
       footer.innerHTML = '<button class="item-action-button" type="button" data-action-cancel>Cancel</button><button class="item-action-button" type="button" data-action-confirm>Take off</button>';
-    } else if (action.id === "drop") {
-      body.innerHTML = `<div class="item-action-form"><label for="itemActionAmount">Amount to drop</label><input id="itemActionAmount" type="number" min="1" max="${item.quantity}" value="${item.quantity}" /></div>`;
-      footer.innerHTML = '<button class="item-action-button" type="button" data-action-cancel>Cancel</button><button class="item-action-button" type="button" data-action-confirm>Drop</button>';
+    } else if (AMOUNT_ACTION_IDS.has(action.id)) {
+      const profile = amountActionProfile(action,item);
+      body.innerHTML = amountActionMarkup(action,item);
+      footer.innerHTML = `<button class="item-action-button" type="button" data-action-cancel>Cancel</button><button class="item-action-button" type="button" data-action-confirm>${escapeHtml(profile.confirmLabel)}</button>`;
     } else if (action.id === "destroy") {
       body.innerHTML = `<p>Destroying items cannot be undone in the game.</p><div class="item-action-form"><label for="itemActionAmount">Amount to destroy</label><input id="itemActionAmount" type="number" min="1" max="${item.quantity}" value="${item.quantity}" /></div>`;
       footer.innerHTML = '<button class="item-action-button" type="button" data-action-cancel>Cancel</button><button class="item-action-button danger" type="button" data-action-confirm>Destroy</button>';
@@ -517,8 +589,24 @@
     return true;
   }
 
+  function showAmountActionResult() {
+    if (!itemActionState || !AMOUNT_ACTION_IDS.has(itemActionState.action.id) || itemActionState.result) return false;
+    const amountInput = $("#itemActionAmount");
+    if (!amountInput) return false;
+    const profile = amountActionProfile(itemActionState.action,itemActionState.item);
+    const amount = clamp(Math.round(Number(amountInput.value) || 1),1,profile.maximum);
+    const remaining = profile.maximum - amount;
+    $("#itemActionBody").innerHTML = `<div class="item-transfer-result" role="status"><strong>${escapeHtml(profile.resultTitle)}</strong><p>${escapeHtml(profile.resultName(amount))}</p><span>${escapeHtml(profile.resourceLabel)}: ${formatNumber.format(profile.maximum)} → ${formatNumber.format(remaining)}</span><small>Prototype result only — ${escapeHtml(profile.unchanged)}</small></div>`;
+    $("#itemActionFooter").innerHTML = '<button class="item-action-button" type="button" data-action-cancel>Close</button>';
+    itemActionState.result = true;
+    appendGameMessage({type:"loot",markup:`<b class="gold">You:</b> ${escapeHtml(profile.message(amount))} <span class="slate">(prototype only)</span>`});
+    requestAnimationFrame(() => $("#itemActionFooter button")?.focus());
+    return true;
+  }
+
   function closeItemActionDialog(returnFocus = true) {
     if (itemActionLayer.hidden) return;
+    const returnTarget = itemActionState?.returnFocus || activeItemContext?.row;
     windowManager.closeKind("item-action",{restoreFocus:false,force:true});
     if (itemActionBackState && itemActionState?.action.id !== "open-bag") {
       const parent = itemActionBackState;
@@ -539,7 +627,7 @@
     itemActionDialog.classList.remove("is-compact","is-inspect");
     $("#itemActionBody").innerHTML = "";
     $("#itemActionFooter").innerHTML = "";
-    if (returnFocus) activeItemContext?.row?.focus();
+    if (returnFocus && returnTarget?.isConnected) returnTarget.focus();
   }
 
   function updateThrowTarget(col,row) {
@@ -560,7 +648,7 @@
     throwTargeting.setAttribute("aria-label", `${throwTargetState.action.label} ${throwTargetState.item.name}; target cell ${throwTargetState.worldX}, ${throwTargetState.worldY}`);
   }
 
-  function beginMapTargeting(action,item,index) {
+  function beginMapTargeting(action,item,index,options = {}) {
     closeInventoryContextMenu(false);
     if (!itemActionLayer.hidden && itemActionState?.action.id === "open-bag") {
       throwReturnItemActionState = {
@@ -575,10 +663,11 @@
     const viewport = mapViewport();
     const playerCol = mapState.playerX - mapState.cameraX;
     const playerRow = mapState.playerY - mapState.cameraY;
-    const hostWindow = activeItemContext?.row?.closest("#browseWindow") ? "browse" : activeItemContext?.row?.closest("#combinedItemsWindow") ? "combined" : activeItemContext?.source;
+    const hostWindow = options.hostWindow || (activeItemContext?.row?.closest("#browseWindow") ? "browse" : activeItemContext?.row?.closest("#combinedItemsWindow") ? "combined" : activeItemContext?.source);
     throwTargetState = {
       action,item,index,
       hostWindow,
+      returnFocus:options.opener || activeItemContext?.row,
       inventoryWasVisible:!inventoryOverlay.hidden,
       equipmentWasVisible:!equipmentOverlay.hidden,
       combinedWasVisible:!combinedItemsOverlay.hidden,
@@ -586,7 +675,7 @@
       col:playerCol >= 0 && playerCol < viewport.width ? playerCol : Math.floor(viewport.width / 2),
       row:playerRow >= 0 && playerRow < viewport.height ? playerRow : Math.floor(viewport.height / 2)
     };
-    windowManager.push("map-target",{action:action.id,index},{opener:activeItemContext?.row});
+    windowManager.push("map-target",{action:action.id,index},{opener:options.opener || activeItemContext?.row});
     if (hostWindow !== "browse") {
       inventoryOverlay.hidden = true;
       inventoryOverlay.setAttribute("aria-hidden","true");
@@ -670,7 +759,8 @@
       equipmentOverlay.hidden = false;
       equipmentOverlay.setAttribute("aria-hidden","false");
       requestAnimationFrame(() => activeItemContext?.row?.focus());
-    } else if (restoreInventory) requestAnimationFrame(() => activeItemContext?.row?.focus());
+    } else if (restoreInventory && hostWindow === "global" && !completeAction) requestAnimationFrame(() => completedTarget.returnFocus?.focus());
+    else if (restoreInventory) requestAnimationFrame(() => activeItemContext?.row?.focus());
     if (restoreInventory && throwReturnItemActionState) {
       const parent = throwReturnItemActionState;
       throwReturnItemActionState = null;
@@ -683,7 +773,7 @@
         }
       }));
     }
-    if (restoreInventory && completeAction && (USE_ACTION_IDS.has(completedTarget.action.id) || DEVICE_ACTION_IDS.has(completedTarget.action.id))) {
+    if (restoreInventory && completeAction && (USE_ACTION_IDS.has(completedTarget.action.id) || DEVICE_ACTION_IDS.has(completedTarget.action.id) || RANGED_ACTION_IDS.has(completedTarget.action.id))) {
       if (throwReturnItemActionState === null && itemActionState?.action.id === "open-bag") {
         itemActionBackState = {
           ...itemActionState,
@@ -691,7 +781,8 @@
           focusItemIndex:activeItemContext?.index
         };
       }
-      if (DEVICE_ACTION_IDS.has(completedTarget.action.id)) showDeviceResult(completedTarget.action,completedTarget.item,completedTarget.index,{target:completedTarget});
+      if (RANGED_ACTION_IDS.has(completedTarget.action.id)) showRangedResult(completedTarget.action,completedTarget.item,completedTarget.index,{target:completedTarget});
+      else if (DEVICE_ACTION_IDS.has(completedTarget.action.id)) showDeviceResult(completedTarget.action,completedTarget.item,completedTarget.index,{target:completedTarget});
       else showUseResult(completedTarget.action,completedTarget.item,completedTarget.index,{target:completedTarget});
     }
   }
@@ -735,10 +826,6 @@
       return;
     }
     if (action.id === "set-trap") {
-      closeInventoryContextMenu();
-      return;
-    }
-    if (action.id === "drop" && item.quantity === 1) {
       closeInventoryContextMenu();
       return;
     }
@@ -903,6 +990,7 @@
     }
     if (event.target.closest("[data-action-confirm]") && showTransferResult()) return;
     if (event.target.closest("[data-action-confirm]") && showTakeOffResult()) return;
+    if (event.target.closest("[data-action-confirm]") && showAmountActionResult()) return;
     const target = event.target.closest("[data-action-target]");
     if (target && itemActionState?.action.id === "read" && itemActionState.item.effect === "recharge") {
       const secondaryItem = INVENTORY_ITEMS[Number(target.dataset.actionTarget)];
@@ -919,6 +1007,12 @@
       : "Unchecked replaces the complete current inscription.";
   });
   itemActionLayer.addEventListener("keydown", event => {
+    if (AMOUNT_ACTION_IDS.has(itemActionState?.action.id) && event.target.matches("#itemActionAmount") && (event.key.toLowerCase() === "a" || event.key === " ")) {
+      event.preventDefault();
+      event.target.value = amountActionProfile(itemActionState.action,itemActionState.item).maximum;
+      showAmountActionResult();
+      return;
+    }
     if (event.key !== "Enter" || !event.target.matches("#itemActionAmount")) return;
     const confirm = itemActionDialog.querySelector("[data-action-confirm]:not(:disabled)");
     if (!confirm) return;
@@ -997,6 +1091,8 @@
       return true;
     }
     if (!editing && !windowManager.gameplayBlocked() && !event.ctrlKey && !event.altKey && !event.metaKey) {
+      if (event.key === "$") return openDropGoldCommand(event.target);
+      if (event.key === "f" && !event.shiftKey) return openFireCommand(event.target);
       const equipCommand = EQUIP_COMMANDS[event.key];
       if (equipCommand) return openEquipCommand(equipCommand,event.target);
       const command = USE_COMMANDS[event.key];

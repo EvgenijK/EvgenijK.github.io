@@ -1,5 +1,5 @@
 (() => {
-  window.TomeNetPrototype.createCharacterFeature = ({state,$,$$,persist,formatNumber,experienceRange,PY_MAX_EXP,CHARACTER_DATA,CHARACTER_SOURCES,CHARACTER_SOURCE_EQUIPMENT,CHARACTER_RESIST_GROUPS,CHARACTER_SOURCE_ICONS,TERM_COLORS}) => {
+  window.TomeNetPrototype.createCharacterFeature = ({state,$,$$,persist,formatNumber,experienceRange,PY_MAX_EXP,PLAYER_GOLD,CHARACTER_DATA,CHARACTER_SOURCES,CHARACTER_SOURCE_EQUIPMENT,CHARACTER_RESIST_GROUPS,CHARACTER_SOURCE_ICONS,TERM_COLORS}) => {
   const CHARACTER_PAGES = ["profile","skills","resists"];
   const CHARACTER_FIELD_ORDER = {
     profile:["race","class","body","trait","mode","str","int","wis","dex","con","chr"],
@@ -47,7 +47,7 @@
       ["Exp to Adv.",formatNumber.format(Math.max(0,range.next-currentExperience)),state.xpLevel >= 99 ? "l-umber" : "l-green"],
       ["Mode",CHARACTER_DATA.mode,"l-blue"],
       ["Status",CHARACTER_DATA.status,CHARACTER_DATA.status === "Alive" ? "l-green" : CHARACTER_DATA.status.includes("WINNER") ? "violet" : CHARACTER_DATA.status.includes("Ghost") ? "red" : "l-dark"],
-      ["Gold","952,358","l-green"]
+      ["Gold",formatNumber.format(PLAYER_GOLD),"l-green"]
     ];
     const vitalResources = [
       ["HP",`${state.hp} / 1912`,resourceTone(state.hp,1912)],["MP",`${state.mp} / 275`,resourceTone(state.mp,275)],

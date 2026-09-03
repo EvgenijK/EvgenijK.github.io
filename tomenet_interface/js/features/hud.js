@@ -266,7 +266,7 @@
 
     $("#xpFill").style.width = `${state.xpProgress}%`;
     $(".xp-level span").textContent = state.xpLevel;
-    $(".xp-level").setAttribute("aria-label", `Уровень ${state.xpLevel}`);
+    $(".xp-level").setAttribute("aria-label", `Уровень ${state.xpLevel} — открыть навыки`);
     value.hidden = state.xpHideNumber;
     value.classList.toggle("remaining", state.xpRemainingOnly);
     value.textContent = state.xpRemainingOnly

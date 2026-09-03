@@ -6,6 +6,7 @@
     const treeRows = $("#skillsTreeRows");
     const detail = $("#skillsDetail");
     const shortcut = $("#skillsShortcut");
+    const levelShortcut = $(".xp-level");
     const prompt = $("#skillsPrompt");
     const promptInput = $("#skillsPromptInput");
     const byId = new Map(skillsData.map(item => [item.id,item]));
@@ -223,8 +224,8 @@
     }
     function registerGuideArticles(){guideFeature.registerArticles(skillsData.map(item=>({id:`skill:${item.id}`,title:item.name,reference:item.id==="runecraft"?"TomeNET Guide · Runecraft":"TomeNET Guide · Skills",paragraphs:skillGuideParagraphs(item)})))}
     function isOpen(){return windowManager.has("skills");}
-    function show(){overlay.hidden=false;overlay.setAttribute("aria-hidden","false");shortcut.setAttribute("aria-expanded","true");render();requestAnimationFrame(()=>tree.focus());}
-    function hide(){overlay.hidden=true;overlay.setAttribute("aria-hidden","true");shortcut.setAttribute("aria-expanded","false");closePrompt();}
+    function show(){overlay.hidden=false;overlay.setAttribute("aria-hidden","false");shortcut.setAttribute("aria-expanded","true");levelShortcut.setAttribute("aria-expanded","true");render();requestAnimationFrame(()=>tree.focus());}
+    function hide(){overlay.hidden=true;overlay.setAttribute("aria-hidden","true");shortcut.setAttribute("aria-expanded","false");levelShortcut.setAttribute("aria-expanded","false");closePrompt();}
     windowManager.register({kind:"skills",layer:"primary",blocksGameplay:true,allowsChat:true,focusTarget:()=>tree,onOpen:show,onClose:hide});
     function openWindow(opener=shortcut){if(isOpen())return false;return windowManager.open("skills",{},{opener});}
     function closeWindow(){return windowManager.closeKind("skills");}
@@ -265,7 +266,7 @@
       if(event.key==="Tab"){const guide=detail.querySelector(".skills-guide-copy");const targets=[tree,guide,...skillsWindow.querySelectorAll("button:not([disabled]),input:not([disabled])")].filter(el=>el&&el.offsetParent!==null);const i=targets.indexOf(document.activeElement);targets[(i+(event.shiftKey?-1:1)+targets.length)%targets.length].focus();return true;}
       return false;
     }
-    shortcut.addEventListener("click",event=>isOpen()?closeWindow():openWindow(event.currentTarget));$("#skillsWindowClose").addEventListener("click",closeWindow);$("#skillsUnavailableToggle").addEventListener("click",toggleUnavailable);overlay.addEventListener("click",event=>{if(event.target===overlay)closeWindow();});
+    shortcut.addEventListener("click",event=>isOpen()?closeWindow():openWindow(event.currentTarget));levelShortcut.addEventListener("click",event=>isOpen()?closeWindow():openWindow(event.currentTarget));$("#skillsWindowClose").addEventListener("click",closeWindow);$("#skillsUnavailableToggle").addEventListener("click",toggleUnavailable);overlay.addEventListener("click",event=>{if(event.target===overlay)closeWindow();});
     tree.addEventListener("click",event=>{const row=event.target.closest("[data-skill-id]");if(!row)return;const id=row.dataset.skillId;const branch=(children.get(id)||[]).length;const fold=event.target.closest("[data-skill-fold]");const now=performance.now();const doubleClick=!fold&&branch&&lastRowClick.id===id&&now-lastRowClick.time<400;runtime.selected=id;lastRowClick=doubleClick||fold?{id:null,time:0}:{id,time:now};if((fold&&branch)||doubleClick)toggleBranch();else render();tree.focus();});
     detail.addEventListener("click",event=>{if(event.target.closest("#skillsTrain"))train();});$("#skillsPromptApply").addEventListener("click",applyPrompt);$("#skillsPromptCancel").addEventListener("click",closePrompt);
     registerGuideArticles();

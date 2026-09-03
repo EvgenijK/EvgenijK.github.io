@@ -32,6 +32,7 @@
 .item-use-resource b { color:#b49342;font-weight:400; }
 .item-use-target { color:#55d9e8;font:11px/1 var(--terminal); }
 .item-use-message { color:#aaa99f;font:11px/1.2 var(--terminal); }
+.item-use-resource-note { padding:6px 10px;border:1px solid rgba(139,111,48,.38);color:#d8c98e;font:11px/1 var(--terminal); }
 .item-use-result small { margin-top:4px;color:#6f756f;font:10px/1.2 var(--terminal); }
 .item-device-result.is-failure > strong { color:#ff594f;text-shadow:0 0 8px rgba(255,45,35,.28); }
 .item-device-result .item-use-resource dd { white-space:nowrap; }

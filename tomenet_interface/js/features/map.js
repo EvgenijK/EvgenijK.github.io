@@ -1,5 +1,5 @@
 (() => {
-  window.TomeNetPrototype.createMapFeature = ({state,persist,$,clamp,getThrowTarget,updateThrowTarget}) => {
+  window.TomeNetPrototype.createMapFeature = ({state,persist,$,clamp,getThrowTarget,updateThrowTarget,mapOverlays=[]}) => {
   const MAP_DATA = window.TOMENET_BREE_MAP;
   const MAP_COLORS = [
     "#000000","#ffffff","#9d9d9d","#ff8d00","#b70000","#009d44","#0000ff","#8d6600",
@@ -11,10 +11,24 @@
   const mapState = {
     playerX:MAP_DATA?.start.x ?? 121,
     playerY:MAP_DATA?.start.y ?? 30,
-    cameraX:0,cameraY:0,hover:null,atlasReady:false,drag:null,blocked:null
+    cameraX:0,cameraY:0,hover:null,atlasReady:false,drag:null,blocked:null,returnToPlayerOnMove:false
   };
 
-  function mapViewport() { return MAP_DATA.viewport; }
+  function mapViewport() {
+    return {
+      ...MAP_DATA.viewport,
+      width:clamp(Math.round(Number(state.mapViewportWidth) || MAP_DATA.viewport.width),3,MAP_DATA.viewport.width),
+      height:clamp(Math.round(Number(state.mapViewportHeight) || MAP_DATA.viewport.height),3,MAP_DATA.viewport.height)
+    };
+  }
+
+  function resizeMapBitmap() {
+    const viewport = mapViewport();
+    const width = viewport.width*viewport.tileWidth;
+    const height = viewport.height*viewport.tileHeight;
+    if (mapCanvas.width !== width) mapCanvas.width = width;
+    if (mapCanvas.height !== height) mapCanvas.height = height;
+  }
 
   function mapCellAt(x,y) {
     if (!MAP_DATA || x < 0 || y < 0 || x >= MAP_DATA.width || y >= MAP_DATA.height) return null;
@@ -33,6 +47,7 @@
     mapState.cameraX = mapState.playerX - Math.floor(viewport.width / 2);
     mapState.cameraY = mapState.playerY - Math.floor(viewport.height / 2);
     clampMapCamera();
+    mapState.returnToPlayerOnMove = false;
     if (enableFollow) state.mapFollow = true;
     applyMapControls();
     renderMap();
@@ -90,6 +105,12 @@
       const cell = mapCellAt(mapState.cameraX + viewX,mapState.cameraY + viewY);
       if (cell) drawMapTile(cell,viewX,viewY);
     }
+    mapOverlays.filter(point => point.visible && point.glyph).forEach(point => {
+      const viewX = point.x-mapState.cameraX;
+      const viewY = point.y-mapState.cameraY;
+      if (viewX >= 0 && viewY >= 0 && viewX < viewport.width && viewY < viewport.height)
+        drawMapGlyph(point.glyph,MAP_COLORS[point.color] || "#fff",viewX*viewport.tileWidth,viewY*viewport.tileHeight);
+    });
     if (state.mapGrid || getThrowTarget()) {
       mapContext.save();
       mapContext.strokeStyle = "rgba(120,190,180,.13)";
@@ -131,8 +152,16 @@
 
   function fitMapCanvas() {
     const view = $("#gameView");
-    const size = Math.max(1,Math.floor(Math.min(view.clientWidth,view.clientHeight)));
-    $("#mapStage").style.setProperty("--map-canvas-size",`${size}px`);
+    const viewport = mapViewport();
+    const availableWidth = Math.max(1,view.clientWidth);
+    const availableHeight = Math.max(1,view.clientHeight);
+    const mapAspect = viewport.width*viewport.tileWidth/(viewport.height*viewport.tileHeight);
+    const viewAspect = availableWidth/availableHeight;
+    const width = Math.max(1,Math.floor(viewAspect > mapAspect ? availableHeight*mapAspect : availableWidth));
+    const height = Math.max(1,Math.floor(viewAspect > mapAspect ? availableHeight : availableWidth/mapAspect));
+    const stage = $("#mapStage");
+    stage.style.setProperty("--map-canvas-width",`${width}px`);
+    stage.style.setProperty("--map-canvas-height",`${height}px`);
     if (getThrowTarget()) updateThrowTarget(getThrowTarget().col,getThrowTarget().row);
   }
 
@@ -151,7 +180,10 @@
       info.hidden = true;
       return;
     }
-    info.textContent = `${cell.x}, ${cell.y} · ${cell.name} · ${cell.passable ? "walkable" : "blocked"}`;
+    const overlay = mapOverlays.find(point => point.visible && point.x === cell.x && point.y === cell.y);
+    info.textContent = overlay
+      ? `${cell.x}, ${cell.y} · ${overlay.name} · ${overlay.kind}`
+      : `${cell.x}, ${cell.y} · ${cell.name} · ${cell.passable ? "walkable" : "blocked"}`;
     info.hidden = false;
   }
 
@@ -168,7 +200,10 @@
     mapState.playerX = target.x;
     mapState.playerY = target.y;
     mapState.blocked = null;
-    if (state.mapFollow) recenterMapCamera(false);
+    if (mapState.returnToPlayerOnMove) {
+      state.mapFollow = true;
+      recenterMapCamera(false);
+    } else if (state.mapFollow) recenterMapCamera(false);
     else renderMap();
   }
 
@@ -179,14 +214,39 @@
   }
 
   function applyMapControls() {
+    const viewport = mapViewport();
+    state.mapViewportWidth = viewport.width;
+    state.mapViewportHeight = viewport.height;
     $("#mapGridControl").checked = state.mapGrid;
     $("#mapCellInfoControl").checked = state.mapCellInfo;
     $("#mapFollowControl").checked = state.mapFollow;
+    $("#mapViewportWidthControl").value = viewport.width;
+    $("#mapViewportHeightControl").value = viewport.height;
+    $("#mapViewportWidthValue").value = `${viewport.width} tiles`;
+    $("#mapViewportHeightValue").value = `${viewport.height} tiles`;
+    $("#mapViewportValue").value = `Viewport: ${viewport.width} × ${viewport.height} tiles`;
+    if (!mapCanvas.classList.contains("is-looking") && !mapCanvas.classList.contains("is-locating"))
+      mapCanvas.setAttribute("aria-label",`Bree map, ${viewport.width} by ${viewport.height} cell viewport`);
     if (!state.mapCellInfo) $("#mapCellInfo").hidden = true;
     mapControlPositionText();
   }
 
+  function setMapViewport(width,height) {
+    state.mapViewportWidth = clamp(Math.round(Number(width) || MAP_DATA.viewport.width),3,MAP_DATA.viewport.width);
+    state.mapViewportHeight = clamp(Math.round(Number(height) || MAP_DATA.viewport.height),3,MAP_DATA.viewport.height);
+    resizeMapBitmap();
+    mapState.hover = null;
+    if (state.mapFollow) recenterMapCamera(false);
+    else {
+      clampMapCamera();
+      applyMapControls();
+      renderMap();
+    }
+    fitMapCanvas();
+  }
+
   function resetMapPlayer() {
+    resizeMapBitmap();
     mapState.playerX = MAP_DATA.start.x;
     mapState.playerY = MAP_DATA.start.y;
     mapState.hover = null;
@@ -194,6 +254,7 @@
   }
 
   function initMap() {
+    resizeMapBitmap();
     recenterMapCamera(false);
     applyMapControls();
     fitMapCanvas();
@@ -205,7 +266,7 @@
 
   return {
     mapCanvas,mapState,mapViewport,mapCellAt,recenterMapCamera,renderMap,fitMapCanvas,
-    mapPointerCell,showMapCellInfo,moveMapPlayer,mapMovementDelta,applyMapControls,
+    mapPointerCell,showMapCellInfo,moveMapPlayer,mapMovementDelta,applyMapControls,setMapViewport,
     resetMapPlayer,initMap,clampMapCamera
   };
   };

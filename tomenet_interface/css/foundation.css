@@ -172,8 +172,8 @@ h2 { font-size: 13px; font-weight: 600; margin-bottom: 9px; }
 }
 .map-canvas {
   display:block;
-  width:var(--map-canvas-size,100%);
-  height:var(--map-canvas-size,100%);
+  width:var(--map-canvas-width,100%);
+  height:var(--map-canvas-height,100%);
   max-width:100%;
   max-height:100%;
   background:#000;
@@ -361,6 +361,16 @@ h2 { font-size: 13px; font-weight: 600; margin-bottom: 9px; }
   background:#010302;
   color:#71d7d1;
   font:10px/1.25 var(--terminal);
+}
+.map-viewport-value {
+  display:block;
+  margin:4px 0 10px;
+  padding:6px 7px;
+  border:1px solid #40351f;
+  background:#030503;
+  color:#d8bb5c!important;
+  font:10px/1.2 var(--terminal);
+  text-align:center;
 }
 
 @media (max-width: 1400px) {
@@ -669,4 +679,3 @@ h2 { color:#d9b858; font-size:14px; }
 .xp-thresholds { margin:-4px 0 9px; padding:7px 9px; border-left:2px solid #765b27; background:#0b0d0b; color:#777a72; font:11px var(--serif); text-align:right; }
 #drainedAmountGroup { margin-left:8px; padding-left:10px; border-left:1px solid #594520; }
 .controls-page .controls-tip { margin-top:11px; }
-

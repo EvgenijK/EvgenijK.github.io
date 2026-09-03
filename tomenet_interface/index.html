@@ -12,6 +12,10 @@
   <link rel="stylesheet" href="css/messages.css" />
   <link rel="stylesheet" href="css/shortcuts.css" />
   <link rel="stylesheet" href="css/windows.css" />
+  <link rel="stylesheet" href="css/game-menu.css" />
+  <link rel="stylesheet" href="css/mini-map.css" />
+  <link rel="stylesheet" href="css/locate.css" />
+  <link rel="stylesheet" href="css/look.css" />
   <link rel="stylesheet" href="css/equipment-window.css" />
   <link rel="stylesheet" href="css/combined-items-window.css" />
   <link rel="stylesheet" href="css/browse-window.css" />
@@ -43,7 +47,7 @@
               <div class="progress xp">
                 <div class="fill" id="xpFill" style="width:68%"></div>
                 <div class="xp-drained-segment" id="xpDrainedSegment" hidden></div>
-                <strong class="xp-level" aria-label="Уровень 57"><span>57</span></strong>
+                <button class="xp-level" type="button" aria-label="Уровень 57 — открыть навыки" aria-haspopup="dialog" aria-controls="skillsWindowOverlay" aria-expanded="false"><span>57</span></button>
                 <strong class="xp-value" id="xpValue">1,710,159 / 2,500,000</strong>
               </div>
             </div>
@@ -54,7 +58,7 @@
           <span class="icon gold-icon" aria-hidden="true">●</span>
           <div>
             <div class="eyebrow">GOLD</div>
-            <div class="big-number">952,358</div>
+            <div class="big-number" id="goldValue">952,358</div>
           </div>
         </section>
 
@@ -171,7 +175,7 @@
         </section>
       </div>
       <nav class="game-shortcuts" aria-label="Primary game windows">
-        <button class="game-shortcut game-shortcut-menu" type="button" aria-disabled="true" aria-label="Game Menu — Not implemented" data-tooltip="Game Menu · Not implemented">
+        <button class="game-shortcut game-shortcut-menu" id="gameMenuShortcut" type="button" aria-label="Open Game Menu" aria-haspopup="dialog" aria-controls="gameMenuOverlay" aria-expanded="false" data-tooltip="Game Menu · Esc">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V7l7-4 7 4v14M8 21V9l4-2 4 2v12M10 21v-7h4v7"/><path d="M3 21h18M9 10h6"/></svg>
           <kbd>Esc</kbd>
         </button>
@@ -206,6 +210,22 @@
         <div class="map-stage" id="mapStage">
           <canvas class="map-canvas" id="mapCanvas" width="1056" height="1056" tabindex="0" aria-label="Bree map, 66 by 44 cell viewport"></canvas>
           <div class="map-cell-info" id="mapCellInfo" role="status" hidden></div>
+          <div class="locate-mode" id="locateMode" aria-hidden="true" hidden>
+            <div class="locate-mode-head"><strong>LOCATE</strong><span>ONLINE · GAME CONTINUES</span></div>
+            <div class="locate-mode-status" id="locateStatus" role="status" aria-live="polite"></div>
+            <div class="locate-mode-help">Directions move panel · Shift+L / Space / Esc close · : chat</div>
+          </div>
+          <div class="look-mode" id="lookMode" aria-hidden="true" hidden>
+            <div class="look-mode-head"><strong>LOOK</strong><span id="lookModeLabel">INTERESTING POSITIONS</span><button type="button" id="lookClose" aria-label="Close Look mode">×</button></div>
+            <div class="look-cursor" id="lookCursor" aria-hidden="true"></div>
+            <div class="look-description" id="lookDescription" role="status" aria-live="polite"></div>
+            <div class="look-mode-help" id="lookHelp">Directions browse · p manual cursor · q / Esc close · : chat</div>
+          </div>
+          <aside class="look-card" id="lookCard" role="status" aria-live="polite" hidden>
+            <span class="look-card-state" id="lookCardState">LOCAL PREVIEW</span>
+            <strong id="lookCardTitle">Unknown grid</strong>
+            <span id="lookCardText"></span>
+          </aside>
         </div>
         <div class="game-vignette"></div>
         <div class="map-chat-bar" id="mapChatBar">
@@ -630,6 +650,17 @@
     </div>
 
     <div class="inventory-context-menu" id="inventoryContextMenu" role="menu" aria-label="Item actions" hidden></div>
+    <div class="map-context-menu" id="mapContextMenu" role="menu" aria-label="Map actions" hidden>
+      <button type="button" role="menuitem" data-map-action="look"><kbd>l</kbd><span>Look</span></button>
+      <button type="button" role="menuitem" data-map-action="look-mode"><span></span><span>Enter Look mode</span></button>
+      <div class="map-context-separator" role="separator" aria-label="Activity actions"></div>
+      <button type="button" role="menuitem" data-map-action="search-once"><kbd>s</kbd><span>Search once</span></button>
+      <button type="button" role="menuitemcheckbox" aria-checked="false" data-map-action="search-mode"><kbd>S</kbd><span>Search mode</span><small>OFF</small></button>
+      <button type="button" role="menuitemcheckbox" aria-checked="false" data-map-action="rest"><kbd>R</kbd><span>Rest</span><small>OFF</small></button>
+      <div class="map-context-separator" role="separator" aria-hidden="true"></div>
+      <button type="button" role="menuitem" disabled aria-disabled="true"><span>Target</span><small>NOT IMPLEMENTED</small></button>
+      <button type="button" role="menuitem" disabled aria-disabled="true"><span>Walk here</span><small>NOT IMPLEMENTED</small></button>
+    </div>
     <div class="item-action-layer" id="itemActionLayer" aria-hidden="true" hidden>
       <section class="item-action-dialog" id="itemActionDialog" role="dialog" aria-modal="true" aria-labelledby="itemActionTitle">
         <header class="item-action-head">
@@ -638,6 +669,44 @@
         </header>
         <div class="item-action-body" id="itemActionBody"></div>
         <footer class="item-action-footer" id="itemActionFooter"></footer>
+      </section>
+    </div>
+
+    <div class="game-menu-overlay" id="gameMenuOverlay" aria-hidden="true" hidden>
+      <section class="game-menu-window" id="gameMenuWindow" role="dialog" aria-modal="true" aria-labelledby="gameMenuTitle">
+        <header class="game-menu-head">
+          <strong id="gameMenuTitle">GAME MENU</strong>
+          <span class="game-menu-online">ONLINE · GAME CONTINUES</span>
+          <button class="game-menu-close" id="gameMenuClose" type="button" aria-label="Close Game Menu">×</button>
+        </header>
+        <nav class="game-menu-list" id="gameMenuList" role="menu" aria-label="Game Menu sections">
+          <button type="button" role="menuitem" data-game-menu-entry="social" data-game-menu-key="a" aria-disabled="true"><kbd>a</kbd><span>Social</span><small>NOT IMPLEMENTED</small></button>
+          <button type="button" role="menuitem" data-game-menu-entry="knowledge" data-game-menu-key="b" aria-disabled="true"><kbd>b</kbd><span>Knowledge</span><small>NOT IMPLEMENTED</small></button>
+          <button type="button" role="menuitem" data-game-menu-entry="messages" data-game-menu-key="c"><kbd>c</kbd><span>Messages</span><small>OPEN</small></button>
+          <button type="button" role="menuitem" data-game-menu-entry="mini-map" data-game-menu-key="d"><kbd>d</kbd><span>Mini-map</span><small>OPEN</small></button>
+          <button type="button" role="menuitem" data-game-menu-entry="settings" data-game-menu-key="e" aria-disabled="true"><kbd>e</kbd><span>Settings</span><small>NOT IMPLEMENTED</small></button>
+          <button type="button" role="menuitem" data-game-menu-entry="help" data-game-menu-key="f" aria-disabled="true"><kbd>f</kbd><span>Help</span><small>NOT IMPLEMENTED</small></button>
+          <button type="button" role="menuitem" data-game-menu-entry="session" data-game-menu-key="g" aria-disabled="true"><kbd>g</kbd><span>Session</span><small>NOT IMPLEMENTED</small></button>
+        </nav>
+        <div class="game-menu-status" id="gameMenuStatus" role="status" aria-live="polite">Select a section.</div>
+        <footer class="game-menu-help">a–g select/open · 2/8 or arrows move · Enter open · : chat · Esc close</footer>
+      </section>
+    </div>
+
+    <div class="mini-map-overlay" id="miniMapOverlay" aria-hidden="true" hidden>
+      <section class="mini-map-window" id="miniMapWindow" role="dialog" aria-modal="true" aria-labelledby="miniMapTitle">
+        <header class="mini-map-head">
+          <strong id="miniMapTitle">LOCAL MINI-MAP · BREE</strong>
+          <span id="miniMapModeLabel">STATIC 3×3 COMPRESSION</span>
+          <button class="mini-map-close" id="miniMapClose" type="button" aria-label="Close Mini-map">×</button>
+        </header>
+        <div class="mini-map-body">
+          <div class="mini-map-state" id="miniMapState" role="status" hidden></div>
+          <canvas class="mini-map-canvas" id="miniMapCanvas" width="528" height="264" tabindex="0" aria-label="Mini-map"></canvas>
+          <div class="mini-map-legend" id="miniMapLegend" aria-label="Mini-map legend"></div>
+        </div>
+        <div class="mini-map-status" id="miniMapStatus" role="status" aria-live="polite"></div>
+        <footer class="mini-map-help" id="miniMapHelp">5 / Space / r player · M / Esc close · : chat</footer>
       </section>
     </div>
 
@@ -776,14 +845,14 @@
 
       <div class="controls-page window-controls-page" data-controls-page="windows">
         <nav class="window-controls-tabs" role="tablist" aria-label="Настройки отдельных игровых окон">
-          <button type="button" role="tab" aria-selected="false" disabled title="Not implemented">Game Menu</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="game-menu">Game Menu</button>
           <button type="button" role="tab" aria-selected="false" data-window-controls-tab="items">Items</button>
           <button type="button" role="tab" aria-selected="false" data-window-controls-tab="browse">Browse</button>
           <button type="button" role="tab" aria-selected="false" data-window-controls-tab="selector">Item Selector</button>
           <button type="button" role="tab" aria-selected="false" data-window-controls-tab="devices">Devices</button>
           <button class="active" type="button" role="tab" aria-selected="true" data-window-controls-tab="inventory">Inventory</button>
           <button type="button" role="tab" aria-selected="false" data-window-controls-tab="messages">Messages</button>
-          <button type="button" role="tab" aria-selected="false" disabled title="Not implemented">Mini-map</button>
+          <button type="button" role="tab" aria-selected="false" data-window-controls-tab="mini-map">Mini-map</button>
           <button type="button" role="tab" aria-selected="false" data-window-controls-tab="equipment">Equipment</button>
           <button type="button" role="tab" aria-selected="false" data-window-controls-tab="character">Character</button>
           <button type="button" role="tab" aria-selected="false" data-window-controls-tab="skills">Skills</button>
@@ -797,6 +866,29 @@
           <button type="button" role="tab" aria-selected="false" data-window-controls-tab="runecraft">Runecraft</button>
           <button type="button" role="tab" aria-selected="false" data-window-controls-tab="ghost-powers">Ghost powers</button>
         </nav>
+        <section class="window-controls-subpage" data-window-controls-page="game-menu" role="tabpanel">
+          <button id="gameMenuDemoOpen" type="button">Open Game Menu</button>
+          <p class="controls-tip">Messages and Mini-map open working prototype windows. Social, Knowledge, Settings, Help and Session remain visible placeholders; Character keeps its dedicated left-panel button.</p>
+        </section>
+        <section class="window-controls-subpage" data-window-controls-page="mini-map" role="tabpanel">
+          <label>Map context
+            <select id="miniMapContextControl">
+              <option value="local">Bree · local</option>
+              <option value="world">Wilderness · demo</option>
+            </select>
+          </label>
+          <label>Data state
+            <select id="miniMapDataStateControl">
+              <option value="ready">Ready</option>
+              <option value="loading">Loading</option>
+              <option value="empty">Empty</option>
+              <option value="unavailable">Unavailable</option>
+              <option value="error">Error</option>
+            </select>
+          </label>
+          <button id="miniMapDemoOpen" type="button">Open Mini-map</button>
+          <p class="controls-tip">Local mode compresses all of Bree into 66×22 cells. Wilderness mode uses a deterministic 64×64 prototype fixture for scrolling and selector checks.</p>
+        </section>
         <section class="window-controls-subpage" data-window-controls-page="items" role="tabpanel">
           <label class="toggle-control"><span>Combined Equipment + Inventory</span><input id="combinedItemsWindowControl" type="checkbox" /></label>
           <p class="controls-tip">При включении клавиши и кнопки i/e используют одно окно Items. Повтор активной клавиши закрывает окно, другая клавиша переключает секцию.</p>
@@ -998,15 +1090,31 @@
       </div>
 
       <div class="controls-page" data-controls-page="map">
+        <label>Visible columns <output id="mapViewportWidthValue">66 tiles</output>
+          <input id="mapViewportWidthControl" type="range" min="3" max="66" step="1" />
+        </label>
+        <label>Visible rows <output id="mapViewportHeightValue">44 tiles</output>
+          <input id="mapViewportHeightControl" type="range" min="3" max="44" step="1" />
+        </label>
+        <output class="map-viewport-value" id="mapViewportValue">Viewport: 66 × 44 tiles</output>
         <label class="toggle-control"><span>Show grid</span><input id="mapGridControl" type="checkbox" /></label>
         <label class="toggle-control"><span>Show cell info</span><input id="mapCellInfoControl" type="checkbox" /></label>
         <label class="toggle-control"><span>Follow player</span><input id="mapFollowControl" type="checkbox" /></label>
+        <label>Look availability
+          <select id="lookAvailabilityControl">
+            <option value="ready">Ready</option>
+            <option value="blind">Blind</option>
+            <option value="hallucinating">Hallucinating</option>
+          </select>
+        </label>
         <div class="map-control-actions">
           <button type="button" id="mapRecenterControl">Recenter camera</button>
           <button type="button" id="mapResetPlayerControl">Reset player</button>
+          <button type="button" id="locateDemoOpen">Enter Locate mode</button>
+          <button type="button" id="lookDemoOpen">Enter Look mode</button>
         </div>
         <output class="map-control-position" id="mapControlPosition">Player 121, 30 · Camera 88, 8</output>
-        <p class="controls-tip">Viewport фиксирован на максимуме клиента 66×44. Shift + drag панорамирует карту, Home возвращает камеру к игроку.</p>
+        <p class="controls-tip">Viewport настраивается от 3×3 до штатного максимума 66×44. Карта сохраняет пропорции тайлов и максимально вписывается в доступную область. Shift + drag панорамирует карту, Home возвращает камеру к игроку.</p>
       </div>
 
       <div class="controls-page" data-controls-page="experience">
@@ -1079,6 +1187,8 @@
   <script src="js/core/window-manager.js"></script>
   <script src="js/core/input-router.js"></script>
   <script src="js/data/game-data.js"></script>
+  <script src="js/data/mini-map-data.js"></script>
+  <script src="js/data/look-data.js"></script>
   <script src="js/data/skills-data.js"></script>
   <script src="js/data/abilities-data.js"></script>
   <script src="js/data/spellbook-data.js"></script>
@@ -1111,9 +1221,15 @@
   <script src="js/features/hud.js"></script>
   <script src="js/features/item-lists.js"></script>
   <script src="js/features/messages.js"></script>
+  <script src="js/features/mini-map.js"></script>
+  <script src="js/features/locate.js"></script>
+  <script src="js/features/activity-actions.js"></script>
+  <script src="js/features/look.js"></script>
+  <script src="js/features/game-menu.js"></script>
   <script src="js/features/system-overlay.js"></script>
   <script src="js/features/cursors.js"></script>
   <script src="js/features/item-use.js"></script>
+  <script src="js/features/ranged-action.js"></script>
   <script src="js/features/item-device.js"></script>
   <script src="js/features/item-equip.js"></script>
   <script src="js/features/items.js"></script>

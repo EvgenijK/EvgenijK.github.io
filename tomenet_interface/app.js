@@ -1,12 +1,13 @@
 (() => {
   const root = document.documentElement;
   const {
-    PY_MAX_EXP,PLAYER_EXP,INVENTORY_CAPACITY,BAGS_DEFAULT_ROW_LIMIT,INVENTORY_ICONS,INVENTORY_ITEMS,BAGS,FLOOR_ITEMS,
+    PY_MAX_EXP,PLAYER_GOLD,PLAYER_EXP,INVENTORY_CAPACITY,BAGS_DEFAULT_ROW_LIMIT,INVENTORY_ICONS,INVENTORY_ITEMS,BAGS,FLOOR_ITEMS,
     EQUIPMENT_ICONS,CHARACTER_SOURCE_ICONS,TERM_COLORS,EQUIPMENT_SLOT_META,EQUIPMENT_ITEMS,MESSAGE_STREAM,RIGHT_PANEL_WIDGETS,DEFAULT_RIGHT_PANEL_ORDER,
     CHARACTER_DATA,CHARACTER_SOURCES,CHARACTER_SOURCE_EQUIPMENT,CHARACTER_RESIST_GROUPS,ENCUMBRANCE_STATUSES,STATUS_ICONS,STATUS_INDICATORS,
     SHIELD_OPTIONS,CONDITION_DEFINITIONS,CONDITION_BASES,STATUS_SLOTS,DEFAULT_INDICATORS,DEFAULT_CONDITIONS,DEFAULT_ENCUMBRANCE,SKILL_TREE_DATA,ABILITY_DATA,
     SPELL_DEFINITIONS,SPELLBOOK_SOURCES,MIMIC_POWERS,MIMIC_FORMS,MIMIC_IMMUNITIES,COMBAT_STANCES,MELEE_TECHNIQUES,RANGED_TECHNIQUES,DRAGON_BREATH_ELEMENTS,DRAGON_LINEAGES,
-    RUNES,RUNE_MODES,RUNE_TYPES,RUNE_ENHANCED_TYPES,calculateRuneSpell
+    RUNES,RUNE_MODES,RUNE_TYPES,RUNE_ENHANCED_TYPES,calculateRuneSpell,
+    MINI_MAP_LOCAL_PRIORITY,MINI_MAP_TERM_PALETTE,MINI_MAP_WORLD_DEMO,LOOK_DEMO_POINTS
   } = window.TomeNetPrototype.data;
   const storedNumber = (key, fallback) => {
     const value = localStorage.getItem(`tomenet.${key}`);
@@ -133,6 +134,11 @@
     mapGrid: storedBoolean("mapGrid", false),
     mapCellInfo: storedBoolean("mapCellInfo", true),
     mapFollow: storedBoolean("mapFollow", true),
+    mapViewportWidth: storedNumber("mapViewportWidth", 66),
+    mapViewportHeight: storedNumber("mapViewportHeight", 44),
+    miniMapContext: storedString("miniMapContext", "local"),
+    miniMapDataState: storedString("miniMapDataState", "ready"),
+    lookAvailability: storedString("lookAvailability", "ready"),
     cursorTheme: storedString("cursorTheme", "mithril"),
     controlsTab: localStorage.getItem("tomenet.controlsTab") || "general",
     windowControlsTab: storedString("windowControlsTab", "inventory"),
@@ -164,12 +170,17 @@
   let ghostPowersFeature = null;
   let mycorrhizaFeature = null;
   let trappingFeature = null;
+  let gameMenuFeature = null;
+  let miniMapFeature = null;
+  let locateFeature = null;
+  let lookFeature = null;
   const mapFeature = window.TomeNetPrototype.createMapFeature({
     state,persist,$,clamp,
     getThrowTarget:() => itemFeature?.getThrowTarget() || null,
-    updateThrowTarget:(col,row) => itemFeature?.updateThrowTarget(col,row)
+    updateThrowTarget:(col,row) => itemFeature?.updateThrowTarget(col,row),
+    mapOverlays:LOOK_DEMO_POINTS
   });
-  const {mapCanvas,mapState,mapViewport,mapCellAt,recenterMapCamera,renderMap,fitMapCanvas,mapPointerCell,showMapCellInfo,moveMapPlayer,mapMovementDelta,applyMapControls,resetMapPlayer,initMap,clampMapCamera} = mapFeature;
+  const {mapCanvas,mapState,mapViewport,mapCellAt,recenterMapCamera,renderMap,fitMapCanvas,mapPointerCell,showMapCellInfo,moveMapPlayer,mapMovementDelta,applyMapControls,setMapViewport,resetMapPlayer,initMap,clampMapCamera} = mapFeature;
   const rightPanelFeature = window.TomeNetPrototype.createRightPanelFeature({
     root,state,$,$$,clamp,BAGS,DEFAULT_RIGHT_PANEL_ORDER,RIGHT_PANEL_WIDGETS,fitMapCanvas,renderCharacter:() => renderCharacter()
   });
@@ -192,11 +203,21 @@
 
   const messageFeature = window.TomeNetPrototype.createMessageFeature({
     $,$$,state,persist,clamp,MESSAGE_STREAM,escapeHtml,scrollMessagesToBottom,
-    restoreFocus:() => runecraftFeature?.isOpen() ? runecraftFeature.restoreFocus() : dragonBreathFeature?.isOpen() ? dragonBreathFeature.restoreFocus() : rangedTechniquesFeature?.isOpen() ? rangedTechniquesFeature.restoreFocus() : meleeTechniquesFeature?.isOpen() ? meleeTechniquesFeature.restoreFocus() : combatStancesFeature?.isOpen() ? combatStancesFeature.restoreFocus() : mimicPowersFeature?.isOpen() ? mimicPowersFeature.restoreFocus() : spellbookWindowFeature?.isOpen() ? spellbookWindowFeature.restoreFocus() : abilitiesWindowFeature?.isOpen() ? abilitiesWindowFeature.restoreFocus() : skillsWindowFeature?.isOpen() ? skillsWindowFeature.restoreFocus() : combinedItemsWindowFeature?.isOpen() ? combinedItemsWindowFeature.restoreFocus() : equipmentWindowFeature?.isOpen() ? equipmentWindowFeature.restoreFocus() : itemFeature?.restoreFocus(),
+    restoreFocus:() => locateFeature?.isOpen() ? locateFeature.restoreFocus() : lookFeature?.isOpen() ? lookFeature.restoreFocus() : miniMapFeature?.isOpen() ? miniMapFeature.restoreFocus() : gameMenuFeature?.isOpen() ? gameMenuFeature.restoreFocus() : runecraftFeature?.isOpen() ? runecraftFeature.restoreFocus() : dragonBreathFeature?.isOpen() ? dragonBreathFeature.restoreFocus() : rangedTechniquesFeature?.isOpen() ? rangedTechniquesFeature.restoreFocus() : meleeTechniquesFeature?.isOpen() ? meleeTechniquesFeature.restoreFocus() : combatStancesFeature?.isOpen() ? combatStancesFeature.restoreFocus() : mimicPowersFeature?.isOpen() ? mimicPowersFeature.restoreFocus() : spellbookWindowFeature?.isOpen() ? spellbookWindowFeature.restoreFocus() : abilitiesWindowFeature?.isOpen() ? abilitiesWindowFeature.restoreFocus() : skillsWindowFeature?.isOpen() ? skillsWindowFeature.restoreFocus() : combinedItemsWindowFeature?.isOpen() ? combinedItemsWindowFeature.restoreFocus() : equipmentWindowFeature?.isOpen() ? equipmentWindowFeature.restoreFocus() : itemFeature?.restoreFocus(),
     closePrimaryWindow:() => combinedItemsWindowFeature?.isOpen() ? combinedItemsWindowFeature.closeWindow() : itemFeature?.closeInventoryWindow(),windowManager
   });
   const {buildMessageFeeds,appendDemoMessage,appendGameMessage,setPinnedMessageMode,openMapChatEditor,closeMapChatEditor,mapChatEditor,handleKeydown:handleMessageKeydown,applyHistoryControls} = messageFeature;
+  locateFeature = window.TomeNetPrototype.createLocateFeature({
+    state,$,windowManager,mapState,mapViewport,clampMapCamera,renderMap,applyMapControls,recenterMapCamera,appendGameMessage
+  });
+  const activityActionsFeature = window.TomeNetPrototype.createActivityActionsFeature({
+    state,persist,applyCombatStatuses,appendGameMessage,escapeHtml
+  });
+  lookFeature = window.TomeNetPrototype.createLookFeature({
+    state,$,windowManager,mapState,mapViewport,mapCellAt,mapPointerCell,recenterMapCamera,renderMap,applyMapControls,appendGameMessage,activityActions:activityActionsFeature,points:LOOK_DEMO_POINTS
+  });
   itemUseFeature = window.TomeNetPrototype.createItemUseFeature({escapeHtml,appendGameMessage});
+  const rangedActionFeature = window.TomeNetPrototype.createRangedActionFeature({state,escapeHtml,appendGameMessage});
   itemDeviceFeature = window.TomeNetPrototype.createItemDeviceFeature({state,escapeHtml,appendGameMessage});
   itemEquipFeature = window.TomeNetPrototype.createItemEquipFeature({escapeHtml,appendGameMessage,EQUIPMENT_ITEMS,EQUIPMENT_SLOT_META});
   const systemOverlayFeature = window.TomeNetPrototype.createSystemOverlayFeature({$,windowManager});
@@ -207,7 +228,7 @@
   });
   const {buildInventoryUi,buildEquipmentUi,buildBagsUi} = itemListFeature;
   const characterFeature = window.TomeNetPrototype.createCharacterFeature({
-    state,$,$$,persist,formatNumber,experienceRange,PY_MAX_EXP,CHARACTER_DATA,CHARACTER_SOURCES,CHARACTER_SOURCE_EQUIPMENT,
+    state,$,$$,persist,formatNumber,experienceRange,PY_MAX_EXP,PLAYER_GOLD,CHARACTER_DATA,CHARACTER_SOURCES,CHARACTER_SOURCE_EQUIPMENT,
     CHARACTER_RESIST_GROUPS,CHARACTER_SOURCE_ICONS,TERM_COLORS
   });
   const {CHARACTER_PAGES,renderCharacter,setCharacterPage,characterFieldsForPage,getSelectedCharacterField,selectCharacterField} = characterFeature;
@@ -269,6 +290,15 @@
     characterFieldsForPage,getSelectedCharacterField,selectCharacterField
   });
   const {handleKeydown:handleCharacterWindowKeydown,applyControls:applyCharacterWindowControls} = characterWindowFeature;
+  miniMapFeature = window.TomeNetPrototype.createMiniMapFeature({
+    state,$,windowManager,mapState,mapViewport,mapCellAt,
+    localPriority:MINI_MAP_LOCAL_PRIORITY,termPalette:MINI_MAP_TERM_PALETTE,worldData:MINI_MAP_WORLD_DEMO
+  });
+  gameMenuFeature = window.TomeNetPrototype.createGameMenuFeature({
+    $,windowManager,
+    openMessages:opener => messageFeature.openHistory("all",opener),
+    openMiniMap:opener => miniMapFeature.openWindow(opener)
+  });
   function buildEncumbranceUi() {
     const slots = Array.from({length:12}, (_, slot) => {
       const statuses = ENCUMBRANCE_STATUSES.filter(status => status.slot === slot);
@@ -314,7 +344,7 @@
   }
 
   function activateWindowControlsTab(name) {
-    const target = ["items","browse","selector","devices","inventory","messages","equipment","character","skills","abilities","spellbook","mimic-powers","combat-stances","melee-techniques","ranged-techniques","dragon-breath","runecraft","ghost-powers"].includes(name) ? name : "inventory";
+    const target = ["game-menu","mini-map","items","browse","selector","devices","inventory","messages","equipment","character","skills","abilities","spellbook","mimic-powers","combat-stances","melee-techniques","ranged-techniques","dragon-breath","runecraft","ghost-powers"].includes(name) ? name : "inventory";
     state.windowControlsTab = target;
     $$('[data-window-controls-tab]').forEach(button => {
       const active = button.dataset.windowControlsTab === target;
@@ -349,7 +379,7 @@
   itemFeature = window.TomeNetPrototype.createItemsFeature({
     state,$, $$, clamp, escapeHtml, INVENTORY_ITEMS, INVENTORY_ICONS, EQUIPMENT_ITEMS, TERM_COLORS, BAGS, FLOOR_ITEMS,
     mapCanvas, mapViewport, mapPointerCell, mapState, renderMap,
-    openMapChatEditor,windowManager,itemUseFeature,itemDeviceFeature,itemEquipFeature,
+    openMapChatEditor,appendGameMessage,windowManager,itemUseFeature,itemDeviceFeature,itemEquipFeature,rangedActionFeature,PLAYER_GOLD,formatNumber,
     getItemSelectorFeature:() => itemSelectorFeature,
     getCombinedItemsFeature:() => combinedItemsWindowFeature,getBrowseFeature:() => browseWindowFeature
   });
@@ -396,7 +426,7 @@
   $("#characterWidgetTitle").addEventListener("click",event => characterWindowFeature.openWindow(event.currentTarget));
   mapCanvas.addEventListener("pointerdown", event => {
     mapCanvas.focus();
-    if (!event.shiftKey || event.button !== 0 || itemFeature?.getThrowTarget()) return;
+    if (locateFeature?.isOpen() || lookFeature?.isOpen() || !event.shiftKey || event.button !== 0 || itemFeature?.getThrowTarget()) return;
     event.preventDefault();
     mapCanvas.setPointerCapture(event.pointerId);
     mapCanvas.classList.add("is-panning");
@@ -410,6 +440,7 @@
       mapState.cameraY = mapState.drag.cameraY - (event.clientY - mapState.drag.startY) / (rect.height / viewport.height);
       clampMapCamera();
       state.mapFollow = false;
+      mapState.returnToPlayerOnMove = true;
       applyMapControls();
       renderMap();
       return;
@@ -447,6 +478,8 @@
     return true;
   });
   inputRouter.registerHandler("message-history",450,event => handleMessageKeydown(event));
+  inputRouter.registerHandler("locate",448,event => locateFeature.handleKeydown(event));
+  inputRouter.registerHandler("look",447,event => lookFeature.handleKeydown(event));
   inputRouter.registerHandler("guide-window",440,event => guideWindowFeature.handleKeydown(event));
   inputRouter.registerHandler("mimic-powers-window",439,event => handleMimicPowersKeydown(event));
   inputRouter.registerHandler("combat-stances-window",439,event => handleCombatStancesKeydown(event));
@@ -457,6 +490,7 @@
   inputRouter.registerHandler("spellbook-window",438,event => handleSpellbookKeydown(event));
   inputRouter.registerHandler("abilities-window",435,event => handleAbilitiesWindowKeydown(event));
   inputRouter.registerHandler("skills-window",430,event => handleSkillsWindowKeydown(event));
+  inputRouter.registerHandler("mini-map",427,event => miniMapFeature.handleKeydown(event));
   inputRouter.registerHandler("character-window",425,event => handleCharacterWindowKeydown(event));
   inputRouter.registerHandler("item-windows",400,event => {
     const editing = event.target.matches("input, textarea, select");
@@ -467,6 +501,7 @@
     if (handleCombinedItemsKeydown(event,editing)) return true;
     return handleEquipmentWindowKeydown(event,editing);
   });
+  inputRouter.registerHandler("game-menu",350,event => gameMenuFeature.handleKeydown(event));
   inputRouter.registerHandler("open-chat",300,event => {
     const editing = event.target.matches("input, textarea, select");
     if (event.key !== ":" || editing || !windowManager.chatAllowed()) return false;
@@ -489,9 +524,20 @@
   $("#rightWidth").addEventListener("input", e => { state.rightWidth = +e.target.value; applyLayout(); persist(); });
   $("#mapGridControl").addEventListener("change", e => { state.mapGrid = e.target.checked;applyMapControls();renderMap();persist(); });
   $("#mapCellInfoControl").addEventListener("change", e => { state.mapCellInfo = e.target.checked;applyMapControls();showMapCellInfo(mapState.hover ? mapCellAt(mapState.hover.x,mapState.hover.y) : null);persist(); });
-  $("#mapFollowControl").addEventListener("change", e => { state.mapFollow = e.target.checked;if (state.mapFollow) recenterMapCamera(false);applyMapControls();renderMap();persist(); });
+  $("#mapFollowControl").addEventListener("change", e => { state.mapFollow = e.target.checked;mapState.returnToPlayerOnMove = false;if (state.mapFollow) recenterMapCamera(false);applyMapControls();renderMap();persist(); });
+  $("#mapViewportWidthControl").addEventListener("input", e => { setMapViewport(+e.target.value,state.mapViewportHeight);persist(); });
+  $("#mapViewportHeightControl").addEventListener("input", e => { setMapViewport(state.mapViewportWidth,+e.target.value);persist(); });
   $("#mapRecenterControl").addEventListener("click", () => { recenterMapCamera(true);persist(); });
   $("#mapResetPlayerControl").addEventListener("click", () => { resetMapPlayer();persist(); });
+  $("#locateDemoOpen").addEventListener("click", () => {
+    windowManager.closeKind("prototype-controls",{restoreFocus:false,force:true});
+    requestAnimationFrame(() => locateFeature.open($("#openControls")));
+  });
+  $("#lookAvailabilityControl").addEventListener("change",e => { state.lookAvailability=e.target.value;lookFeature.applyControls();persist(); });
+  $("#lookDemoOpen").addEventListener("click", () => {
+    windowManager.closeKind("prototype-controls",{restoreFocus:false,force:true});
+    requestAnimationFrame(() => lookFeature.open($("#openControls")));
+  });
   $("#pingControl").addEventListener("input", e => { state.ping = +e.target.value; applyVitals(); persist(); });
   $("#hpControl").addEventListener("input", e => { state.hp = +e.target.value; applyVitals();dragonBreathFeature.refreshAvailability();persist(); });
   $("#mpControl").addEventListener("input", e => { state.mp = +e.target.value; applyVitals();runecraftFeature.refreshPreview();persist(); });
@@ -519,6 +565,16 @@
   $("#messageHistoryOpacityControl").addEventListener("input", e => { state.messageHistoryOpacity = +e.target.value; applyHistoryControls(); persist(); });
   $("#messageHistoryDataStateControl").addEventListener("change", e => { state.messageHistoryDataState = e.target.value; applyHistoryControls(); persist(); });
   $("#messageHistoryAppendDemoControl").addEventListener("click", appendDemoMessage);
+  $("#gameMenuDemoOpen").addEventListener("click", () => {
+    windowManager.closeKind("prototype-controls",{restoreFocus:false,force:true});
+    requestAnimationFrame(() => gameMenuFeature.openWindow($("#openControls")));
+  });
+  $("#miniMapContextControl").addEventListener("change", e => { state.miniMapContext = e.target.value;miniMapFeature.applyControls();persist(); });
+  $("#miniMapDataStateControl").addEventListener("change", e => { state.miniMapDataState = e.target.value;miniMapFeature.applyControls();persist(); });
+  $("#miniMapDemoOpen").addEventListener("click", () => {
+    windowManager.closeKind("prototype-controls",{restoreFocus:false,force:true});
+    requestAnimationFrame(() => miniMapFeature.openWindow($("#openControls")));
+  });
   $("#inventoryVisibleControl").addEventListener("change", e => { state.inventoryVisible = e.target.checked; applyRightPanel(); persist(); });
   $("#inventoryFontSizeControl").addEventListener("input", e => { state.inventoryFontSize = +e.target.value; applyRightPanel(); persist(); });
   $("#inventoryWindowFontSizeControl").addEventListener("input", e => { state.inventoryWindowFontSize = +e.target.value; applyRightPanel(); applyCombinedItemsControls(); persist(); });
@@ -672,13 +728,13 @@
       rightPanelHeadersHidden:false,rightPanelHeaderHeight:30,
       msgChatVisible:true,msgChatRows:10,msgChatFontSize:12,rightPanelMessageMode:"all",messageHistoryMode:"all",messageHistoryFontSize:14,messageHistoryOpacity:70,messageHistoryDataState:"ready",inventoryVisible:true,inventoryFontSize:12,inventoryWindowFontSize:14,equipmentVisible:false,equipmentFontSize:12,equipmentWindowFontSize:14,combinedItemsWindow:false,browseWindowFontSize:14,browseDataState:"ready",browseInventoryFull:false,itemSelectorDemoAction:"inspect",deviceOutcome:"success",deviceReadiness:"data",deviceWrappingSkill:"sufficient",bagsVisible:true,bagsFontSize:12,bagsRowLimit:BAGS_DEFAULT_ROW_LIMIT,
       characterVisible:true,characterHeight:30,characterFontSize:9,characterWindowFontSize:12,skillsWindowFontSize:12,skillsShowUnavailable:false,abilitiesWindowFontSize:12,abilitiesExpanded:true,spellbookWindowFontSize:12,mimicPowersFontSize:12,combatStancesFontSize:12,meleeTechniquesFontSize:12,rangedTechniquesFontSize:12,rangedDemoLauncher:"bow",rangedDemoShield:false,rangedDemoAmmo:42,rangedDemoAmmoCondition:"normal",rangedDemoAmmoProtected:false,rangedDemoOil:true,rangedDemoMaterials:"inventory",dragonBreathFontSize:12,dragonDemoLineage:"multi",dragonDemoForm:"native",runecraftFontSize:12,ghostDemoState:"living",stanceDemoLoadout:"shield",combatStance:"balanced",combatStanceRank:"STANDARD",dualWieldMode:"dual-hand",mycorrhiza:null,characterPage:"profile",characterSummaryPage:"profile",characterResistsLegendHidden:false,
-      rightPanelOrder:[...DEFAULT_RIGHT_PANEL_ORDER],mapGrid:false,mapCellInfo:true,mapFollow:true,cursorTheme:"mithril",controlsTab:"general",windowControlsTab:"inventory"
+      rightPanelOrder:[...DEFAULT_RIGHT_PANEL_ORDER],mapGrid:false,mapCellInfo:true,mapFollow:true,mapViewportWidth:66,mapViewportHeight:44,miniMapContext:"local",miniMapDataState:"ready",lookAvailability:"ready",cursorTheme:"mithril",controlsTab:"general",windowControlsTab:"inventory"
     });
     $("#itemSelectorDemoActionControl").value = state.itemSelectorDemoAction;
     $("#deviceOutcomeControl").value = state.deviceOutcome;
     $("#deviceReadinessControl").value = state.deviceReadiness;
     $("#deviceWrappingSkillControl").value = state.deviceWrappingSkill;
-    skillsWindowFeature.resetSimulation();ghostPowersFeature.resetSimulation();mycorrhizaFeature.resetSimulation();trappingFeature.resetSimulation();abilitiesWindowFeature.resetSimulation();spellbookWindowFeature.resetSimulation();mimicPowersFeature.resetSimulation();combatStancesFeature.resetSimulation();meleeTechniquesFeature.resetSimulation();rangedTechniquesFeature.resetSimulation();dragonBreathFeature.resetSimulation();runecraftFeature.resetSimulation();combinedItemsWindowFeature.applyModeChange(false);resetMapPlayer();buildMessageFeeds();applyLayout(); applyRightPanel(); applyHistoryControls(); applyCharacterWindowControls(); applySkillsWindowControls(); applyAbilitiesWindowControls(); applySpellbookControls(); applyMimicPowersControls(); applyCombatStancesControls(); applyMeleeTechniquesControls(); applyRangedTechniquesControls(); applyDragonBreathControls(); applyRunecraftControls(); applyGhostPowersControls(); applyEquipmentWindowControls(); applyCombinedItemsControls(); applyBrowseControls(); scrollMessagesToBottom(); applyVitals(); applyEnemyHealth(); applyCombatStatuses(); applyExperience(); applyEncumbrance(); applyCursorTheme(); activateControlsTab(state.controlsTab); activateWindowControlsTab(state.windowControlsTab); persist();
+    skillsWindowFeature.resetSimulation();ghostPowersFeature.resetSimulation();mycorrhizaFeature.resetSimulation();trappingFeature.resetSimulation();abilitiesWindowFeature.resetSimulation();spellbookWindowFeature.resetSimulation();mimicPowersFeature.resetSimulation();combatStancesFeature.resetSimulation();meleeTechniquesFeature.resetSimulation();rangedTechniquesFeature.resetSimulation();dragonBreathFeature.resetSimulation();runecraftFeature.resetSimulation();miniMapFeature.resetSimulation();locateFeature.reset();lookFeature.reset();combinedItemsWindowFeature.applyModeChange(false);resetMapPlayer();buildMessageFeeds();applyLayout(); applyRightPanel(); applyHistoryControls(); applyCharacterWindowControls(); applySkillsWindowControls(); applyAbilitiesWindowControls(); applySpellbookControls(); applyMimicPowersControls(); applyCombatStancesControls(); applyMeleeTechniquesControls(); applyRangedTechniquesControls(); applyDragonBreathControls(); applyRunecraftControls(); applyGhostPowersControls(); applyEquipmentWindowControls(); applyCombinedItemsControls(); applyBrowseControls(); miniMapFeature.applyControls(); lookFeature.applyControls(); scrollMessagesToBottom(); applyVitals(); applyEnemyHealth(); applyCombatStatuses(); applyExperience(); applyEncumbrance(); applyCursorTheme(); activateControlsTab(state.controlsTab); activateWindowControlsTab(state.windowControlsTab); persist();
   });
 
   // Draggable splitters
@@ -711,6 +767,7 @@
   });
 
   buildEncumbranceUi();
+  $("#goldValue").textContent = formatNumber.format(PLAYER_GOLD);
   buildMessageFeeds();
   buildInventoryUi();
   buildEquipmentUi();
@@ -722,6 +779,8 @@
   $("#deviceReadinessControl").value = state.deviceReadiness;
   $("#deviceWrappingSkillControl").value = state.deviceWrappingSkill;
   initMap();
+  miniMapFeature.applyControls();
+  lookFeature.applyControls();
   applyLayout();
   applyRightPanel();
   applyHistoryControls();
