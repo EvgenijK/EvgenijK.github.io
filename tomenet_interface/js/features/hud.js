@@ -1,5 +1,7 @@
 (() => {
-  window.TomeNetPrototype.createHudFeature = ({root,state,$,$$,clamp,formatNumber,PLAYER_EXP,PY_MAX_EXP,STATUS_ICONS,STATUS_INDICATORS,STATUS_SLOTS,SHIELD_OPTIONS,CONDITION_DEFINITIONS,renderCharacter}) => {
+  window.TomeNetPrototype.createHudFeature = ({root,state,$,$$,clamp,formatNumber,PLAYER_EXP,PY_MAX_EXP,STATUS_ICONS,STATUS_INDICATORS,STATUS_SLOTS,SHIELD_OPTIONS,CONDITION_DEFINITIONS,isLeftPanelWidgetVisible,renderCharacter}) => {
+  const STATUS_PULSE_PERIOD_MS = 2500;
+
   function pingColor(ms) {
     const ratio = clamp((ms - 100) / 900, 0, 1);
     const greenBlue = Math.round(255 - 245 * Math.sqrt(ratio));
@@ -86,13 +88,13 @@
     $("#wideMpBar").hidden = !state.wideMp;
     $("#wideSnBar").hidden = !state.wideSanity;
     $("#wideHpBar").hidden = !state.wideHp;
-    $("#wideVitals").hidden = wideVitalsCount === 0;
+    $("#wideVitals").hidden = wideVitalsCount === 0 || !isLeftPanelWidgetVisible("wideVitals");
     $("#wideVitals").style.setProperty("--wide-vital-count", wideVitalsCount);
     $$(".wide-vital-value").forEach(value => { value.hidden = !state.wideVitalValues; });
     $(".vitals").style.setProperty("--standard-vitals-height", `${11 + standardVitalsCount * 36}px`);
     $(".vitals").classList.toggle("wide-vitals-active", state.wideHp || state.wideMp);
     $(".sanity-armor").classList.toggle("wide-vitals-active", state.wideSanity);
-    $(".panel-scroll").classList.toggle("wide-vitals-layout", wideVitalsCount > 0);
+    $(".panel-scroll").classList.toggle("wide-vitals-layout", wideVitalsCount > 0 && isLeftPanelWidgetVisible("wideVitals"));
 
     $("#pingControl").value = state.ping;
     $("#pingControlValue").value = `${state.ping} ms`;
@@ -114,7 +116,7 @@
     state.enemyHealth = clamp(Math.round(state.enemyHealth), 0, 100);
     const card = $("#enemyHealthCard");
     const meter = $("#enemyHealthMeter");
-    card.hidden = false;
+    card.hidden = !isLeftPanelWidgetVisible("enemyHealth");
     card.classList.toggle("is-inactive", !state.enemyPresent);
     $("#enemyHealthFill").style.width = `${state.enemyHealth}%`;
     meter.setAttribute("aria-valuenow", state.enemyHealth);
@@ -131,15 +133,18 @@
     return `<span class="status-icon-tile inactive severity-0" data-status-slot="${slot.id}" data-active="false" style="--status-color:${slot.color}" title="${slot.label}: inactive" role="img" aria-label="${slot.label}: inactive">${STATUS_ICONS[slot.icon]}</span>`;
   }
 
-  function updateStatusTile(slot, presentation, active) {
+  function updateStatusTile(slot, presentation, active, pulseDelayMs) {
     const tile = $(`[data-status-slot="${slot.id}"]`);
     if (!tile) return;
     const current = {...slot,...presentation};
     const severity = active ? clamp(current.severity || 0, 0, 4) : 0;
     const critical = active && (current.critical || severity >= 3);
+    const wasCritical = tile.classList.contains("is-critical");
     const inactiveState = current.label && current.label !== slot.label ? current.label : "inactive";
     const description = active ? current.label : `${slot.label}: ${inactiveState}`;
     tile.className = `status-icon-tile ${active ? "active" : "inactive"} severity-${severity}${critical ? " is-critical" : ""}`;
+    if (critical && !wasCritical) tile.style.animationDelay = `${pulseDelayMs}ms`;
+    else if (!critical) tile.style.removeProperty("animation-delay");
     tile.dataset.active = active ? "true" : "false";
     tile.style.setProperty("--status-color", current.color || slot.color);
     tile.title = description;
@@ -164,6 +169,7 @@
   }
 
   function applyCombatStatuses() {
+    const pulseDelayMs = -(performance.now() % STATUS_PULSE_PERIOD_MS);
     state.speed = clamp(Math.round(state.speed), -50, 100);
     state.bpr = clamp(Math.round(state.bpr), 0, 31);
     if (!["numeric","wraith","wstep","pbtrav"].includes(state.bprMode)) state.bprMode = "numeric";
@@ -200,19 +206,19 @@
     dualBadge.title=`${dualLabel} · Click to switch`;
     dualBadge.setAttribute("aria-label",`${dualLabel}. Switch hand mode`);
 
-    STATUS_INDICATORS.forEach(status => updateStatusTile(status, status, Boolean(state.indicators[status.id])));
+    STATUS_INDICATORS.forEach(status => updateStatusTile(status, status, Boolean(state.indicators[status.id]), pulseDelayMs));
     const shieldSlot = STATUS_SLOTS.find(slot => slot.kind === "shield");
     const shield = SHIELD_OPTIONS.find(option => option.value === state.shield) || SHIELD_OPTIONS[0];
-    updateStatusTile(shieldSlot, shield.value === "none" ? {label:"None",icon:"shield",color:shieldSlot.color} : {...shield,icon:"shield"}, shield.value !== "none");
+    updateStatusTile(shieldSlot, shield.value === "none" ? {label:"None",icon:"shield",color:shieldSlot.color} : {...shield,icon:"shield"}, shield.value !== "none", pulseDelayMs);
     CONDITION_DEFINITIONS.forEach(condition => {
       const slot = STATUS_SLOTS.find(item => item.conditionId === condition.id);
       const selected = condition.options.find(option => option.value === state.conditions[condition.id]) || condition.options[0];
       state.conditions[condition.id] = selected.value;
-      updateStatusTile(slot, selected.icon ? selected : {label:selected.label,icon:slot.icon,color:slot.color}, Boolean(selected.icon));
+      updateStatusTile(slot, selected.icon ? selected : {label:selected.label,icon:slot.icon,color:slot.color}, Boolean(selected.icon), pulseDelayMs);
     });
     const mycorrhizaSlot=STATUS_SLOTS.find(slot=>slot.kind==="mycorrhiza");
     const mycorrhiza=state.mycorrhiza;
-    updateStatusTile(mycorrhizaSlot,mycorrhiza?{label:`Mycorrhiza: ${mycorrhiza.name}`,icon:"mushroom",color:"#69bd66"}:mycorrhizaSlot,Boolean(mycorrhiza));
+    updateStatusTile(mycorrhizaSlot,mycorrhiza?{label:`Mycorrhiza: ${mycorrhiza.name}`,icon:"mushroom",color:"#69bd66"}:mycorrhizaSlot,Boolean(mycorrhiza),pulseDelayMs);
 
     $("#speedControl").value = state.speed;
     $("#speedControlValue").value = state.speed > 0 ? `+${state.speed}` : state.speed;

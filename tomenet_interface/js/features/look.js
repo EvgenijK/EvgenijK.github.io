@@ -314,9 +314,8 @@
       if (contextOpen()) {
         if (event.key === "Escape") { closeContextMenu();return true; }
         if (event.key.toLowerCase() === "l") { activateContextInspect();return true; }
-        if (event.key === "s") { activateContextAction("search-once");return true; }
-        if (event.key === "S") { activateContextAction("search-mode");return true; }
-        if (event.key === "R") { activateContextAction("rest");return true; }
+        const activityAction = activityActions.actionForKey(event);
+        if (activityAction) { activateContextAction(activityAction);return true; }
         if (event.key === "Enter" || event.key === " ") {
           activateContextAction(document.activeElement?.dataset.mapAction);
           return true;

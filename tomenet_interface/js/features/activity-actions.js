@@ -61,6 +61,16 @@
       return true;
     }
 
+    function actionForKey(event) {
+      if (event.ctrlKey || event.altKey || event.metaKey) return null;
+      return ({s:"search-once",S:"search-mode",R:"rest"})[event.key] || null;
+    }
+
+    function handleKeydown(event) {
+      const actionId = actionForKey(event);
+      return actionId ? activate(actionId) : false;
+    }
+
     function syncContextMenu(menu) {
       const activity = currentActivity();
       [["search-mode",activity === "searching"],["rest",activity === "resting"]].forEach(([actionId,active]) => {
@@ -73,6 +83,6 @@
       });
     }
 
-    return {activate,syncContextMenu};
+    return {activate,actionForKey,handleKeydown,syncContextMenu};
   };
 })();

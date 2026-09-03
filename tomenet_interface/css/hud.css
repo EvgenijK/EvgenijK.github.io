@@ -419,7 +419,6 @@
   animation:status-critical-pulse var(--critical-cycle) ease-in-out infinite alternate;
 }
 .status-icon-tile.severity-4 {
-  --critical-cycle:.9s;
   --critical-dim-opacity:.72;
   --critical-brightness:1.3;
   --critical-near-glow:11px;

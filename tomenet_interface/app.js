@@ -3,6 +3,7 @@
   const {
     PY_MAX_EXP,PLAYER_GOLD,PLAYER_EXP,INVENTORY_CAPACITY,BAGS_DEFAULT_ROW_LIMIT,INVENTORY_ICONS,INVENTORY_ITEMS,BAGS,FLOOR_ITEMS,
     EQUIPMENT_ICONS,CHARACTER_SOURCE_ICONS,TERM_COLORS,EQUIPMENT_SLOT_META,EQUIPMENT_ITEMS,MESSAGE_STREAM,RIGHT_PANEL_WIDGETS,DEFAULT_RIGHT_PANEL_ORDER,
+    LEFT_PANEL_WIDGETS,DEFAULT_LEFT_PANEL_ORDER,DEFAULT_LEFT_PANEL_VISIBILITY,
     CHARACTER_DATA,CHARACTER_SOURCES,CHARACTER_SOURCE_EQUIPMENT,CHARACTER_RESIST_GROUPS,ENCUMBRANCE_STATUSES,STATUS_ICONS,STATUS_INDICATORS,
     SHIELD_OPTIONS,CONDITION_DEFINITIONS,CONDITION_BASES,STATUS_SLOTS,DEFAULT_INDICATORS,DEFAULT_CONDITIONS,DEFAULT_ENCUMBRANCE,SKILL_TREE_DATA,ABILITY_DATA,
     SPELL_DEFINITIONS,SPELLBOOK_SOURCES,MIMIC_POWERS,MIMIC_FORMS,MIMIC_IMMUNITIES,COMBAT_STANCES,MELEE_TECHNIQUES,RANGED_TECHNIQUES,DRAGON_BREATH_ELEMENTS,DRAGON_LINEAGES,
@@ -130,6 +131,8 @@
     characterPage: storedString("characterPage", "profile"),
     characterSummaryPage: storedString("characterSummaryPage", "profile"),
     characterResistsLegendHidden: storedBoolean("characterResistsLegendHidden", false),
+    leftPanelVisibility: storedObject("leftPanelVisibility", DEFAULT_LEFT_PANEL_VISIBILITY),
+    leftPanelOrder: storedArray("leftPanelOrder", DEFAULT_LEFT_PANEL_ORDER),
     rightPanelOrder: storedArray("rightPanelOrder", DEFAULT_RIGHT_PANEL_ORDER),
     mapGrid: storedBoolean("mapGrid", false),
     mapCellInfo: storedBoolean("mapCellInfo", true),
@@ -181,12 +184,17 @@
     mapOverlays:LOOK_DEMO_POINTS
   });
   const {mapCanvas,mapState,mapViewport,mapCellAt,recenterMapCamera,renderMap,fitMapCanvas,mapPointerCell,showMapCellInfo,moveMapPlayer,mapMovementDelta,applyMapControls,setMapViewport,resetMapPlayer,initMap,clampMapCamera} = mapFeature;
+  const leftPanelFeature = window.TomeNetPrototype.createLeftPanelFeature({
+    state,$,LEFT_PANEL_WIDGETS,DEFAULT_LEFT_PANEL_ORDER,DEFAULT_LEFT_PANEL_VISIBILITY
+  });
+  const {applyLeftPanel,isWidgetVisible:isLeftPanelWidgetVisible} = leftPanelFeature;
   const rightPanelFeature = window.TomeNetPrototype.createRightPanelFeature({
     root,state,$,$$,clamp,BAGS,DEFAULT_RIGHT_PANEL_ORDER,RIGHT_PANEL_WIDGETS,fitMapCanvas,renderCharacter:() => renderCharacter()
   });
   const {applyLayout,applyRightPanel,scrollMessagesToBottom} = rightPanelFeature;
   const hudFeature = window.TomeNetPrototype.createHudFeature({
-    root,state,$,$$,clamp,formatNumber,PLAYER_EXP,PY_MAX_EXP,STATUS_ICONS,STATUS_INDICATORS,STATUS_SLOTS,SHIELD_OPTIONS,CONDITION_DEFINITIONS,renderCharacter:() => renderCharacter()
+    root,state,$,$$,clamp,formatNumber,PLAYER_EXP,PY_MAX_EXP,STATUS_ICONS,STATUS_INDICATORS,STATUS_SLOTS,SHIELD_OPTIONS,CONDITION_DEFINITIONS,
+    isLeftPanelWidgetVisible,renderCharacter:() => renderCharacter()
   });
   const {applyVitals,applyEnemyHealth,buildStatusUi,applyCombatStatuses,experienceRange,applyExperience} = hudFeature;
   function persist() {
@@ -331,7 +339,7 @@
   $("#closeControls").addEventListener("click", () => windowManager.closeKind("prototype-controls"));
 
   function activateControlsTab(name) {
-    const target = ["general", "rightpanel", "windows", "map", "cursor", "experience", "encumbrance", "statuses"].includes(name) ? name : "general";
+    const target = ["general", "leftpanel", "rightpanel", "windows", "map", "cursor", "experience", "encumbrance", "statuses"].includes(name) ? name : "general";
     state.controlsTab = target;
     $$("[data-controls-tab]").forEach(button => {
       const active = button.dataset.controlsTab === target;
@@ -511,7 +519,9 @@
   inputRouter.registerHandler("gameplay",0,event => {
     const editing = event.target.matches("input, textarea, select");
     if (event.key === "Escape" && editing) { event.target.blur();return true; }
-    if (editing || windowManager.gameplayBlocked() || event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) return false;
+    if (editing || windowManager.gameplayBlocked()) return false;
+    if (activityActionsFeature.handleKeydown(event)) return true;
+    if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) return false;
     if (event.key === "Home") { recenterMapCamera(true);persist();return true; }
     const movement = mapMovementDelta(event);
     if (!movement) return false;
@@ -550,6 +560,24 @@
   $("#wideVitalValuesControl").addEventListener("change", e => { state.wideVitalValues = e.target.checked; applyVitals(); persist(); });
   $("#enemyPresentControl").addEventListener("change", e => { state.enemyPresent = e.target.checked; applyEnemyHealth(); persist(); });
   $("#enemyHealthControl").addEventListener("input", e => { state.enemyHealth = +e.target.value; applyEnemyHealth(); persist(); });
+  $("#leftPanelOrderControls").addEventListener("change", e => {
+    const checkbox = e.target.closest("[data-left-panel-visible]");
+    if (!checkbox) return;
+    state.leftPanelVisibility[checkbox.dataset.leftPanelVisible] = checkbox.checked;
+    applyLeftPanel();
+    applyVitals();
+    persist();
+  });
+  $("#leftPanelOrderControls").addEventListener("click", e => {
+    const button = e.target.closest("[data-left-order-move]");
+    if (!button || button.disabled) return;
+    const index = state.leftPanelOrder.indexOf(button.dataset.leftOrderId);
+    const target = index + (button.dataset.leftOrderMove === "up" ? -1 : 1);
+    if (index < 0 || target < 0 || target >= state.leftPanelOrder.length) return;
+    [state.leftPanelOrder[index],state.leftPanelOrder[target]] = [state.leftPanelOrder[target],state.leftPanelOrder[index]];
+    applyLeftPanel();
+    persist();
+  });
   $("#rightPanelHeadersHiddenControl").addEventListener("change", e => { state.rightPanelHeadersHidden = e.target.checked; applyRightPanel(); persist(); });
   $("#rightPanelHeaderHeightControl").addEventListener("input", e => { state.rightPanelHeaderHeight = +e.target.value; applyRightPanel(); persist(); });
   $("#msgChatVisibleControl").addEventListener("change", e => {
@@ -728,13 +756,13 @@
       rightPanelHeadersHidden:false,rightPanelHeaderHeight:30,
       msgChatVisible:true,msgChatRows:10,msgChatFontSize:12,rightPanelMessageMode:"all",messageHistoryMode:"all",messageHistoryFontSize:14,messageHistoryOpacity:70,messageHistoryDataState:"ready",inventoryVisible:true,inventoryFontSize:12,inventoryWindowFontSize:14,equipmentVisible:false,equipmentFontSize:12,equipmentWindowFontSize:14,combinedItemsWindow:false,browseWindowFontSize:14,browseDataState:"ready",browseInventoryFull:false,itemSelectorDemoAction:"inspect",deviceOutcome:"success",deviceReadiness:"data",deviceWrappingSkill:"sufficient",bagsVisible:true,bagsFontSize:12,bagsRowLimit:BAGS_DEFAULT_ROW_LIMIT,
       characterVisible:true,characterHeight:30,characterFontSize:9,characterWindowFontSize:12,skillsWindowFontSize:12,skillsShowUnavailable:false,abilitiesWindowFontSize:12,abilitiesExpanded:true,spellbookWindowFontSize:12,mimicPowersFontSize:12,combatStancesFontSize:12,meleeTechniquesFontSize:12,rangedTechniquesFontSize:12,rangedDemoLauncher:"bow",rangedDemoShield:false,rangedDemoAmmo:42,rangedDemoAmmoCondition:"normal",rangedDemoAmmoProtected:false,rangedDemoOil:true,rangedDemoMaterials:"inventory",dragonBreathFontSize:12,dragonDemoLineage:"multi",dragonDemoForm:"native",runecraftFontSize:12,ghostDemoState:"living",stanceDemoLoadout:"shield",combatStance:"balanced",combatStanceRank:"STANDARD",dualWieldMode:"dual-hand",mycorrhiza:null,characterPage:"profile",characterSummaryPage:"profile",characterResistsLegendHidden:false,
-      rightPanelOrder:[...DEFAULT_RIGHT_PANEL_ORDER],mapGrid:false,mapCellInfo:true,mapFollow:true,mapViewportWidth:66,mapViewportHeight:44,miniMapContext:"local",miniMapDataState:"ready",lookAvailability:"ready",cursorTheme:"mithril",controlsTab:"general",windowControlsTab:"inventory"
+      leftPanelVisibility:{...DEFAULT_LEFT_PANEL_VISIBILITY},leftPanelOrder:[...DEFAULT_LEFT_PANEL_ORDER],rightPanelOrder:[...DEFAULT_RIGHT_PANEL_ORDER],mapGrid:false,mapCellInfo:true,mapFollow:true,mapViewportWidth:66,mapViewportHeight:44,miniMapContext:"local",miniMapDataState:"ready",lookAvailability:"ready",cursorTheme:"mithril",controlsTab:"general",windowControlsTab:"inventory"
     });
     $("#itemSelectorDemoActionControl").value = state.itemSelectorDemoAction;
     $("#deviceOutcomeControl").value = state.deviceOutcome;
     $("#deviceReadinessControl").value = state.deviceReadiness;
     $("#deviceWrappingSkillControl").value = state.deviceWrappingSkill;
-    skillsWindowFeature.resetSimulation();ghostPowersFeature.resetSimulation();mycorrhizaFeature.resetSimulation();trappingFeature.resetSimulation();abilitiesWindowFeature.resetSimulation();spellbookWindowFeature.resetSimulation();mimicPowersFeature.resetSimulation();combatStancesFeature.resetSimulation();meleeTechniquesFeature.resetSimulation();rangedTechniquesFeature.resetSimulation();dragonBreathFeature.resetSimulation();runecraftFeature.resetSimulation();miniMapFeature.resetSimulation();locateFeature.reset();lookFeature.reset();combinedItemsWindowFeature.applyModeChange(false);resetMapPlayer();buildMessageFeeds();applyLayout(); applyRightPanel(); applyHistoryControls(); applyCharacterWindowControls(); applySkillsWindowControls(); applyAbilitiesWindowControls(); applySpellbookControls(); applyMimicPowersControls(); applyCombatStancesControls(); applyMeleeTechniquesControls(); applyRangedTechniquesControls(); applyDragonBreathControls(); applyRunecraftControls(); applyGhostPowersControls(); applyEquipmentWindowControls(); applyCombinedItemsControls(); applyBrowseControls(); miniMapFeature.applyControls(); lookFeature.applyControls(); scrollMessagesToBottom(); applyVitals(); applyEnemyHealth(); applyCombatStatuses(); applyExperience(); applyEncumbrance(); applyCursorTheme(); activateControlsTab(state.controlsTab); activateWindowControlsTab(state.windowControlsTab); persist();
+    skillsWindowFeature.resetSimulation();ghostPowersFeature.resetSimulation();mycorrhizaFeature.resetSimulation();trappingFeature.resetSimulation();abilitiesWindowFeature.resetSimulation();spellbookWindowFeature.resetSimulation();mimicPowersFeature.resetSimulation();combatStancesFeature.resetSimulation();meleeTechniquesFeature.resetSimulation();rangedTechniquesFeature.resetSimulation();dragonBreathFeature.resetSimulation();runecraftFeature.resetSimulation();miniMapFeature.resetSimulation();locateFeature.reset();lookFeature.reset();combinedItemsWindowFeature.applyModeChange(false);resetMapPlayer();buildMessageFeeds();applyLayout(); applyLeftPanel(); applyRightPanel(); applyHistoryControls(); applyCharacterWindowControls(); applySkillsWindowControls(); applyAbilitiesWindowControls(); applySpellbookControls(); applyMimicPowersControls(); applyCombatStancesControls(); applyMeleeTechniquesControls(); applyRangedTechniquesControls(); applyDragonBreathControls(); applyRunecraftControls(); applyGhostPowersControls(); applyEquipmentWindowControls(); applyCombinedItemsControls(); applyBrowseControls(); miniMapFeature.applyControls(); lookFeature.applyControls(); scrollMessagesToBottom(); applyVitals(); applyEnemyHealth(); applyCombatStatuses(); applyExperience(); applyEncumbrance(); applyCursorTheme(); activateControlsTab(state.controlsTab); activateWindowControlsTab(state.windowControlsTab); persist();
   });
 
   // Draggable splitters
@@ -782,6 +810,7 @@
   miniMapFeature.applyControls();
   lookFeature.applyControls();
   applyLayout();
+  applyLeftPanel();
   applyRightPanel();
   applyHistoryControls();
   applyCharacterWindowControls();

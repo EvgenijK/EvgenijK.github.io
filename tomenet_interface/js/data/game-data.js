@@ -207,6 +207,22 @@
     {id:"character",elementId:"characterWidget",label:"Character"}
   ];
   const DEFAULT_RIGHT_PANEL_ORDER = RIGHT_PANEL_WIDGETS.map(widget => widget.id);
+  const LEFT_PANEL_WIDGETS = [
+    {id:"level",elementId:"levelCard",label:"Level & XP"},
+    {id:"gold",elementId:"currencyCard",label:"Gold"},
+    {id:"encumbrance",elementId:"encumbranceCard",label:"Encumbrance"},
+    {id:"ping",elementId:"pingCard",label:"Ping"},
+    {id:"attributes",elementId:"attributesCard",label:"Attributes"},
+    {id:"sanityArmor",elementId:"sanityArmorCard",label:"Sanity & Armor"},
+    {id:"vitals",elementId:"vitalsCard",label:"Vitals"},
+    {id:"enemyHealth",elementId:"enemyHealthCard",label:"Enemy Health"},
+    {id:"speed",elementId:"speedCard",label:"Speed"},
+    {id:"bpr",elementId:"bprCard",label:"Blows / Round"},
+    {id:"statusEffects",elementId:"statusEffectsCard",label:"Status Effects"},
+    {id:"wideVitals",elementId:"wideVitals",label:"Wide resource bars"}
+  ];
+  const DEFAULT_LEFT_PANEL_ORDER = LEFT_PANEL_WIDGETS.map(widget => widget.id);
+  const DEFAULT_LEFT_PANEL_VISIBILITY = Object.fromEntries(LEFT_PANEL_WIDGETS.map(widget => [widget.id,true]));
   const CHARACTER_DATA = {
     name:"MaiaMage", sex:"Female", race:"Maia", className:"Mimic",
     body:"Vampire", trait:"Enlightened", mode:"Everlasting (infinite lives)", status:"Alive", totalWinner:false,
@@ -350,6 +366,7 @@
   window.TomeNetPrototype.data = {
     PY_MAX_EXP,PLAYER_GOLD,PLAYER_EXP,INVENTORY_CAPACITY,BAGS_DEFAULT_ROW_LIMIT,INVENTORY_ICONS,INVENTORY_ITEMS,BAGS,FLOOR_ITEMS,
     EQUIPMENT_ICONS,CHARACTER_SOURCE_ICONS,TERM_COLORS,EQUIPMENT_SLOT_META,EQUIPMENT_ITEMS,MESSAGE_STREAM,RIGHT_PANEL_WIDGETS,DEFAULT_RIGHT_PANEL_ORDER,
+    LEFT_PANEL_WIDGETS,DEFAULT_LEFT_PANEL_ORDER,DEFAULT_LEFT_PANEL_VISIBILITY,
     CHARACTER_DATA,CHARACTER_SOURCES,CHARACTER_SOURCE_EQUIPMENT,CHARACTER_RESIST_GROUPS,ENCUMBRANCE_STATUSES,STATUS_ICONS,STATUS_INDICATORS,
     SHIELD_OPTIONS,CONDITION_DEFINITIONS,CONDITION_BASES,STATUS_SLOTS,DEFAULT_INDICATORS,DEFAULT_CONDITIONS,DEFAULT_ENCUMBRANCE
   };
